@@ -109,6 +109,11 @@ const btnSaveChamp = document.getElementById("btn-save-champ");
 const detailChampsList = document.getElementById("detail-championships-list");
 const emptyChampsMsg = document.getElementById("empty-championships-msg");
 
+// Elementos de Ubicación (Logros)
+const champCountry = document.getElementById("champ-country");
+const champState = document.getElementById("champ-state");
+const champCity = document.getElementById("champ-city");
+
 // ==========================================================================
 // REFERENCIAS AL DOM - AUTENTICACIÓN Y SESIÓN
 // ==========================================================================
@@ -143,7 +148,130 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFilterSelects();
   attachEventListeners();
   adjuntarEventosLogin();
+  fetchCountries(); // Cargar países de la API mundial
 });
+
+// Cache para los países y estados
+window.countriesData = [];
+
+async function fetchCountries() {
+  try {
+    const response = await fetch("https://countriesnow.space/api/v0.1/countries/states");
+    const data = await response.json();
+    if (!data.error) {
+      window.countriesData = data.data;
+      if (champCountry) {
+        champCountry.innerHTML = '<option value="">Seleccione país...</option>';
+        data.data.forEach(countryObj => {
+          const opt = document.createElement("option");
+          opt.value = countryObj.name;
+          opt.textContent = countryObj.name;
+          champCountry.appendChild(opt);
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error cargando países:", error);
+    if (champCountry) champCountry.innerHTML = '<option value="Error">Error cargando países</option>';
+  }
+}
+
+async function handleCountryChange() {
+  const selectedCountryName = champCountry.value;
+  champState.innerHTML = '<option value="">Seleccione estado...</option>';
+  champCity.innerHTML = '<option value="">Seleccione estado primero...</option>';
+  champState.disabled = true;
+  champCity.disabled = true;
+
+  if (!selectedCountryName) return;
+
+  const countryObj = window.countriesData.find(c => c.name === selectedCountryName);
+  if (countryObj && countryObj.states && countryObj.states.length > 0) {
+    champState.disabled = false;
+    countryObj.states.forEach(stateObj => {
+      const opt = document.createElement("option");
+      opt.value = stateObj.name;
+      opt.textContent = stateObj.name;
+      champState.appendChild(opt);
+    });
+  } else {
+    // Si el país no tiene estados en la API
+    champState.innerHTML = '<option value="N/A">N/A</option>';
+    champState.disabled = false;
+    handleStateChange(); // Disparar la carga de ciudades
+  }
+}
+
+async function handleStateChange() {
+  const selectedCountryName = champCountry.value;
+  const selectedStateName = champState.value;
+  
+  champCity.innerHTML = '<option value="">Cargando ciudades...</option>';
+  champCity.disabled = true;
+
+  if (!selectedStateName) return;
+
+  if (selectedStateName === "N/A") {
+    // Intentar buscar ciudades directamente por país si no hay estado
+    fetchCitiesForCountry(selectedCountryName);
+    return;
+  }
+
+  try {
+    const response = await fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ country: selectedCountryName, state: selectedStateName })
+    });
+    const data = await response.json();
+    champCity.innerHTML = '<option value="">Seleccione ciudad/municipio...</option>';
+    
+    if (!data.error && data.data && data.data.length > 0) {
+      champCity.disabled = false;
+      data.data.forEach(city => {
+        const opt = document.createElement("option");
+        opt.value = city;
+        opt.textContent = city;
+        champCity.appendChild(opt);
+      });
+    } else {
+      champCity.innerHTML = '<option value="N/A">N/A (No hay ciudades en este estado)</option>';
+      champCity.disabled = false;
+    }
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+    champCity.innerHTML = '<option value="N/A">N/A</option>';
+    champCity.disabled = false;
+  }
+}
+
+async function fetchCitiesForCountry(countryName) {
+  try {
+    const response = await fetch("https://countriesnow.space/api/v0.1/countries/cities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ country: countryName })
+    });
+    const data = await response.json();
+    champCity.innerHTML = '<option value="">Seleccione ciudad...</option>';
+    
+    if (!data.error && data.data && data.data.length > 0) {
+      champCity.disabled = false;
+      data.data.forEach(city => {
+        const opt = document.createElement("option");
+        opt.value = city;
+        opt.textContent = city;
+        champCity.appendChild(opt);
+      });
+    } else {
+      champCity.innerHTML = '<option value="N/A">N/A</option>';
+      champCity.disabled = false;
+    }
+  } catch (error) {
+    champCity.innerHTML = '<option value="N/A">N/A</option>';
+    champCity.disabled = false;
+  }
+}
 
 // Verifica si ya hay una sesión guardada y muestra/oculta la pantalla de login
 function verificarSesionActiva() {
@@ -179,6 +307,15 @@ function actualizarInterfazPorRol(usuario) {
     navegacionPrincipal.style.display = "flex";
   } else {
     navegacionPrincipal.style.display = "none";
+  }
+
+  const btnMiPerfil = document.getElementById("btn-mi-perfil");
+  if (btnMiPerfil) {
+    if (usuario.rol === "atleta") {
+      btnMiPerfil.style.display = "inline-flex";
+    } else {
+      btnMiPerfil.style.display = "none";
+    }
   }
 
   const btnRegistrar = document.getElementById("btn-open-register");
@@ -265,16 +402,19 @@ function adjuntarEventosLogin() {
       if (rolSeleccionado === "admin") {
         etiquetaUsuario.textContent = "Usuario";
         inputLoginUsuario.placeholder = "admin";
+        inputLoginUsuario.type = "text";
         switchRegistro.style.display = "none";
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
       } else if (rolSeleccionado === "profesor") {
-        etiquetaUsuario.textContent = "Número de Cédula";
-        inputLoginUsuario.placeholder = "Ej. 111820495";
+        etiquetaUsuario.textContent = "Correo Electrónico";
+        inputLoginUsuario.placeholder = "ejemplo@valle.co";
+        inputLoginUsuario.type = "email";
         switchRegistro.style.display = "block";
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
       } else if (rolSeleccionado === "atleta") {
-        etiquetaUsuario.textContent = "Número de Cédula";
-        inputLoginUsuario.placeholder = "Ej. 111820495";
+        etiquetaUsuario.textContent = "Correo Electrónico";
+        inputLoginUsuario.placeholder = "ejemplo@valle.co";
+        inputLoginUsuario.type = "email";
         switchRegistro.style.display = "none";
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "block";
       }
@@ -476,8 +616,8 @@ async function manejarRegistroProfesor() {
     return;
   }
 
-  // El inicio de sesión de profesores ahora es con la cédula (cedula)
-  const sesion = await iniciarSesion(cedula, clave, "profesor");
+  // El inicio de sesión de profesores ahora es con el correo
+  const sesion = await iniciarSesion(correo, clave, "profesor");
   if (sesion) {
     contenedorLogin.style.display = "none";
     actualizarInterfazPorRol(sesion);
@@ -623,6 +763,9 @@ function attachEventListeners() {
   btnTriggerDocUpload.addEventListener("click", () => docFileInput.click());
   docFileInput.addEventListener("change", handleDocUpload);
 
+  if (champCountry) champCountry.addEventListener("change", handleCountryChange);
+  if (champState) champState.addEventListener("change", handleStateChange);
+
   btnOpenChampForm.addEventListener("click", () => toggleChampForm(true));
   btnEmptyChampTrigger.addEventListener("click", () => toggleChampForm(true));
   btnCloseChampForm.addEventListener("click", () => toggleChampForm(false));
@@ -636,6 +779,17 @@ function attachEventListeners() {
       openRegisterModal(athlete);
     }
   });
+
+  // Eventos para el botón de "Mi Perfil" (Atletas)
+  const btnMiPerfil = document.getElementById("btn-mi-perfil");
+  if (btnMiPerfil) {
+    btnMiPerfil.addEventListener("click", () => {
+      const usuarioActual = obtenerUsuarioActual();
+      if (usuarioActual && usuarioActual.rol === "atleta") {
+        openDetailModal(usuarioActual.id);
+      }
+    });
+  }
 
   // Eventos para el modal de Inicio de Sesión
   if (btnPortalLogin) {
@@ -977,7 +1131,7 @@ async function handleSaveAthlete() {
     if (!obtenerUsuarioActual()) {
       // Nuevo atleta registrado desde login — iniciar sesión automáticamente
       contenedorLogin.style.display = "none";
-      const sesion = await iniciarSesion(athleteData.cedula, athleteData.password, "atleta");
+      const sesion = await iniciarSesion(athleteData.correo, athleteData.password, "atleta");
       if (sesion) {
         actualizarInterfazPorRol(sesion);
       }
@@ -1006,7 +1160,8 @@ function validateAthleteForm() {
     { el: fieldGender, err: "error-athlete-gender" },
     { el: fieldDiscap, err: "error-athlete-discapacidad" },
     { el: fieldTipoClase, err: "error-athlete-tipo-clase" },
-    { el: fieldClass, err: "error-athlete-clase" }
+    { el: fieldClass, err: "error-athlete-clase" },
+    { el: fieldEmail, err: "error-athlete-email" }
   ];
 
   // La contraseña es obligatoria solo en el registro nuevo
@@ -1189,9 +1344,16 @@ function toggleChampForm(show) {
 async function handleSaveChampionship() {
   if (!validateChampForm()) return;
 
+  const country = document.getElementById("champ-country").value;
+  const state = document.getElementById("champ-state").value;
+  const city = document.getElementById("champ-city").value;
+  
+  // Construir el string de lugar
+  const place = `${city !== 'N/A' ? city + ', ' : ''}${state !== 'N/A' ? state + ', ' : ''}${country}`;
+
   const champData = {
     campeonato: document.getElementById("champ-name").value.trim(),
-    lugar: document.getElementById("champ-place").value.trim(),
+    lugar: place,
     prueba: document.getElementById("champ-event").value.trim(),
     marca: document.getElementById("champ-result").value.trim(),
     fecha: document.getElementById("champ-date").value,
@@ -1204,7 +1366,20 @@ async function handleSaveChampionship() {
     await loadData();
     const athlete = currentAthletes.find(a => a.id === selectedAthleteId);
     if (athlete) renderChampionshipsTimeline(athlete);
-    toggleChampForm(false);
+    
+    // No cerrar el formulario, solo resetearlo para añadir más rápido
+    formChampionship.reset();
+    clearChampFormErrors();
+    // Reiniciar los selects de ciudad
+    if (champState) {
+      champState.innerHTML = '<option value="">Seleccione estado...</option>';
+      champState.disabled = true;
+    }
+    if (champCity) {
+      champCity.innerHTML = '<option value="">Seleccione estado primero...</option>';
+      champCity.disabled = true;
+    }
+    alert("¡Logro añadido con éxito! Puedes registrar otro a continuación.");
   }
 }
 
@@ -1214,7 +1389,9 @@ function validateChampForm() {
 
   const fields = [
     { id: "champ-name", errorId: "error-champ-name" },
-    { id: "champ-place", errorId: "error-champ-place" },
+    { id: "champ-country", errorId: "error-champ-country" },
+    { id: "champ-state", errorId: "error-champ-state" },
+    { id: "champ-city", errorId: "error-champ-city" },
     { id: "champ-event", errorId: "error-champ-event" },
     { id: "champ-result", errorId: "error-champ-result" },
     { id: "champ-date", errorId: "error-champ-date" },

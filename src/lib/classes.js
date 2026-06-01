@@ -20,10 +20,19 @@ export const DISCAPACIDADES = {
     id: "auditiva",
     nombre: "Discapacidad Auditiva",
     descripcion: "Atletas con pérdida auditiva de diversa intensidad (Categoría 15)."
-  }
+  },
+  guia: {
+    id: "guia",
+    nombre: "Guía",
+    descripcion: "Atletas videntes que acompañan y asisten a competidores con discapacidad visual (clases 11 y 12) en pruebas de pista y campo."
+  },
 };
 
 export const CLASES_DEPORTIVAS = [
+
+  // ==================== GUÍAS ====================
+  { clase: "TGUIA", tipo: "pista", discapacidad: "guia", descripcion: "Guía de pista. Acompaña al atleta T11 o T12 mediante teter. " },
+  { clase: "FGUIA", tipo: "campo", discapacidad: "guia", descripcion: "Guía de campo. Asiste al atleta F11 o F12 dando referencias auditivas para orientar lanzamientos o saltos." },
   // ==================== DISCAPACIDAD VISUAL ====================
   // Pista (T)
   { clase: "T11", tipo: "pista", discapacidad: "visual", descripcion: "Ceguera casi total o total. Compiten con antifaz obligatorio y guía en pista." },
@@ -33,11 +42,11 @@ export const CLASES_DEPORTIVAS = [
   { clase: "F11", tipo: "campo", discapacidad: "visual", descripcion: "Ceguera casi total o total. Pruebas de campo (saltos y lanzamientos) con llamador." },
   { clase: "F12", tipo: "campo", discapacidad: "visual", descripcion: "Discapacidad visual grave. Competiciones de campo con asistencia visual y llamador." },
   { clase: "F13", tipo: "campo", discapacidad: "visual", descripcion: "Discapacidad visual leve. Compiten en campo de forma autónoma con apoyo visual estándar." },
-  
+
   // ==================== DISCAPACIDAD INTELECTUAL ====================
   { clase: "T20", tipo: "pista", discapacidad: "intelectual", descripcion: "Limitaciones en el funcionamiento intelectual y en habilidades adaptativas. Pruebas de pista." },
   { clase: "F20", tipo: "campo", discapacidad: "intelectual", descripcion: "Limitaciones en el funcionamiento intelectual y en habilidades adaptativas. Pruebas de campo (Lanzamiento de bala, salto largo)." },
-  
+
   // ==================== PARÁLISIS CEREBRAL / COORDINACIÓN ====================
   // Pista (T)
   { clase: "T32", tipo: "pista", discapacidad: "fisica", descripcion: "Parálisis cerebral grave. Compite en silla de ruedas, empuje con pies o fuerza muy reducida en brazos." },
@@ -55,13 +64,13 @@ export const CLASES_DEPORTIVAS = [
   { clase: "F36", tipo: "campo", discapacidad: "fisica", descripcion: "Movimientos incontrolados de pie. Afecta el equilibrio en giros de lanzamiento." },
   { clase: "F37", tipo: "campo", discapacidad: "fisica", descripcion: "Hemiplejia. Lanzamientos y saltos de pie con soporte asimétrico del cuerpo." },
   { clase: "F38", tipo: "campo", discapacidad: "fisica", descripcion: "Afectación mínima de coordinación de pie. Lanzamiento y saltos con balance casi normal." },
-  
+
   // ==================== ESTATURA BAJA ====================
   { clase: "T40", tipo: "pista", discapacidad: "fisica", descripcion: "Estatura baja con proporciones corporales específicas (velocidad y saltos de pie)." },
   { clase: "T41", tipo: "pista", discapacidad: "fisica", descripcion: "Estatura baja de grado menor (velocidad y saltos de pie)." },
   { clase: "F40", tipo: "campo", discapacidad: "fisica", descripcion: "Estatura baja. Lanzamiento de disco, jabalina y bala sentado o de pie." },
   { clase: "F41", tipo: "campo", discapacidad: "fisica", descripcion: "Estatura baja de grado menor. Lanzamientos de disco, jabalina y bala de pie." },
-  
+
   // ==================== DEFICIENCIAS EXTREMIDADES (MIEMBRO SUPERIOR / SIN PRÓTESIS) ====================
   // Pista (T)
   { clase: "T42", tipo: "pista", discapacidad: "fisica", descripcion: "Deficiencia en una o ambas extremidades inferiores sin prótesis (o afectación severa de rodilla)." },
@@ -77,7 +86,7 @@ export const CLASES_DEPORTIVAS = [
   { clase: "F45", tipo: "campo", discapacidad: "fisica", descripcion: "Deficiencia doble en miembros superiores. Lanzamientos de pie." },
   { clase: "F46", tipo: "campo", discapacidad: "fisica", descripcion: "Deficiencia en un miembro superior. Lanzamientos y saltos de pie." },
   { clase: "F47", tipo: "campo", discapacidad: "fisica", descripcion: "Deficiencia unilateral leve en miembro superior. Lanzamientos y saltos." },
-  
+
   // ==================== SILLA DE RUEDAS / LANZAMIENTOS SENTADOS ====================
   // Pista (T)
   { clase: "T51", tipo: "pista", discapacidad: "fisica", descripcion: "Lesión cervical grave. Fuerza muy limitada en hombros y codos. Carreras en silla." },
@@ -92,7 +101,7 @@ export const CLASES_DEPORTIVAS = [
   { clase: "F55", tipo: "campo", discapacidad: "fisica", descripcion: "Lanzamiento sentado. Fuerza normal en brazos y tronco parcial. Sin función de piernas." },
   { clase: "F56", tipo: "campo", discapacidad: "fisica", descripcion: "Lanzamiento sentado. Fuerza de tronco normal, extensión parcial de caderas." },
   { clase: "F57", tipo: "campo", discapacidad: "fisica", descripcion: "Lanzamiento sentado. Afectación asimétrica o leve en piernas. Excelente control de tronco." },
-  
+
   // ==================== PRÓTESIS (MIEMBRO INFERIOR DE PIE) ====================
   // Pista (T)
   { clase: "T61", tipo: "pista", discapacidad: "fisica", descripcion: "Amputación bilateral sobre la rodilla. Compiten en pista con prótesis dobles." },
@@ -104,7 +113,7 @@ export const CLASES_DEPORTIVAS = [
   { clase: "F62", tipo: "campo", discapacidad: "fisica", descripcion: "Amputación bilateral bajo la rodilla. Lanzamientos y saltos de pie con prótesis." },
   { clase: "F63", tipo: "campo", discapacidad: "fisica", descripcion: "Amputación unilateral sobre la rodilla. Saltos y lanzamientos con prótesis." },
   { clase: "F64", tipo: "campo", discapacidad: "fisica", descripcion: "Amputación unilateral bajo la rodilla. Saltos y lanzamientos con prótesis." },
-  
+
   // ==================== DISCAPACIDAD AUDITIVA ====================
   { clase: "T15", tipo: "pista", discapacidad: "auditiva", descripcion: "Atletas con pérdida auditiva superior a 55 dB. Pruebas de pista." },
   { clase: "F15", tipo: "campo", discapacidad: "auditiva", descripcion: "Atletas con pérdida auditiva superior a 55 dB. Pruebas de campo." }
