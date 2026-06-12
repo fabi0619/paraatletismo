@@ -31,8 +31,8 @@ export const DISCAPACIDADES = {
 export const CLASES_DEPORTIVAS = [
 
   // ==================== GUÍAS ====================
-  { clase: "TGUIA", tipo: "pista", discapacidad: "guia", descripcion: "Guía de pista. Acompaña al atleta T11 o T12 mediante teter. " },
-  { clase: "FGUIA", tipo: "campo", discapacidad: "guia", descripcion: "Guía de campo. Asiste al atleta F11 o F12 dando referencias auditivas para orientar lanzamientos o saltos." },
+  { clase: "GUIA PISTA", tipo: "pista", discapacidad: "guia", descripcion: "Guía de pista. Acompaña al atleta T11 o T12 mediante teter. " },
+  { clase: "AUXILIAR", tipo: "campo", discapacidad: "guia", descripcion: "Guía de campo. Asiste al atleta F11 o F12 dando referencias auditivas para orientar lanzamientos o saltos." },
   // ==================== DISCAPACIDAD VISUAL ====================
   // Pista (T)
   { clase: "T11", tipo: "pista", discapacidad: "visual", descripcion: "Ceguera casi total o total. Compiten con antifaz obligatorio y guía en pista." },

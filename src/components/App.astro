@@ -231,13 +231,6 @@ import "../styles/index.css";
           <p class="stat-label">Campeonatos</p>
         </div>
       </div>
-      <div class="stat-card" id="stat-medals">
-        <span class="material-icons-round text-gold">military_tech</span>
-        <div>
-          <h3 class="stat-value">0</h3>
-          <p class="stat-label">Medallas de Oro</p>
-        </div>
-      </div>
     </div>
 
     <!-- Acciones del Header -->
@@ -565,24 +558,21 @@ import "../styles/index.css";
             <div class="live-preview-container">
               <label class="photo-upload-label">Vista Previa de Tarjeta</label>
               <div class="athlete-card preview-card">
-                <div class="preview-card-inner">
-                  <div class="card-image-wrapper">
+                <div class="preview-card-inner" style="display: flex; gap: 16px; padding: 20px;">
+                  <div class="card-image-wrapper-small">
                     <div
-                      class="card-img"
+                      class="card-img-small"
                       id="preview-card-img"
                       style="background-image: none;"
                     >
                       <span
                         class="material-icons-round"
-                        style="font-size: 40px; color: #cbd5e1;">person</span
+                        style="font-size: 35px; color: #cbd5e1;">person</span
                       >
                     </div>
                   </div>
-                  <div class="card-details">
+                  <div class="card-details" style="padding: 0;">
                     <h3 id="preview-card-name">Nombre del Atleta</h3>
-                    <p class="card-id-text">
-                      CC: <span id="preview-card-id">-</span>
-                    </p>
                     <div class="card-badges">
                       <span
                         class="badge badge-discapacidad"
@@ -708,6 +698,19 @@ import "../styles/index.css";
                 <span class="error-msg" id="error-athlete-password"
                   >La contraseña es requerida para el ingreso.</span
                 >
+              </div>
+              <div class="form-group">
+                <label for="athlete-club">Club <span class="required">*</span></label>
+                <div class="custom-select-wrapper">
+                  <select id="athlete-club" required>
+                    <option value="">Seleccione un club...</option>
+                    <!-- aqui van los club -->
+                    <option value="Club Valle">Club Valle</option>
+                    <option value="Club Paraíso">Club Paraíso</option>
+                  </select>
+                  <span class="material-icons-round select-arrow">expand_more</span>
+                </div>
+                <span class="error-msg" id="error-athlete-club">El club es requerido.</span>
               </div>
             </div>
 

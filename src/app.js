@@ -35,9 +35,7 @@ const athletesGrid = document.getElementById("athletes-grid");
 const emptyState = document.getElementById("empty-state");
 
 // Elementos del DOM - Estadísticas
-const statAthletesVal = document.getElementById("stat-athletes").querySelector(".stat-value");
 const statChampsVal = document.getElementById("stat-championships").querySelector(".stat-value");
-const statMedalsVal = document.getElementById("stat-medals").querySelector(".stat-value");
 
 // Elementos del DOM - Modal Registro
 const modalRegister = document.getElementById("modal-register");
@@ -58,6 +56,7 @@ const fieldGender = document.getElementById("athlete-gender");
 const fieldPhone = document.getElementById("athlete-phone");
 const fieldEmail = document.getElementById("athlete-email");
 const fieldPassword = document.getElementById("athlete-password");
+const fieldClub = document.getElementById("athlete-club");
 const fieldDiscap = document.getElementById("athlete-discapacidad");
 const fieldTipoClase = document.getElementById("athlete-tipo-clase");
 const fieldClass = document.getElementById("athlete-clase");
@@ -363,20 +362,16 @@ function populateClasesSelect(selectElement, discapacityId, classType, defaultTe
 function renderStats() {
   const totalAthletes = currentAthletes.length;
   let totalChamps = 0;
-  let goldMedals = 0;
 
   currentAthletes.forEach(athlete => {
     totalChamps += (athlete.campeonatos || []).length;
-    (athlete.campeonatos || []).forEach(c => {
-      if (c.posicion && c.posicion.toLowerCase() === "oro") {
-        goldMedals++;
-      }
-    });
   });
 
-  statAthletesVal.textContent = totalAthletes;
-  statChampsVal.textContent = totalChamps;
-  statMedalsVal.textContent = goldMedals;
+  const statAthletesVal = document.getElementById("stat-athletes").querySelector(".stat-value");
+  const statChampsVal = document.getElementById("stat-championships").querySelector(".stat-value");
+
+  if(statAthletesVal) statAthletesVal.textContent = totalAthletes;
+  if(statChampsVal) statChampsVal.textContent = totalChamps;
 }
 
 // ==========================================================================
@@ -871,20 +866,41 @@ function renderFilteredAthletes(athletes) {
   athletes.forEach(athlete => {
     const discapLabel = DISCAPACIDADES[athlete.discapacidad]?.nombre || athlete.discapacidad;
 
+    let oro = 0, plata = 0, bronce = 0;
+    (athlete.campeonatos || []).forEach(c => {
+      if (c.posicion) {
+        let pos = c.posicion.toLowerCase();
+        if (pos === "oro") oro++;
+        else if (pos === "plata") plata++;
+        else if (pos === "bronce") bronce++;
+      }
+    });
+
     const card = document.createElement("div");
     card.className = "athlete-card animate-fade-in";
     card.innerHTML = `
-      <div class="card-image-wrapper">
-        <div class="card-img" style="background-image: url('${athlete.foto || ''}')">
-          ${!athlete.foto ? '<span class="material-icons-round" style="font-size: 55px; color: #cbd5e1;">person</span>' : ''}
+      <div style="display: flex; gap: 16px; padding: 20px;">
+        <div class="card-image-wrapper-small">
+          <div class="card-img-small">
+            ${athlete.foto ? `<img src="${athlete.foto}" alt="Foto de ${athlete.nombre}" style="width: 100%; height: 100%; object-fit: cover;" />` : '<span class="material-icons-round" style="font-size: 35px; color: #cbd5e1;">person</span>'}
+          </div>
         </div>
-      </div>
-      <div class="card-details">
-        <h3>${athlete.nombre}</h3>
-        <p class="card-id-text">CC: ${athlete.cedula}</p>
-        <div class="card-badges">
+        <div class="card-details" style="padding: 0;">
+          <h3 style="margin: 0; padding-bottom: 4px;">${athlete.nombre}</h3>
+          <div class="card-badges">
           <span class="badge badge-discapacidad">${discapLabel}</span>
           <span class="badge badge-clase">${athlete.claseDeportiva} (${athlete.tipoClase === "pista" ? "Pista" : "Campo"})</span>
+        </div>
+        <div class="card-medals" style="display: flex; gap: 10px; margin-top: 10px; font-size: 0.85rem; font-weight: 600;">
+          <div style="display: flex; align-items: center; gap: 4px; color: #b8860b;">
+            <span class="material-icons-round" style="font-size: 16px;">military_tech</span> ${oro}
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px; color: #94a3b8;">
+            <span class="material-icons-round" style="font-size: 16px;">military_tech</span> ${plata}
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px; color: #cd7f32;">
+            <span class="material-icons-round" style="font-size: 16px;">military_tech</span> ${bronce}
+          </div>
         </div>
       </div>
     `;
@@ -957,8 +973,8 @@ function handleFormClassChange() {
 // REACTIVIDAD: VISTA PREVIA EN VIVO (LIVE PREVIEW)
 // ==========================================================================
 function updateLivePreview() {
-  previewCardName.textContent = fieldName.value.trim() || "Nombre del Atleta";
-  previewCardId.textContent = fieldDoc.value.trim() || "-";
+  if (previewCardName) previewCardName.textContent = fieldName.value.trim() || "Nombre del Atleta";
+  if (previewCardId) previewCardId.textContent = fieldDoc.value.trim() || "-";
 
   const selectedDiscap = fieldDiscap.value;
   if (selectedDiscap) {
@@ -978,8 +994,8 @@ function updateLivePreview() {
   }
 
   if (currentProfilePhotoBase64) {
-    previewCardImg.style.backgroundImage = `url('${currentProfilePhotoBase64}')`;
-    previewCardImg.innerHTML = "";
+    previewCardImg.style.backgroundImage = "none";
+    previewCardImg.innerHTML = `<img src="${currentProfilePhotoBase64}" alt="Vista Previa" style="width: 100%; height: 100%; object-fit: cover;" />`;
   } else {
     previewCardImg.style.backgroundImage = "none";
     previewCardImg.innerHTML = `<span class="material-icons-round" style="font-size: 40px; color: #cbd5e1;">person</span>`;
@@ -1001,8 +1017,8 @@ function handlePhotoUpload(e) {
   const reader = new FileReader();
   reader.onload = function (event) {
     currentProfilePhotoBase64 = event.target.result;
-    photoPreview.style.backgroundImage = `url('${currentProfilePhotoBase64}')`;
-    photoPreview.innerHTML = "";
+    photoPreview.style.backgroundImage = "none";
+    photoPreview.innerHTML = `<img src="${currentProfilePhotoBase64}" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md);" />`;
     btnRemovePhoto.style.display = "inline-flex";
     updateLivePreview();
   };
@@ -1039,6 +1055,7 @@ function openRegisterModal(athlete = null) {
     fieldGender.value = athlete.genero;
     fieldPhone.value = athlete.telefono || "";
     fieldEmail.value = athlete.correo || "";
+    if(fieldClub) fieldClub.value = athlete.club || "";
     // No prellenar la contraseña; sólo la cambia si el usuario la escribe
     fieldPassword.value = "";
 
@@ -1072,8 +1089,8 @@ function openRegisterModal(athlete = null) {
 
     if (athlete.foto) {
       currentProfilePhotoBase64 = athlete.foto;
-      photoPreview.style.backgroundImage = `url('${athlete.foto}')`;
-      photoPreview.innerHTML = "";
+      photoPreview.style.backgroundImage = "none";
+      photoPreview.innerHTML = `<img src="${athlete.foto}" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md);" />`;
       btnRemovePhoto.style.display = "inline-flex";
     }
   } else {
@@ -1081,6 +1098,7 @@ function openRegisterModal(athlete = null) {
     modalRegisterTitle.textContent = "Registrar Nuevo Atleta";
     fieldId.value = "";
     fieldPassword.value = "";
+    if(fieldClub) fieldClub.value = "";
     fieldTipoClase.innerHTML = `<option value="">Primero elija discapacidad...</option>`;
     fieldTipoClase.disabled = true;
     fieldClass.innerHTML = `<option value="">Primero elija modalidad...</option>`;
@@ -1115,6 +1133,7 @@ async function handleSaveAthlete() {
     discapacidad: fieldDiscap.value,
     tipoClase: fieldTipoClase.value,
     claseDeportiva: fieldClass.value,
+    club: fieldClub ? fieldClub.value : "",
     foto: currentProfilePhotoBase64
   };
 
@@ -1160,9 +1179,11 @@ function validateAthleteForm() {
     { el: fieldGender, err: "error-athlete-gender" },
     { el: fieldDiscap, err: "error-athlete-discapacidad" },
     { el: fieldTipoClase, err: "error-athlete-tipo-clase" },
-    { el: fieldClass, err: "error-athlete-clase" },
-    { el: fieldEmail, err: "error-athlete-email" }
+    { el: fieldClass, err: "error-athlete-clase" }
   ];
+  if(fieldClub) {
+    requiredFields.push({ el: fieldClub, err: "error-athlete-club" });
+  }
 
   // La contraseña es obligatoria solo en el registro nuevo
   if (!isEditing) {
