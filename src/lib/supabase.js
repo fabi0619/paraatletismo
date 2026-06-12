@@ -14,7 +14,7 @@ export async function getAthletes() {
     .from('para_athletes')
     .select(`
       id, nombre, cedula, fecha_nacimiento, genero, telefono, correo, 
-      discapacidad, tipo_clase, clase_deportiva, foto, password,
+      discapacidad, tipo_clase, clase_deportiva, foto,
       documentos:para_documentos(*),
       campeonatos:para_campeonatos(*)
     `);
@@ -37,7 +37,6 @@ export async function getAthletes() {
     tipoClase: a.tipo_clase,
     claseDeportiva: a.clase_deportiva,
     foto: a.foto,
-    password: a.password,
     documentos: a.documentos || [],
     campeonatos: a.campeonatos || []
   }));
@@ -59,15 +58,25 @@ export async function saveAthlete(athlete) {
     foto: athlete.foto
   };
 
-  if (athlete.password) {
-    payload.password = athlete.password;
-  }
-
   if (isUpdate) {
     const { data, error } = await supabase.from('para_athletes').update(payload).eq('id', athlete.id).select().single();
     if (error) throw error;
     return data;
   } else {
+    // Usar Supabase Auth para ocultar y encriptar la contraseña usando el correo real
+    const authEmail = athlete.correo.trim();
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: authEmail,
+      password: athlete.password,
+    });
+
+    if (authError) throw authError;
+
+    // Usar el ID seguro generado por Supabase Auth
+    if (authData.user) {
+      payload.id = authData.user.id;
+    }
+
     const { data, error } = await supabase.from('para_athletes').insert([payload]).select().single();
     if (error) throw error;
     return data;
@@ -142,40 +151,34 @@ export async function iniciarSesion(usuario, clave, rol) {
     return null;
   }
 
-  if (rol === "profesor") {
-    // Iniciar sesión de profesores con cédula
+  if (rol === "profesor" || rol === "atleta") {
+    // Usar el correo directamente proporcionado en el login
+    const authEmail = usuario.trim();
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: authEmail,
+      password: clave,
+    });
+
+    if (authError || !authData.user) {
+      return null; // Contraseña incorrecta o usuario no existe
+    }
+
+    // Buscar el perfil público en la tabla correspondiente usando el ID seguro
+    const tabla = rol === "profesor" ? "para_profesores" : "para_athletes";
     const { data, error } = await supabase
-      .from('para_profesores')
+      .from(tabla)
       .select('*')
-      .eq('cedula', usuario.trim())
-      .eq('password', clave)
+      .eq('id', authData.user.id)
       .maybeSingle();
 
     if (data) {
       const sesion = { 
         id: data.id, 
         nombre: data.nombre, 
-        rol: "profesor", 
-        especialidad: data.especialidad,
-        cedula: data.cedula 
+        rol: rol, 
+        cedula: data.cedula,
+        ...(rol === "profesor" ? { especialidad: data.especialidad } : {})
       };
-      localStorage.setItem("sesion_usuario", JSON.stringify(sesion));
-      return sesion;
-    }
-    return null;
-  }
-
-  if (rol === "atleta") {
-    // Iniciar sesión de atletas con cédula y su contraseña personalizada
-    const { data, error } = await supabase
-      .from('para_athletes')
-      .select('*')
-      .eq('cedula', usuario.trim())
-      .eq('password', clave)
-      .maybeSingle();
-
-    if (data) {
-      const sesion = { id: data.id, nombre: data.nombre, rol: "atleta", cedula: data.cedula };
       localStorage.setItem("sesion_usuario", JSON.stringify(sesion));
       return sesion;
     }
@@ -216,18 +219,29 @@ export async function registrarProfesor(nuevoProfesor) {
     return { error: "La cédula ya se encuentra registrada." };
   }
 
+  // Registrar en Auth de forma segura usando el correo real
+  const authEmail = nuevoProfesor.correo.trim();
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email: authEmail,
+    password: nuevoProfesor.password,
+  });
+
+  if (authError) {
+    return { error: "Error en registro de seguridad: " + authError.message };
+  }
+
   const payload = {
+    id: authData.user.id,
     nombre: nuevoProfesor.nombre,
     especialidad: nuevoProfesor.especialidad,
     correo: nuevoProfesor.correo,
-    password: nuevoProfesor.password,
     cedula: nuevoProfesor.cedula,
     fecha_nacimiento: nuevoProfesor.fechaNacimiento
   };
 
   const { data, error } = await supabase.from('para_profesores').insert([payload]).select().single();
   if (error) {
-    return { error: "Error al registrar profesor: " + error.message };
+    return { error: "Error al guardar perfil de profesor: " + error.message };
   }
   return data;
 }
