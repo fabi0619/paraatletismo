@@ -14,7 +14,7 @@ export async function getAthletes() {
     .from('para_athletes')
     .select(`
       id, nombre, cedula, fecha_nacimiento, genero, telefono, correo, 
-      discapacidad, tipo_clase, clase_deportiva, foto, club,
+      discapacidad, tipo_clase, clase_deportiva, foto,
       documentos:para_documentos(*),
       campeonatos:para_campeonatos(*)
     `);
@@ -36,7 +36,6 @@ export async function getAthletes() {
     discapacidad: a.discapacidad,
     tipoClase: a.tipo_clase,
     claseDeportiva: a.clase_deportiva,
-    club: a.club,
     foto: a.foto,
     documentos: a.documentos || [],
     campeonatos: a.campeonatos || []
@@ -56,14 +55,12 @@ export async function saveAthlete(athlete) {
     discapacidad: athlete.discapacidad,
     tipo_clase: athlete.tipoClase,
     clase_deportiva: athlete.claseDeportiva,
-    club: athlete.club,
     foto: athlete.foto
   };
 
   if (isUpdate) {
-    const { data, error } = await supabase.from('para_athletes').update(payload).eq('id', athlete.id).select().maybeSingle();
+    const { data, error } = await supabase.from('para_athletes').update(payload).eq('id', athlete.id).select().single();
     if (error) throw error;
-    if (!data) throw new Error(`No se encontró el atleta con id ${athlete.id} para actualizar. Verifique permisos o que el registro exista.`);
     return data;
   } else {
     // Usar Supabase Auth para ocultar y encriptar la contraseña usando el correo real
