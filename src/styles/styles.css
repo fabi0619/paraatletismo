@@ -494,37 +494,20 @@ body {
 
 /* Athlete Card */
 .athlete-card {
-  background-color: var(--bg-card);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
+  background-color: transparent;
+  border-radius: 0;
+  border: none;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: var(--transition-bounce);
   position: relative;
-}
-
-.athlete-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background-color: var(--primary-red);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
 }
 
 .athlete-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
-  border-color: hsla(0, 68%, 50%, 0.2);
-}
-
-.athlete-card:hover::after {
-  transform: scaleX(1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
 }
 
 .preview-card {
@@ -532,90 +515,110 @@ body {
 }
 .preview-card:hover {
   transform: none !important;
-  box-shadow: var(--shadow-sm) !important;
-  border-color: var(--border-color) !important;
-}
-.preview-card::after {
-  display: none !important;
+  box-shadow: none !important;
 }
 
-.card-image-wrapper {
+.card-image-container {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background-color: #f1f5f9;
+  border: 4px solid var(--primary-red);
+  border-bottom: none;
+  box-sizing: border-box;
   position: relative;
-  padding-top: 75%; /* 4:3 Aspect Ratio */
-  background-color: var(--bg-light);
   overflow: hidden;
-  border-bottom: 1px solid var(--border-color);
 }
 
-.card-image-wrapper-small {
-  width: 90px;
-  height: 110px;
-  border-radius: var(--radius-sm);
-  background-color: var(--bg-light);
-  overflow: hidden;
+.card-img-full {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-img-placeholder .material-icons-round {
+  font-size: 60px;
+  color: #cbd5e1;
+}
+
+.card-content-wrapper {
+  padding: 16px 20px;
+  background-color: #ffffff;
   border: 1px solid var(--border-color);
-  position: relative;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
+  border-top: none;
+  border-bottom: 3px solid var(--primary-red);
 }
 
-.card-img-small {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-light);
-}
-
-.card-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  transition: var(--transition-smooth);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.athlete-card:hover .card-img {
-  transform: scale(1.05);
-}
-
-.card-details {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.card-details h3 {
-  font-size: 1.12rem;
-  font-weight: 700;
+.card-athlete-name {
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--bg-dark);
+  margin: 0 0 4px 0;
+  font-family: var(--font-family);
+  letter-spacing: -0.3px;
+  text-transform: capitalize;
   line-height: 1.3;
-  /* Truncar textos largos */
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
-.card-id-text {
+.card-athlete-subtitle {
   font-size: 0.8rem;
+  color: var(--primary-red);
+  margin: 0 0 2px 0;
   font-weight: 600;
-  color: var(--text-muted);
+  line-height: 1.4;
 }
 
-.card-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.card-athlete-category {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.card-medals-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 18px;
   margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f4f8;
+}
+
+.medal-item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+
+.medal-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: block;
+}
+
+.medal-circle.gold   { background-color: #FFD700; box-shadow: 0 0 0 2px rgba(255,215,0,0.3); }
+.medal-circle.silver { background-color: #C0C0C0; box-shadow: 0 0 0 2px rgba(192,192,192,0.3); }
+.medal-circle.bronze { background-color: #CD7F32; box-shadow: 0 0 0 2px rgba(205,127,50,0.3); }
+
+.medal-count {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
 }
 
 /* Empty State / No Results */

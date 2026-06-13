@@ -1198,7 +1198,7 @@ import "../styles/index.css";
   import "../app.js";
 </script>
 
-<style>
-  /* Inclusión de estilos antiguos no migrados a Tailwind de forma nativa */
+<style is:global>
+  /* Inclusión de estilos no migrados a Tailwind de forma nativa — is:global para que apliquen a elementos generados por JS */
   @import "../styles/styles.css";
 </style>
