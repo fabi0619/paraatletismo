@@ -879,27 +879,27 @@ function renderFilteredAthletes(athletes) {
     const card = document.createElement("div");
     card.className = "athlete-card animate-fade-in";
     card.innerHTML = `
-      <div style="display: flex; gap: 16px; padding: 20px;">
-        <div class="card-image-wrapper-small">
-          <div class="card-img-small">
-            ${athlete.foto ? `<img src="${athlete.foto}" alt="Foto de ${athlete.nombre}" style="width: 100%; height: 100%; object-fit: cover;" />` : '<span class="material-icons-round" style="font-size: 35px; color: #cbd5e1;">person</span>'}
+      <div class="card-image-container">
+        ${athlete.foto
+          ? `<img src="${athlete.foto}" class="card-img-full" alt="Foto de ${athlete.nombre}" />`
+          : '<div class="card-img-placeholder"><span class="material-icons-round">person</span></div>'}
+      </div>
+      <div class="card-content-wrapper">
+        <h3 class="card-athlete-name">${athlete.nombre}</h3>
+        <p class="card-athlete-subtitle">${athlete.club || 'Atleta Valle Oro Puro'}</p>
+        <p class="card-athlete-category">${discapLabel} &mdash; ${athlete.claseDeportiva} (${athlete.tipoClase === "pista" ? "pista" : "campo"})</p>
+        <div class="card-medals-row">
+          <div class="medal-item">
+            <span class="medal-circle gold"></span>
+            <span class="medal-count">${oro.toString().padStart(2, '0')}</span>
           </div>
-        </div>
-        <div class="card-details" style="padding: 0;">
-          <h3 style="margin: 0; padding-bottom: 4px;">${athlete.nombre}</h3>
-          <div class="card-badges">
-          <span class="badge badge-discapacidad">${discapLabel}</span>
-          <span class="badge badge-clase">${athlete.claseDeportiva} (${athlete.tipoClase === "pista" ? "Pista" : "Campo"})</span>
-        </div>
-        <div class="card-medals" style="display: flex; gap: 10px; margin-top: 10px; font-size: 0.85rem; font-weight: 600;">
-          <div style="display: flex; align-items: center; gap: 4px; color: #b8860b;">
-            <span class="material-icons-round" style="font-size: 16px;">military_tech</span> ${oro}
+          <div class="medal-item">
+            <span class="medal-circle silver"></span>
+            <span class="medal-count">${plata.toString().padStart(2, '0')}</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 4px; color: #94a3b8;">
-            <span class="material-icons-round" style="font-size: 16px;">military_tech</span> ${plata}
-          </div>
-          <div style="display: flex; align-items: center; gap: 4px; color: #cd7f32;">
-            <span class="material-icons-round" style="font-size: 16px;">military_tech</span> ${bronce}
+          <div class="medal-item">
+            <span class="medal-circle bronze"></span>
+            <span class="medal-count">${bronce.toString().padStart(2, '0')}</span>
           </div>
         </div>
       </div>
@@ -995,10 +995,12 @@ function updateLivePreview() {
 
   if (currentProfilePhotoBase64) {
     previewCardImg.style.backgroundImage = "none";
-    previewCardImg.innerHTML = `<img src="${currentProfilePhotoBase64}" alt="Vista Previa" style="width: 100%; height: 100%; object-fit: cover;" />`;
+    previewCardImg.className = "card-image-container";
+    previewCardImg.innerHTML = `<img src="${currentProfilePhotoBase64}" class="card-img-full" alt="Vista Previa" />`;
   } else {
     previewCardImg.style.backgroundImage = "none";
-    previewCardImg.innerHTML = `<span class="material-icons-round" style="font-size: 40px; color: #cbd5e1;">person</span>`;
+    previewCardImg.className = "card-image-container";
+    previewCardImg.innerHTML = `<div class="card-img-placeholder"><span class="material-icons-round">person</span></div>`;
   }
 }
 
