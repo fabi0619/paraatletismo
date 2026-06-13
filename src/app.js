@@ -82,14 +82,20 @@ const btnCloseDetailModal = document.getElementById("btn-close-detail-modal");
 const btnEditAthleteProfile = document.getElementById("btn-edit-athlete-profile");
 
 const detailAvatar = document.getElementById("detail-avatar");
-const detailName = document.getElementById("detail-name");
+const detailFirstName = document.getElementById("detail-first-name");
+const detailLastName = document.getElementById("detail-last-name");
 const detailIdCard = document.getElementById("detail-id-card");
 const detailBadgeDiscap = document.getElementById("detail-badge-discap");
 const detailBadgeClass = document.getElementById("detail-badge-class");
-const detailAge = document.getElementById("detail-age");
+const detailAgeFull = document.getElementById("detail-age-full");
+const detailClub = document.getElementById("detail-club");
 const detailGender = document.getElementById("detail-gender");
 const detailPhone = document.getElementById("detail-phone");
 const detailEmail = document.getElementById("detail-email");
+const detailPruebasDinamicas = document.getElementById("detail-pruebas-dinamicas");
+const detailMedalsGold = document.getElementById("detail-medals-gold");
+const detailMedalsSilver = document.getElementById("detail-medals-silver");
+const detailMedalsBronze = document.getElementById("detail-medals-bronze");
 
 // Elementos Documentos
 const btnTriggerDocUpload = document.getElementById("btn-trigger-doc-upload");
@@ -105,7 +111,7 @@ const btnCloseChampForm = document.getElementById("btn-close-champ-form");
 const formChampionship = document.getElementById("form-championship");
 const btnCancelChamp = document.getElementById("btn-cancel-champ");
 const btnSaveChamp = document.getElementById("btn-save-champ");
-const detailChampsList = document.getElementById("detail-championships-list");
+const detailChampsList = document.getElementById("detail-championships-table-body");
 const emptyChampsMsg = document.getElementById("empty-championships-msg");
 
 // Elementos de Ubicación (Logros)
@@ -1216,24 +1222,211 @@ function openDetailModal(athleteId) {
   if (!athlete) return;
 
   detailAvatar.src = athlete.foto || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23cbd5e1"><circle cx="50" cy="50" r="40"/></svg>`;
-  detailName.textContent = athlete.nombre;
-  detailIdCard.textContent = athlete.cedula;
-  detailBadgeDiscap.textContent = DISCAPACIDADES[athlete.discapacidad]?.nombre || athlete.discapacidad;
-  detailBadgeClass.textContent = athlete.claseDeportiva + ` (${athlete.tipoClase === "pista" ? "Pista" : "Campo"})`;
+  
+  // Dividir nombre y apellido
+  const nameParts = athlete.nombre.split(" ");
+  if (detailFirstName) detailFirstName.textContent = nameParts[0] || "";
+  if (detailLastName) detailLastName.textContent = nameParts.slice(1).join(" ") || "";
+  
+  if (detailIdCard) detailIdCard.textContent = athlete.cedula;
+  if (detailBadgeDiscap) detailBadgeDiscap.textContent = DISCAPACIDADES[athlete.discapacidad]?.nombre || athlete.discapacidad;
+  if (detailBadgeClass) detailBadgeClass.textContent = athlete.claseDeportiva + ` (${athlete.tipoClase === "pista" ? "Pista" : "Campo"})`;
 
-  detailAge.textContent = calcularEdad(athlete.fechaNacimiento) + " años";
-  detailGender.textContent = athlete.genero;
-  detailPhone.textContent = athlete.telefono || "No registrado";
-  detailEmail.textContent = athlete.correo || "No registrado";
+  if (detailAgeFull) detailAgeFull.textContent = calcularEdad(athlete.fechaNacimiento) + " años (" + formatearFecha(athlete.fechaNacimiento) + ")";
+  if (detailClub) detailClub.textContent = athlete.club || "Sin Club";
+  if (detailGender) detailGender.textContent = athlete.genero;
+
+  // Pruebas únicas del atleta
+  const uniquePruebas = [...new Set((athlete.campeonatos || []).map(c => c.prueba).filter(Boolean))];
+  if (detailPruebasDinamicas) detailPruebasDinamicas.textContent = uniquePruebas.length > 0 ? uniquePruebas.join(", ") : "No registradas";
+
+  // Calcular medallas
+  let goldCount = 0, silverCount = 0, bronzeCount = 0;
+  (athlete.campeonatos || []).forEach(c => {
+    if (c.posicion) {
+      const pos = c.posicion.toLowerCase();
+      if (pos === "oro") goldCount++;
+      else if (pos === "plata") silverCount++;
+      else if (pos === "bronce") bronzeCount++;
+    }
+  });
+  if (detailMedalsGold) detailMedalsGold.textContent = goldCount.toString();
+  if (detailMedalsSilver) detailMedalsSilver.textContent = silverCount.toString();
+  if (detailMedalsBronze) detailMedalsBronze.textContent = bronzeCount.toString();
+
+  // Calcular Personal Best y Season Best de la prueba principal
+  const parseMarca = (marcaStr) => {
+    if (!marcaStr) return 0;
+    const cleaned = marcaStr.replace(/[^0-9.,]/g, "").replace(",", ".");
+    return parseFloat(cleaned) || 0;
+  };
+
+  const isPista = athlete.tipoClase === "pista";
+  const validChamps = (athlete.campeonatos || []).filter(c => c.marca && c.prueba);
+  
+  const pruebaCounts = {};
+  validChamps.forEach(c => {
+    pruebaCounts[c.prueba] = (pruebaCounts[c.prueba] || 0) + 1;
+  });
+
+  let primaryPrueba = "";
+  let maxCount = 0;
+  for (const p in pruebaCounts) {
+    if (pruebaCounts[p] > maxCount) {
+      maxCount = pruebaCounts[p];
+      primaryPrueba = p;
+    }
+  }
+
+  const activeEventBtn = document.getElementById("detail-active-event-name");
+  if (activeEventBtn) {
+    activeEventBtn.textContent = primaryPrueba || "Sin marca";
+  }
+
+  let personalBest = "-";
+  let seasonBest = "-";
+
+  if (primaryPrueba) {
+    const primaryChamps = validChamps.filter(c => c.prueba === primaryPrueba);
+    let bestVal = isPista ? Infinity : -Infinity;
+    let bestRaw = "";
+    let bestSeasonVal = isPista ? Infinity : -Infinity;
+    let bestSeasonRaw = "";
+    const currentYear = new Date().getFullYear();
+
+    primaryChamps.forEach(c => {
+      const val = parseMarca(c.marca);
+      if (!val) return;
+
+      const isBetterPB = isPista ? (val < bestVal) : (val > bestVal);
+      if (isBetterPB) {
+        bestVal = val;
+        bestRaw = c.marca;
+      }
+
+      const year = c.fecha ? new Date(c.fecha).getFullYear() : 0;
+      if (year === currentYear) {
+        const isBetterSB = isPista ? (val < bestSeasonVal) : (val > bestSeasonVal);
+        if (isBetterSB) {
+          bestSeasonVal = val;
+          bestSeasonRaw = c.marca;
+        }
+      }
+    });
+
+    if (bestRaw) personalBest = bestRaw;
+    if (bestSeasonRaw) {
+      seasonBest = bestSeasonRaw;
+    } else {
+      let newestYear = 0;
+      primaryChamps.forEach(c => {
+        const year = c.fecha ? new Date(c.fecha).getFullYear() : 0;
+        if (year > newestYear) newestYear = year;
+      });
+      if (newestYear) {
+        primaryChamps.forEach(c => {
+          const year = c.fecha ? new Date(c.fecha).getFullYear() : 0;
+          if (year === newestYear) {
+            const val = parseMarca(c.marca);
+            const isBetterSB = isPista ? (val < bestSeasonVal) : (val > bestSeasonVal);
+            if (isBetterSB) {
+              bestSeasonVal = val;
+              bestSeasonRaw = c.marca;
+            }
+          }
+        });
+        if (bestSeasonRaw) seasonBest = bestSeasonRaw + ` (${newestYear})`;
+      }
+    }
+  }
+
+  const detailPersonalBest = document.getElementById("detail-personal-best");
+  if (detailPersonalBest) detailPersonalBest.textContent = personalBest;
+  
+  const detailSeasonBest = document.getElementById("detail-season-best");
+  if (detailSeasonBest) detailSeasonBest.textContent = seasonBest;
+
+  // Actualizar ranking basado en logros
+  const rankingValEl = document.getElementById("detail-ranking-value");
+  if (rankingValEl) {
+    if (goldCount > 0) rankingValEl.textContent = "01";
+    else if (silverCount > 0) rankingValEl.textContent = "05";
+    else if (bronzeCount > 0) rankingValEl.textContent = "12";
+    else rankingValEl.textContent = "99";
+  }
+
+  // Logro destacado en Achievements
+  const featuredBox = document.getElementById("featured-achievement-box");
+  const featuredTitle = document.getElementById("featured-achievement-title");
+  const featuredEvent = document.getElementById("featured-achievement-event");
+  const featuredMark = document.getElementById("featured-achievement-mark");
+  const featuredMeta = document.getElementById("featured-achievement-meta");
+  const featuredChamp = document.getElementById("featured-achievement-championship");
+
+  const medalPriority = { "oro": 1, "plata": 2, "bronce": 3 };
+  let bestChamp = null;
+  let bestPriority = Infinity;
+
+  (athlete.campeonatos || []).forEach(c => {
+    if (c.posicion) {
+      const pos = c.posicion.toLowerCase();
+      const priority = medalPriority[pos] || 99;
+      if (priority < bestPriority) {
+        bestPriority = priority;
+        bestChamp = c;
+      }
+    }
+  });
+
+  if (bestChamp) {
+    if (featuredBox) featuredBox.style.display = "flex";
+    if (featuredTitle) {
+      featuredTitle.textContent = bestChamp.posicion === "Oro" 
+        ? "GOLD MEDAL" 
+        : bestChamp.posicion === "Plata" 
+          ? "SILVER MEDAL" 
+          : bestChamp.posicion === "Bronce" 
+            ? "BRONZE MEDAL" 
+            : bestChamp.posicion.toUpperCase();
+    }
+    if (featuredEvent) featuredEvent.textContent = bestChamp.prueba;
+    if (featuredMark) featuredMark.textContent = bestChamp.marca;
+    if (featuredMeta) featuredMeta.textContent = bestChamp.lugar || "-";
+    if (featuredChamp) featuredChamp.textContent = bestChamp.campeonato;
+  } else {
+    if (featuredBox) featuredBox.style.display = "none";
+  }
+
+  // ── Privacidad: teléfono y correo solo para admin y profesor ──────────────
+  const usuarioPrivacidad = obtenerUsuarioActual();
+  const puedeVerContacto = usuarioPrivacidad &&
+    (usuarioPrivacidad.rol === "admin" || usuarioPrivacidad.rol === "profesor");
+
+  const phoneRow = document.getElementById("detail-phone-row");
+  const emailRow = document.getElementById("detail-email-row");
+  const PRIVADO_HTML = '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);font-size:0.82rem;"><span class=\'material-icons-round\' style=\'font-size:14px;\'>lock</span>Información privada</span>';
+
+  if (puedeVerContacto) {
+    detailPhone.textContent = athlete.telefono || "No registrado";
+    detailEmail.textContent = athlete.correo  || "No registrado";
+    if (phoneRow) phoneRow.style.display = "";
+    if (emailRow) emailRow.style.display = "";
+  } else {
+    detailPhone.innerHTML = PRIVADO_HTML;
+    detailEmail.innerHTML = PRIVADO_HTML;
+    if (phoneRow) phoneRow.style.display = "";
+    if (emailRow) emailRow.style.display = "";
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   toggleChampForm(false);
   renderDocumentsList(athlete);
   renderChampionshipsTimeline(athlete);
+  renderAthleteChart(athlete);
 
   // Controlar la visualización de botones de administración en el expediente detallado
   const usuarioActual = obtenerUsuarioActual();
   const esAdminOProfesor = usuarioActual && (usuarioActual.rol === "admin" || usuarioActual.rol === "profesor");
-  // Los atletas pueden editar solo su propio perfil
   const esAtletaPropietario = usuarioActual && usuarioActual.rol === "atleta" && usuarioActual.id === athleteId;
   const puedeEditar = esAdminOProfesor || esAtletaPropietario;
 
@@ -1243,12 +1436,12 @@ function openDetailModal(athleteId) {
 
   const btnUploadDoc = document.getElementById("btn-trigger-doc-upload");
   if (btnUploadDoc) {
-    btnUploadDoc.style.display = esAdminOProfesor ? "inline-flex" : "none";
+    btnUploadDoc.style.display = puedeEditar ? "flex" : "none";
   }
 
   const btnAddChamp = document.getElementById("btn-open-championship-form");
   if (btnAddChamp) {
-    btnAddChamp.style.display = esAdminOProfesor ? "inline-flex" : "none";
+    btnAddChamp.style.display = puedeEditar ? "inline-flex" : "none";
   }
 
   modalDetail.classList.add("active");
@@ -1280,6 +1473,14 @@ async function handleDocUpload(e) {
 
   if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
     alert("Por favor, suba únicamente archivos en formato PDF.");
+    e.target.value = "";
+    return;
+  }
+
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+  if (file.size > MAX_FILE_SIZE) {
+    alert("El archivo es demasiado grande. Por favor, suba un documento PDF de máximo 2 MB para ahorrar espacio en el sistema.");
+    e.target.value = "";
     return;
   }
 
@@ -1356,11 +1557,11 @@ function toggleChampForm(show) {
   if (show) {
     formChampionship.reset();
     clearChampFormErrors();
-    champFormCard.style.display = "block";
-    btnOpenChampForm.style.display = "none";
+    champFormCard.classList.add("active");
+    champFormCard.style.display = "flex";
   } else {
+    champFormCard.classList.remove("active");
     champFormCard.style.display = "none";
-    btnOpenChampForm.style.display = "inline-flex";
   }
 }
 
@@ -1377,7 +1578,7 @@ async function handleSaveChampionship() {
   const champData = {
     campeonato: document.getElementById("champ-name").value.trim(),
     lugar: place,
-    prueba: document.getElementById("champ-event").value.trim(),
+    prueba: document.getElementById("champ-event").value,
     marca: document.getElementById("champ-result").value.trim(),
     fecha: document.getElementById("champ-date").value,
     posicion: document.getElementById("champ-pos").value
@@ -1388,7 +1589,10 @@ async function handleSaveChampionship() {
   if (updatedAthlete) {
     await loadData();
     const athlete = currentAthletes.find(a => a.id === selectedAthleteId);
-    if (athlete) renderChampionshipsTimeline(athlete);
+    if (athlete) {
+      renderChampionshipsTimeline(athlete);
+      renderAthleteChart(athlete);
+    }
     
     // No cerrar el formulario, solo resetearlo para añadir más rápido
     formChampionship.reset();
@@ -1440,63 +1644,274 @@ function clearChampFormErrors() {
 function renderChampionshipsTimeline(athlete) {
   detailChampsList.innerHTML = "";
   const champs = athlete.campeonatos || [];
+  const tableWrapper = detailChampsList.closest(".table-responsive");
 
   if (champs.length === 0) {
     emptyChampsMsg.style.display = "flex";
-    detailChampsList.style.display = "none";
+    if (tableWrapper) tableWrapper.style.display = "none";
     return;
   }
 
   emptyChampsMsg.style.display = "none";
-  detailChampsList.style.display = "flex";
+  if (tableWrapper) tableWrapper.style.display = "block";
 
   const sortedChamps = [...champs].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-  sortedChamps.forEach(c => {
-    let icon = "emoji_events";
-    if (c.posicion === "Oro" || c.posicion === "Plata" || c.posicion === "Bronce") {
-      icon = "workspace_premium";
-    }
+  const usuarioActual = obtenerUsuarioActual();
+  const esAdminOProfesor = usuarioActual && (usuarioActual.rol === "admin" || usuarioActual.rol === "profesor");
 
-    const card = document.createElement("div");
-    card.className = "champ-card animate-fade-in";
-    card.innerHTML = `
-      <div class="champ-medal-box ${c.posicion}">
-        <span class="material-icons-round champ-medal-icon">${icon}</span>
-      </div>
-      <div class="champ-info">
-        <div class="champ-title-group">
-          <h4>${c.campeonato}</h4>
-          <div class="champ-place-group">
-            <span class="material-icons-round">place</span>
-            <span>${c.lugar}</span>
-          </div>
-        </div>
-        <div class="champ-result-group">
-          <p class="champ-result-label">${c.prueba}</p>
-          <p class="champ-result-value">${c.marca}</p>
-        </div>
-        <div class="champ-meta-group">
-          <span class="champ-date">${c.fecha}</span>
-          <span class="champ-badge ${c.posicion}">${c.posicion}</span>
-        </div>
-      </div>
-      <div class="champ-actions">
-        <button class="btn-icon-sm btn-delete-champ text-red" title="Eliminar esta marca">
-          <span class="material-icons-round">delete</span>
-        </button>
-      </div>
+  sortedChamps.forEach(c => {
+    const year = c.fecha ? new Date(c.fecha).getFullYear() : "-";
+    let medalBadge = `<span class="champ-badge ${c.posicion}">${c.posicion}</span>`;
+
+    const row = document.createElement("tr");
+    row.className = "animate-fade-in";
+    row.innerHTML = `
+      <td><strong>${year}</strong></td>
+      <td>${c.campeonato}</td>
+      <td>${c.prueba}</td>
+      <td style="color: var(--primary-red); font-weight: 800;">${c.marca}</td>
+      <td>${medalBadge}</td>
+      <td>${c.lugar || "-"}</td>
+      <td>${formatearFecha(c.fecha)}</td>
+      <td class="actions-col">
+        ${esAdminOProfesor ? `
+          <button class="btn-icon-sm btn-delete-champ text-red" title="Eliminar esta marca">
+            <span class="material-icons-round">delete</span>
+          </button>
+        ` : "-"}
+      </td>
     `;
 
-    card.querySelector(".btn-delete-champ").addEventListener("click", async () => {
-      if (confirm(`¿Estás seguro de que deseas eliminar el registro de "${c.campeonato}" de este atleta?`)) {
-        await deleteChampionship(athlete.id, c.id);
-        await loadData();
-        const updatedAthlete = currentAthletes.find(a => a.id === athlete.id);
-        if (updatedAthlete) renderChampionshipsTimeline(updatedAthlete);
-      }
-    });
+    if (esAdminOProfesor) {
+      row.querySelector(".btn-delete-champ").addEventListener("click", async () => {
+        if (confirm(`¿Estás seguro de que deseas eliminar el registro de "${c.campeonato}" de este atleta?`)) {
+          await deleteChampionship(athlete.id, c.id);
+          await loadData();
+          const updatedAthlete = currentAthletes.find(a => a.id === athlete.id);
+          if (updatedAthlete) {
+            renderChampionshipsTimeline(updatedAthlete);
+            renderAthleteChart(updatedAthlete);
+          }
+        }
+      });
+    }
 
-    detailChampsList.appendChild(card);
+    detailChampsList.appendChild(row);
   });
+}
+
+function formatearFecha(fechaStr) {
+  if (!fechaStr) return "-";
+  try {
+    const parts = fechaStr.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    const d = new Date(fechaStr);
+    if (isNaN(d.getTime())) return fechaStr;
+    return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+  } catch (e) {
+    return fechaStr;
+  }
+}
+
+function renderAthleteChart(athlete) {
+  const chartWrapper = document.getElementById("detail-chart-wrapper");
+  if (!chartWrapper) return;
+  chartWrapper.innerHTML = "";
+
+  const champs = athlete.campeonatos || [];
+  
+  // Filtrar por años >= 2023
+  const validChamps = champs.filter(c => {
+    if (!c.fecha) return false;
+    const year = new Date(c.fecha).getFullYear();
+    return year >= 2023;
+  });
+
+  if (validChamps.length === 0) {
+    chartWrapper.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 550; padding: 20px; text-align: center;">
+        <span class="material-icons-round" style="font-size: 32px; color: var(--border-color);">show_chart</span>
+        <p>No hay marcas registradas desde 2023 para generar la gráfica de evolución.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Encontrar la prueba con más registros
+  const pruebaCounts = {};
+  validChamps.forEach(c => {
+    if (c.prueba) {
+      pruebaCounts[c.prueba] = (pruebaCounts[c.prueba] || 0) + 1;
+    }
+  });
+
+  let primaryPrueba = "";
+  let maxCount = 0;
+  for (const p in pruebaCounts) {
+    if (pruebaCounts[p] > maxCount) {
+      maxCount = pruebaCounts[p];
+      primaryPrueba = p;
+    }
+  }
+
+  if (!primaryPrueba) return;
+
+  // Filtrar los campeonatos de esa prueba
+  const pruebaChamps = validChamps.filter(c => c.prueba === primaryPrueba);
+
+  // Agrupar por año y obtener la mejor marca del año (2023 - presente)
+  const years = [2023, 2024, 2025, 2026];
+  const currentYear = new Date().getFullYear();
+  if (currentYear > 2026 && !years.includes(currentYear)) {
+    years.push(currentYear);
+  }
+
+  // Parsear marca a flotante
+  const parseMarca = (marcaStr) => {
+    if (!marcaStr) return 0;
+    const cleaned = marcaStr.replace(/[^0-9.,]/g, "").replace(",", ".");
+    return parseFloat(cleaned) || 0;
+  };
+
+  const isPista = athlete.tipoClase === "pista"; // Si es pista, menor tiempo es mejor.
+  
+  const bestMarksByYear = {};
+  pruebaChamps.forEach(c => {
+    const year = new Date(c.fecha).getFullYear();
+    const val = parseMarca(c.marca);
+    if (!val) return;
+
+    if (!bestMarksByYear[year]) {
+      bestMarksByYear[year] = { val, raw: c.marca, campeonato: c.campeonato };
+    } else {
+      const isBetter = isPista ? (val < bestMarksByYear[year].val) : (val > bestMarksByYear[year].val);
+      if (isBetter) {
+        bestMarksByYear[year] = { val, raw: c.marca, campeonato: c.campeonato };
+      }
+    }
+  });
+
+  const dataPoints = [];
+  years.forEach((y, idx) => {
+    if (bestMarksByYear[y]) {
+      dataPoints.push({
+        year: y,
+        index: idx,
+        val: bestMarksByYear[y].val,
+        raw: bestMarksByYear[y].raw,
+        campeonato: bestMarksByYear[y].campeonato
+      });
+    }
+  });
+
+  if (dataPoints.length === 0) {
+    chartWrapper.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 550; padding: 20px; text-align: center;">
+        <span class="material-icons-round" style="font-size: 32px; color: var(--border-color);">show_chart</span>
+        <p>Registre marcas con valores numéricos para visualizar el gráfico de la prueba: <strong>${primaryPrueba}</strong></p>
+      </div>
+    `;
+    return;
+  }
+
+  // Dibujar gráfico SVG
+  const width = 600;
+  const height = 180;
+  const paddingLeft = 50;
+  const paddingRight = 40;
+  const paddingTop = 25;
+  const paddingBottom = 25;
+
+  const chartW = width - paddingLeft - paddingRight;
+  const chartH = height - paddingTop - paddingBottom;
+
+  const minVal = Math.min(...dataPoints.map(p => p.val)) * 0.95;
+  const maxVal = Math.max(...dataPoints.map(p => p.val)) * 1.05;
+  const valRange = maxVal - minVal || 1;
+
+  const getX = (idx) => paddingLeft + (idx / (years.length - 1)) * chartW;
+  const getY = (val) => {
+    const ratio = (val - minVal) / valRange;
+    return isPista 
+      ? paddingTop + ratio * chartH 
+      : paddingTop + (1 - ratio) * chartH;
+  };
+
+  let svgContent = `
+    <svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 100%; font-family: var(--font-family);">
+      <defs>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--primary-red)" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="var(--primary-red)" stop-opacity="0.00"/>
+        </linearGradient>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="var(--primary-red)"/>
+          <stop offset="100%" stop-color="var(--primary-red-hover)"/>
+        </linearGradient>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="var(--primary-red)" flood-opacity="0.3"/>
+        </filter>
+      </defs>
+
+      <line x1="${paddingLeft}" y1="${getY(minVal)}" x2="${width - paddingRight}" y2="${getY(minVal)}" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+      <line x1="${paddingLeft}" y1="${getY(maxVal)}" x2="${width - paddingRight}" y2="${getY(maxVal)}" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+      
+      <text x="${paddingLeft - 8}" y="${getY(minVal) + 4}" fill="var(--text-muted)" font-size="9" font-weight="700" text-anchor="end">${minVal.toFixed(2)}</text>
+      <text x="${paddingLeft - 8}" y="${getY(maxVal) + 4}" fill="var(--text-muted)" font-size="9" font-weight="700" text-anchor="end">${maxVal.toFixed(2)}</text>
+  `;
+
+  years.forEach((y, idx) => {
+    const x = getX(idx);
+    svgContent += `
+      <line x1="${x}" y1="${paddingTop}" x2="${x}" y2="${height - paddingBottom}" stroke="var(--border-color)" stroke-width="1" stroke-opacity="0.5" />
+      <text x="${x}" y="${height - paddingBottom + 16}" fill="var(--text-muted)" font-size="10" font-weight="800" text-anchor="middle">${y}</text>
+    `;
+  });
+
+  let pathD = "";
+  let areaD = "";
+
+  dataPoints.forEach((p, i) => {
+    const x = getX(p.index);
+    const y = getY(p.val);
+    if (i === 0) {
+      pathD = `M ${x} ${y}`;
+      areaD = `M ${x} ${height - paddingBottom} L ${x} ${y}`;
+    } else {
+      pathD += ` L ${x} ${y}`;
+      areaD += ` L ${x} ${y}`;
+    }
+    if (i === dataPoints.length - 1) {
+      areaD += ` L ${x} ${height - paddingBottom} Z`;
+    }
+  });
+
+  if (dataPoints.length > 0) {
+    if (dataPoints.length > 1) {
+      svgContent += `<path d="${areaD}" fill="url(#areaGrad)" />`;
+      svgContent += `<path d="${pathD}" fill="none" stroke="url(#lineGrad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow)" />`;
+    }
+
+    dataPoints.forEach(p => {
+      const x = getX(p.index);
+      const y = getY(p.val);
+      svgContent += `
+        <g class="chart-point" style="cursor: pointer;">
+          <circle cx="${x}" cy="${y}" r="6" fill="#ffffff" stroke="var(--primary-red)" stroke-width="3" />
+          <circle cx="${x}" cy="${y}" r="12" fill="transparent" />
+          <title>${p.raw} (${p.campeonato})</title>
+        </g>
+      `;
+    });
+  }
+
+  svgContent += `
+    <text x="${paddingLeft}" y="15" fill="var(--primary-red)" font-size="10" font-weight="800" text-anchor="start" style="text-transform: uppercase; letter-spacing: 0.5px;">Evolución: ${primaryPrueba}</text>
+    </svg>
+  `;
+
+  chartWrapper.innerHTML = svgContent;
 }

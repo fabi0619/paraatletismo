@@ -495,7 +495,35 @@ import "../styles/index.css";
 <!-- Pie de Página -->
 <footer class="app-footer">
   <div class="footer-container">
-    <p>&copy; Atletas del valle del cauca</p>
+    <div class="footer-brand">
+      <h3>Atletas del Valle del Cauca</h3>
+      <p>Impulsando el deporte y el talento regional.</p>
+    </div>
+
+    <div class="footer-links">
+      <h4>Enlaces</h4>
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Atletas</a></li>
+        <li><a href="#">Logros</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-social">
+      <h4>Síguenos</h4>
+      <div class="social-icons">
+        <a href="#">Facebook</a>
+        <a href="#">Instagram</a>
+        <a href="#">X</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>
+      &copy; 2026 Atletas del Valle del Cauca. Todos los derechos reservados.
+    </p>
   </div>
 </footer>
 
@@ -558,7 +586,10 @@ import "../styles/index.css";
             <div class="live-preview-container">
               <label class="photo-upload-label">Vista Previa de Tarjeta</label>
               <div class="athlete-card preview-card">
-                <div class="preview-card-inner" style="display: flex; gap: 16px; padding: 20px;">
+                <div
+                  class="preview-card-inner"
+                  style="display: flex; gap: 16px; padding: 20px;"
+                >
                   <div class="card-image-wrapper-small">
                     <div
                       class="card-img-small"
@@ -700,17 +731,36 @@ import "../styles/index.css";
                 >
               </div>
               <div class="form-group">
-                <label for="athlete-club">Club <span class="required">*</span></label>
+                <label for="athlete-club"
+                  >Club <span class="required">*</span></label
+                >
                 <div class="custom-select-wrapper">
                   <select id="athlete-club" required>
                     <option value="">Seleccione un club...</option>
                     <!-- aqui van los club -->
-                    <option value="Club Valle">Club Valle</option>
-                    <option value="Club Paraíso">Club Paraíso</option>
+                    <option value="Club Deportivo Imparables a la Meta"
+                      >Club Deportivo Imparables a la Meta</option
+                    >
+                    <option value="Club Deportivo Minas del Paraatletismo"
+                      >Club Deportivo Minas del Paraatletismo</option
+                    >
+                    <option value="Club Deportivo Discatle"
+                      >Club Deportivo Discatle</option
+                    >
+                    <option value="Club Deportivo de Paraatletismo PC Yumbo"
+                      >Club Deportivo de Paraatletismo PC Yumbo</option
+                    >
+                    <option value="Club Deportivo Casin"
+                      >Club Deportivo Casin</option
+                    >
                   </select>
-                  <span class="material-icons-round select-arrow">expand_more</span>
+                  <span class="material-icons-round select-arrow"
+                    >expand_more</span
+                  >
                 </div>
-                <span class="error-msg" id="error-athlete-club">El club es requerido.</span>
+                <span class="error-msg" id="error-athlete-club"
+                  >El club es requerido.</span
+                >
               </div>
             </div>
 
@@ -892,82 +942,179 @@ import "../styles/index.css";
 
 <!-- MODAL: EXPEDIENTE COMPLETO / HISTORIAL DE CAMPEONATOS -->
 <div class="modal-overlay" id="modal-detail">
-  <div class="modal-card modal-large">
-    <div class="modal-header">
+  <div class="modal-card modal-large full-screen-profile">
+    <div class="modal-header mockup-header-bar">
       <div class="modal-title-group">
-        <span class="material-icons-round modal-icon color-red"
-          >sports_athletics</span
-        >
-        <h2 id="modal-detail-title">Expediente del Para-atleta</h2>
+        <button class="btn-back-redesign" id="btn-close-detail-modal">
+          <span class="material-icons-round">arrow_back</span>
+          <span>Regresar</span>
+        </button>
       </div>
       <div class="header-action-buttons">
         <button class="btn btn-secondary btn-sm" id="btn-edit-athlete-profile">
           <span class="material-icons-round">edit</span> Editar Perfil
         </button>
-        <button class="btn-close-modal" id="btn-close-detail-modal">
-          <span class="material-icons-round">close</span>
-        </button>
       </div>
     </div>
 
-    <div class="modal-body no-padding scroll-y">
-      <div class="detail-layout">
-        <!-- Lado Izquierdo: Ficha Técnica y Documentos -->
-        <div class="detail-sidebar">
-          <div class="detail-profile-hero">
-            <div class="detail-avatar-wrapper">
-              <img
-                src=""
-                alt="Foto atleta"
-                class="detail-avatar"
-                id="detail-avatar"
-              />
+    <div class="modal-body no-padding scroll-y bg-mockup-light">
+      <div class="profile-redesign-container">
+        <!-- Left Panel: Athlete Details -->
+        <div class="profile-redesign-left-panel">
+          <h2 class="profile-name">
+            <span id="detail-first-name">-</span>
+            <span id="detail-last-name" class="highlight-red">-</span>
+          </h2>
+
+          <div class="profile-info-list">
+            <div class="info-row">
+              <span class="info-label">Pruebas:</span>
+              <span id="detail-pruebas-dinamicas" class="info-value">-</span>
             </div>
-            <h3 id="detail-name" class="detail-athlete-name">
-              Nombre completo
+            <div class="info-row">
+              <span class="info-label">Clasificación:</span>
+              <span id="detail-badge-class" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Edad:</span>
+              <span id="detail-age-full" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Club:</span>
+              <span id="detail-club" class="info-value">-</span>
+            </div>
+            <!-- Additional Details shown only for Admin/Profesor handled by JS later -->
+            <div
+              class="info-row private-info"
+              id="detail-phone-row"
+              style="display:none;"
+            >
+              <span class="info-label">Teléfono:</span>
+              <span id="detail-phone" class="info-value">-</span>
+            </div>
+            <div
+              class="info-row private-info"
+              id="detail-email-row"
+              style="display:none;"
+            >
+              <span class="info-label">Correo:</span>
+              <span id="detail-email" class="info-value">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Section: Avatar, Medals, Timeline -->
+        <div class="profile-redesign-center-panel">
+          <div class="profile-avatar-wrapper">
+            <img
+              src=""
+              alt="Foto Atleta"
+              id="detail-avatar"
+              class="profile-avatar-circle"
+            />
+          </div>
+
+          <!-- Timeline Chart Section -->
+          <div class="profile-chart-section">
+            <h3 class="section-title-sm">
+              Mejores Marcas por Año (2023 - Presente)
             </h3>
-            <p class="detail-athlete-id">
-              CC: <span id="detail-id-card">-</span>
-            </p>
-
-            <div class="detail-badges-row">
-              <span class="badge badge-discapacidad" id="detail-badge-discap"
-                >Física</span
-              >
-              <span class="badge badge-clase" id="detail-badge-class">T38</span>
+            <div id="detail-chart-wrapper" class="chart-container-svg">
+              <!-- JS Injected SVG -->
             </div>
           </div>
 
-          <!-- Ficha Técnica -->
-          <div class="detail-section">
-            <h4 class="detail-section-title">Ficha Técnica</h4>
-            <ul class="technical-sheet">
-              <li>
-                <span class="tech-label">Edad</span>
-                <span class="tech-val" id="detail-age">-</span>
-              </li>
-              <li>
-                <span class="tech-label">Género</span>
-                <span class="tech-val" id="detail-gender">-</span>
-              </li>
-              <li>
-                <span class="tech-label">Contacto</span>
-                <span class="tech-val" id="detail-phone">-</span>
-              </li>
-              <li>
-                <span class="tech-label">Correo</span>
-                <span class="tech-val" id="detail-email">-</span>
-              </li>
-            </ul>
+          <div class="championships-section">
+            <div class="section-header-flex">
+              <h3 class="section-title-sm">Campeonatos</h3>
+              <button
+                id="btn-open-championship-form"
+                style="display: none; align-items: center; gap: 5px; padding: 6px 14px; font-size: 0.78rem; font-weight: 600; border-radius: 8px; border: 1px solid rgba(220, 38, 38, 0.35); background-color: rgba(220, 38, 38, 0.08); color: #c0392b; cursor: pointer; transition: all 0.25s ease; letter-spacing: 0.3px;"
+              >
+                <span class="material-icons-round" style="font-size: 15px;"
+                  >emoji_events</span
+                > Registrar Campeonato
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="championships-table" id="championships-table-el">
+                <thead>
+                  <tr>
+                    <th>Año</th>
+                    <th>Evento</th>
+                    <th>Prueba</th>
+                    <th>Tiempo/Marca</th>
+                    <th>Posición</th>
+                    <th>Lugar</th>
+                    <th>Fecha</th>
+                    <th class="actions-col">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="detail-championships-table-body">
+                  <!-- JS Injected -->
+                </tbody>
+              </table>
+            </div>
+
+            <div
+              class="empty-championships-state"
+              id="empty-championships-msg"
+              style="display: none;"
+            >
+              <span class="material-icons-round">emoji_events</span>
+              <h4>Sin Historial Deportivo</h4>
+              <button
+                class="btn btn-primary-outline btn-sm mt-3"
+                id="btn-empty-champ-trigger"
+              >
+                Registrar Campeonato
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel / Bottom: Medals and PDF -->
+        <div class="profile-redesign-right-panel">
+          <!-- Medals Section -->
+          <div class="profile-medals-section">
+            <h3 class="section-title-sm">Medallas</h3>
+            <div class="medals-flex">
+              <div class="medal-item">
+                <div class="medal-circle gold"></div>
+                <span id="detail-medals-gold">0</span>
+              </div>
+              <div class="medal-item">
+                <div class="medal-circle silver"></div>
+                <span id="detail-medals-silver">0</span>
+              </div>
+              <div class="medal-item">
+                <div class="medal-circle bronze"></div>
+                <span id="detail-medals-bronze">0</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Gestión de Documentos PDF -->
-          <div class="detail-section">
-            <div class="section-title-between">
-              <h4 class="detail-section-title">Documentos PDF</h4>
-              <button class="btn-text-icon" id="btn-trigger-doc-upload">
-                <span class="material-icons-round">add_circle</span>
-                Subir PDF
+          <div class="docs-section mt-4">
+            <div class="section-header-flex">
+              <h3 class="section-title-sm">Documentos PDF</h3>
+            </div>
+            <div class="docs-list" id="detail-docs-list"></div>
+            <div class="no-docs-message" id="no-docs-msg">
+              <span class="material-icons-round">folder_open</span>
+              <p>Sin documentos cargados</p>
+            </div>
+            <div
+              style="margin-top: 15px; display: flex; justify-content: center;"
+            >
+              <button
+                class="btn btn-sm"
+                id="btn-trigger-doc-upload"
+                style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 6px; background-color: rgba(220, 38, 38, 0.08); color: var(--primary-red); border: 1px dashed rgba(220, 38, 38, 0.3); border-radius: 8px; transition: all 0.3s ease;"
+              >
+                <span class="material-icons-round" style="font-size: 18px;"
+                  >upload_file</span
+                > Subir PDF
               </button>
               <input
                 type="file"
@@ -976,217 +1123,528 @@ import "../styles/index.css";
                 style="display: none;"
               />
             </div>
-
-            <!-- Lista de Documentos -->
-            <div class="docs-list" id="detail-docs-list">
-              <!-- Inyectado por JS -->
-            </div>
-
-            <div class="no-docs-message" id="no-docs-msg">
-              <span class="material-icons-round">folder_open</span>
-              <p>No hay documentos cargados en el expediente</p>
-            </div>
           </div>
         </div>
+      </div>
 
-        <!-- Lado Derecho: Historial de Campeonatos y Marcas -->
-        <div class="detail-main-content">
-          <div class="section-title-between mb-4">
-            <h3 class="panel-section-title">
-              Historial de Campeonatos y Tiempos
-            </h3>
-            <button
-              class="btn btn-primary btn-sm"
-              id="btn-open-championship-form"
-            >
-              <span class="material-icons-round">add_circle</span>
-              Añadir Logro/Campeonato
+      <!-- Hidden Championship Form as Modal -->
+      <div
+        class="modal-overlay"
+        id="championship-form-card"
+        style="display: none; z-index: 10000;"
+      >
+        <div class="modal-content" style="max-width: 600px;">
+          <div
+            class="card-header-simple"
+            style="padding-bottom: 15px; border-bottom: 1px solid #e5e7eb; margin-bottom: 20px;"
+          >
+            <h4>Nuevo Campeonato / Marca</h4>
+            <button class="btn-close-sm" id="btn-close-champ-form">
+              <span class="material-icons-round">close</span>
             </button>
           </div>
+          <form id="form-championship" class="compact-form" novalidate>
+            <div class="form-group-row">
+              <div class="form-group" style="width: 100%;">
+                <label for="champ-name"
+                  >Nombre del Campeonato <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="champ-name"
+                  required
+                  placeholder="Ej. Juegos Paranacionales"
+                />
+                <span class="error-msg" id="error-champ-name">Requerido.</span>
+              </div>
+            </div>
+            <div class="form-group-row" style="gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label for="champ-country"
+                  >País <span class="required">*</span></label
+                >
+                <div class="custom-select-wrapper">
+                  <select id="champ-country" required>
+                    <option value="">Cargando países...</option>
+                  </select>
+                  <span class="material-icons-round select-arrow"
+                    >expand_more</span
+                  >
+                </div>
+                <span class="error-msg" id="error-champ-country"
+                  >Requerido.</span
+                >
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label for="champ-state"
+                  >Estado / Dpto <span class="required">*</span></label
+                >
+                <div class="custom-select-wrapper">
+                  <select id="champ-state" required disabled>
+                    <option value="">Elija país...</option>
+                  </select>
+                  <span class="material-icons-round select-arrow"
+                    >expand_more</span
+                  >
+                </div>
+                <span class="error-msg" id="error-champ-state">Requerido.</span>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label for="champ-city"
+                  >Ciudad / Municipio <span class="required">*</span></label
+                >
+                <div class="custom-select-wrapper">
+                  <select id="champ-city" required disabled>
+                    <option value="">Elija estado...</option>
+                  </select>
+                  <span class="material-icons-round select-arrow"
+                    >expand_more</span
+                  >
+                </div>
+                <span class="error-msg" id="error-champ-city">Requerido.</span>
+              </div>
+            </div>
 
-          <!-- Formulario Oculto/Desplegable de Agregar Campeonato -->
-          <div
-            class="championship-form-card animate-fade-in"
-            id="championship-form-card"
-            style="display: none;"
-          >
-            <div class="card-header-simple">
-              <h4>Nuevo Campeonato / Marca</h4>
-              <button class="btn-close-sm" id="btn-close-champ-form">
-                <span class="material-icons-round">close</span>
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="champ-event"
+                  >Prueba <span class="required">*</span></label
+                >
+                <div class="custom-select-wrapper">
+                  <select id="champ-event" required>
+                    <option value="">Seleccione una prueba...</option>
+
+                    <optgroup label="Pista — Velocidad">
+                      <option value="100m T11">100m T11 </option>
+                      <option value="100m T12">100m T12 </option>
+                      <option value="100m T13">100m T13 </option>
+                      <option value="100m T33">100m T33 </option>
+                      <option value="100m T34">100m T34 </option>
+                      <option value="100m T35">100m T35 </option>
+                      <option value="100m T36">100m T36 </option>
+                      <option value="100m T37">100m T37 </option>
+                      <option value="100m T38">100m T38 </option>
+                      <option value="100m T40">100m T40 </option>
+                      <option value="100m T41">100m T41 </option>
+                      <option value="100m T42">100m T42 </option>
+                      <option value="100m T43">100m T43 </option>
+                      <option value="100m T44">100m T44 </option>
+                      <option value="100m T45">100m T45 </option>
+                      <option value="100m T46">100m T46 </option>
+                      <option value="100m T47">100m T47 </option>
+                      <option value="100m T51">100m T51 </option>
+                      <option value="100m T52">100m T52 </option>
+                      <option value="100m T53">100m T53 </option>
+                      <option value="100m T54">100m T54 </option>
+                      <option value="100m T61">100m T61 </option>
+                      <option value="100m T62">100m T62 </option>
+                      <option value="100m T63">100m T63 </option>
+                      <option value="100m T64">100m T64 </option>
+                      <option value="200m T11">200m T11</option>
+                      <option value="200m T12">200m T12</option>
+                      <option value="200m T13">200m T13</option>
+                      <option value="200m T35">200m T35</option>
+                      <option value="200m T36">200m T36</option>
+                      <option value="200m T37">200m T37</option>
+                      <option value="200m T38">200m T38</option>
+                      <option value="200m T44">200m T44</option>
+                      <option value="200m T47">200m T47</option>
+                      <option value="200m T51">200m T51</option>
+                      <option value="200m T52">200m T52</option>
+                      <option value="200m T53">200m T53</option>
+                      <option value="200m T54">200m T54</option>
+                      <option value="200m T63">200m T63</option>
+                      <option value="200m T64">200m T64</option>
+                    </optgroup>
+
+                    <optgroup label="Pista — Medio Fondo">
+                      <option value="400m T11">400m T11</option>
+                      <option value="400m T12">400m T12</option>
+                      <option value="400m T13">400m T13</option>
+                      <option value="400m T37">400m T37</option>
+                      <option value="400m T38">400m T38</option>
+                      <option value="400m T44">400m T44</option>
+                      <option value="400m T46">400m T46</option>
+                      <option value="400m T47">400m T47</option>
+                      <option value="400m T51">400m T51</option>
+                      <option value="400m T52">400m T52</option>
+                      <option value="400m T53">400m T53</option>
+                      <option value="400m T54">400m T54</option>
+                      <option value="400m T63">400m T63</option>
+                      <option value="400m T64">400m T64</option>
+                      <option value="800m T11">800m T11</option>
+                      <option value="800m T12">800m T12</option>
+                      <option value="800m T13">800m T13</option>
+                      <option value="800m T34">800m T34</option>
+                      <option value="800m T51">800m T51</option>
+                      <option value="800m T52">800m T52</option>
+                      <option value="800m T53">800m T53</option>
+                      <option value="800m T54">800m T54</option>
+                      <option value="1500m T11">1500m T11</option>
+                      <option value="1500m T12">1500m T12</option>
+                      <option value="1500m T13">1500m T13</option>
+                      <option value="1500m T34">1500m T34</option>
+                      <option value="1500m T51">1500m T51</option>
+                      <option value="1500m T52">1500m T52</option>
+                      <option value="1500m T53">1500m T53</option>
+                      <option value="1500m T54">1500m T54</option>
+                    </optgroup>
+
+                    <optgroup label="Pista — Fondo">
+                      <option value="5000m T11">5000m T11</option>
+                      <option value="5000m T12">5000m T12</option>
+                      <option value="5000m T13">5000m T13</option>
+                      <option value="5000m T51">5000m T51</option>
+                      <option value="5000m T52">5000m T52</option>
+                      <option value="5000m T53">5000m T53</option>
+                      <option value="5000m T54">5000m T54</option>
+                      <option value="10000m T11">10000m T11</option>
+                      <option value="10000m T12">10000m T12</option>
+                      <option value="10000m T13">10000m T13</option>
+                      <option value="10000m T53">10000m T53</option>
+                      <option value="10000m T54">10000m T54</option>
+                    </optgroup>
+
+                    <optgroup label="Pista — Vallas">
+                      <option value="100m Vallas T37">100m Vallas T37</option>
+                      <option value="100m Vallas T38">100m Vallas T38</option>
+                      <option value="110m Vallas T44">110m Vallas T44</option>
+                      <option value="110m Vallas T47">110m Vallas T47</option>
+                      <option value="200m Vallas T37">200m Vallas T37</option>
+                      <option value="400m Vallas T38">400m Vallas T38</option>
+                      <option value="400m Vallas T47">400m Vallas T47</option>
+                    </optgroup>
+
+                    <optgroup label="Relevos">
+                      <option value="4x100m T11-T13">4x100m T11-T13</option>
+                      <option value="4x100m T35-T38">4x100m T35-T38</option>
+                      <option value="4x100m T42-T47">4x100m T42-T47</option>
+                      <option value="4x100m T53-T54">4x100m T53-T54</option>
+                      <option value="4x400m T11-T13">4x400m T11-T13</option>
+                      <option value="4x400m T53-T54">4x400m T53-T54</option>
+                    </optgroup>
+
+                    <optgroup label="Ruta / Fondo">
+                      <option value="Maratón T11">Maratón T11</option>
+                      <option value="Maratón T12">Maratón T12</option>
+                      <option value="Maratón T13">Maratón T13</option>
+                      <option value="Maratón T54">Maratón T54</option>
+                      <option value="Medio Maratón T11"
+                        >Medio Maratón T11</option
+                      >
+                      <option value="Medio Maratón T12"
+                        >Medio Maratón T12</option
+                      >
+                      <option value="Medio Maratón T13"
+                        >Medio Maratón T13</option
+                      >
+                      <option value="Medio Maratón T54"
+                        >Medio Maratón T54</option
+                      >
+                      <option value="10km Ruta T11">10km Ruta T11</option>
+                      <option value="10km Ruta T12">10km Ruta T12</option>
+                      <option value="10km Ruta T13">10km Ruta T13</option>
+                    </optgroup>
+
+                    <optgroup label="Saltos">
+                      <option value="Salto Largo F11">Salto Largo F11</option>
+                      <option value="Salto Largo F12">Salto Largo F12</option>
+                      <option value="Salto Largo F13">Salto Largo F13</option>
+                      <option value="Salto Largo F35">Salto Largo F35</option>
+                      <option value="Salto Largo F36">Salto Largo F36</option>
+                      <option value="Salto Largo F37">Salto Largo F37</option>
+                      <option value="Salto Largo F38">Salto Largo F38</option>
+                      <option value="Salto Largo F40">Salto Largo F40</option>
+                      <option value="Salto Largo F41">Salto Largo F41</option>
+                      <option value="Salto Largo F42">Salto Largo F42</option>
+                      <option value="Salto Largo F43">Salto Largo F43</option>
+                      <option value="Salto Largo F44">Salto Largo F44</option>
+                      <option value="Salto Largo F46">Salto Largo F46</option>
+                      <option value="Salto Largo F47">Salto Largo F47</option>
+                      <option value="Salto Alto F42">Salto Alto F42</option>
+                      <option value="Salto Alto F44">Salto Alto F44</option>
+                      <option value="Salto Alto F46">Salto Alto F46</option>
+                      <option value="Salto Triple F11">Salto Triple F11</option>
+                      <option value="Salto Triple F12">Salto Triple F12</option>
+                      <option value="Salto Triple F13">Salto Triple F13</option>
+                      <option value="Salto Triple F44">Salto Triple F44</option>
+                    </optgroup>
+
+                    <optgroup label="Lanzamientos">
+                      <option value="Lanzamiento Bala F11"
+                        >Lanzamiento Bala F11</option
+                      >
+                      <option value="Lanzamiento Bala F12"
+                        >Lanzamiento Bala F12</option
+                      >
+                      <option value="Lanzamiento Bala F13"
+                        >Lanzamiento Bala F13</option
+                      >
+                      <option value="Lanzamiento Bala F32"
+                        >Lanzamiento Bala F32 (sentado)</option
+                      >
+                      <option value="Lanzamiento Bala F33"
+                        >Lanzamiento Bala F33 (sentado)</option
+                      >
+                      <option value="Lanzamiento Bala F34"
+                        >Lanzamiento Bala F34 (sentado)</option
+                      >
+                      <option value="Lanzamiento Bala F35"
+                        >Lanzamiento Bala F35</option
+                      >
+                      <option value="Lanzamiento Bala F36"
+                        >Lanzamiento Bala F36</option
+                      >
+                      <option value="Lanzamiento Bala F37"
+                        >Lanzamiento Bala F37</option
+                      >
+                      <option value="Lanzamiento Bala F38"
+                        >Lanzamiento Bala F38</option
+                      >
+                      <option value="Lanzamiento Bala F40"
+                        >Lanzamiento Bala F40</option
+                      >
+                      <option value="Lanzamiento Bala F41"
+                        >Lanzamiento Bala F41</option
+                      >
+                      <option value="Lanzamiento Bala F42"
+                        >Lanzamiento Bala F42</option
+                      >
+                      <option value="Lanzamiento Bala F43"
+                        >Lanzamiento Bala F43</option
+                      >
+                      <option value="Lanzamiento Bala F44"
+                        >Lanzamiento Bala F44</option
+                      >
+                      <option value="Lanzamiento Bala F45"
+                        >Lanzamiento Bala F45</option
+                      >
+                      <option value="Lanzamiento Bala F46"
+                        >Lanzamiento Bala F46</option
+                      >
+                      <option value="Lanzamiento Disco F11"
+                        >Lanzamiento Disco F11</option
+                      >
+                      <option value="Lanzamiento Disco F12"
+                        >Lanzamiento Disco F12</option
+                      >
+                      <option value="Lanzamiento Disco F13"
+                        >Lanzamiento Disco F13</option
+                      >
+                      <option value="Lanzamiento Disco F32"
+                        >Lanzamiento Disco F32 (sentado)</option
+                      >
+                      <option value="Lanzamiento Disco F33"
+                        >Lanzamiento Disco F33 (sentado)</option
+                      >
+                      <option value="Lanzamiento Disco F34"
+                        >Lanzamiento Disco F34 (sentado)</option
+                      >
+                      <option value="Lanzamiento Disco F35"
+                        >Lanzamiento Disco F35</option
+                      >
+                      <option value="Lanzamiento Disco F36"
+                        >Lanzamiento Disco F36</option
+                      >
+                      <option value="Lanzamiento Disco F37"
+                        >Lanzamiento Disco F37</option
+                      >
+                      <option value="Lanzamiento Disco F38"
+                        >Lanzamiento Disco F38</option
+                      >
+                      <option value="Lanzamiento Disco F40"
+                        >Lanzamiento Disco F40</option
+                      >
+                      <option value="Lanzamiento Disco F41"
+                        >Lanzamiento Disco F41</option
+                      >
+                      <option value="Lanzamiento Disco F42"
+                        >Lanzamiento Disco F42</option
+                      >
+                      <option value="Lanzamiento Disco F44"
+                        >Lanzamiento Disco F44</option
+                      >
+                      <option value="Lanzamiento Disco F46"
+                        >Lanzamiento Disco F46</option
+                      >
+                      <option value="Lanzamiento Jabalina F11"
+                        >Lanzamiento Jabalina F11</option
+                      >
+                      <option value="Lanzamiento Jabalina F12"
+                        >Lanzamiento Jabalina F12</option
+                      >
+                      <option value="Lanzamiento Jabalina F13"
+                        >Lanzamiento Jabalina F13</option
+                      >
+                      <option value="Lanzamiento Jabalina F32"
+                        >Lanzamiento Jabalina F32 (sentado)</option
+                      >
+                      <option value="Lanzamiento Jabalina F33"
+                        >Lanzamiento Jabalina F33 (sentado)</option
+                      >
+                      <option value="Lanzamiento Jabalina F34"
+                        >Lanzamiento Jabalina F34 (sentado)</option
+                      >
+                      <option value="Lanzamiento Jabalina F35"
+                        >Lanzamiento Jabalina F35</option
+                      >
+                      <option value="Lanzamiento Jabalina F36"
+                        >Lanzamiento Jabalina F36</option
+                      >
+                      <option value="Lanzamiento Jabalina F37"
+                        >Lanzamiento Jabalina F37</option
+                      >
+                      <option value="Lanzamiento Jabalina F38"
+                        >Lanzamiento Jabalina F38</option
+                      >
+                      <option value="Lanzamiento Jabalina F40"
+                        >Lanzamiento Jabalina F40</option
+                      >
+                      <option value="Lanzamiento Jabalina F41"
+                        >Lanzamiento Jabalina F41</option
+                      >
+                      <option value="Lanzamiento Jabalina F42"
+                        >Lanzamiento Jabalina F42</option
+                      >
+                      <option value="Lanzamiento Jabalina F44"
+                        >Lanzamiento Jabalina F44</option
+                      >
+                      <option value="Lanzamiento Jabalina F46"
+                        >Lanzamiento Jabalina F46</option
+                      >
+                      <option value="Lanzamiento Martillo F32"
+                        >Lanzamiento Martillo F32 (sentado)</option
+                      >
+                      <option value="Lanzamiento Martillo F33"
+                        >Lanzamiento Martillo F33 (sentado)</option
+                      >
+                      <option value="Lanzamiento Martillo F34"
+                        >Lanzamiento Martillo F34 (sentado)</option
+                      >
+                      <option value="Lanzamiento Martillo F40"
+                        >Lanzamiento Martillo F40</option
+                      >
+                      <option value="Lanzamiento Martillo F41"
+                        >Lanzamiento Martillo F41</option
+                      >
+                      <option value="Lanzamiento Martillo F42"
+                        >Lanzamiento Martillo F42</option
+                      >
+                      <option value="Lanzamiento Martillo F44"
+                        >Lanzamiento Martillo F44</option
+                      >
+                      <option value="Lanzamiento Martillo F46"
+                        >Lanzamiento Martillo F46</option
+                      >
+                      <option value="Lanzamiento Club F31"
+                        >Lanzamiento Club F31</option
+                      >
+                      <option value="Lanzamiento Club F32"
+                        >Lanzamiento Club F32</option
+                      >
+                      <option value="Lanzamiento Club F51"
+                        >Lanzamiento Club F51</option
+                      >
+                    </optgroup>
+
+                    <optgroup label="Discapacidad Intelectual">
+                      <option value="100m T20">100m T20</option>
+                      <option value="200m T20">200m T20</option>
+                      <option value="400m T20">400m T20</option>
+                      <option value="800m T20">800m T20</option>
+                      <option value="1500m T20">1500m T20</option>
+                      <option value="5000m T20">5000m T20</option>
+                      <option value="10000m T20">10000m T20</option>
+                      <option value="Maratón T20">Maratón T20</option>
+                      <option value="Marcha 20km T20">Marcha 20km T20</option>
+                      <option value="Salto Largo F20">Salto Largo F20</option>
+                      <option value="Lanzamiento Bala F20"
+                        >Lanzamiento Bala F20</option
+                      >
+                      <option value="Lanzamiento Disco F20"
+                        >Lanzamiento Disco F20</option
+                      >
+                      <option value="Lanzamiento Jabalina F20"
+                        >Lanzamiento Jabalina F20</option
+                      >
+                    </optgroup>
+
+                    <optgroup label="Pruebas Combinadas">
+                      <option value="Pentatlón T11-T13"
+                        >Pentatlón T11-T13</option
+                      >
+                      <option value="Pentatlón T20">Pentatlón T20</option>
+                      <option value="Heptatlón T20">Heptatlón T20</option>
+                    </optgroup>
+                  </select>
+                  <span class="material-icons-round select-arrow"
+                    >expand_more</span
+                  >
+                </div>
+                <span class="error-msg" id="error-champ-event">Requerido.</span>
+              </div>
+              <div class="form-group">
+                <label for="champ-result"
+                  >Tiempo / Marca <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="champ-result"
+                  required
+                  placeholder="Ej. 11.45 s o 12.50 m"
+                />
+                <span class="error-msg" id="error-champ-result">Requerido.</span
+                >
+              </div>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="champ-date"
+                  >Fecha de Competencia <span class="required">*</span></label
+                >
+                <input type="date" id="champ-date" required />
+                <span class="error-msg" id="error-champ-date">Requerido.</span>
+              </div>
+              <div class="form-group">
+                <label for="champ-pos"
+                  >Posición / Medalla <span class="required">*</span></label
+                >
+                <div class="custom-select-wrapper">
+                  <select id="champ-pos" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Oro">Oro (1° Lugar)</option>
+                    <option value="Plata">Plata (2° Lugar)</option>
+                    <option value="Bronce">Bronce (3° Lugar)</option>
+                    <option value="Cuarto">Cuarto Lugar</option>
+                    <option value="Quinto">Quinto Lugar</option>
+                    <option value="Finalista">Finalista</option>
+                    <option value="Participación">Participación</option>
+                  </select>
+                  <span class="material-icons-round select-arrow"
+                    >expand_more</span
+                  >
+                </div>
+                <span class="error-msg" id="error-champ-pos">Requerido.</span>
+              </div>
+            </div>
+
+            <div class="form-actions-right">
+              <button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                id="btn-cancel-champ">Cancelar</button
+              >
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                id="btn-save-champ"
+              >
+                <span class="material-icons-round">check</span>
+                Añadir Registro
               </button>
             </div>
-            <form id="form-championship" class="compact-form" novalidate>
-              <div class="form-group-row">
-                <div class="form-group" style="width: 100%;">
-                  <label for="champ-name"
-                    >Nombre del Campeonato <span class="required">*</span
-                    ></label
-                  >
-                  <input
-                    type="text"
-                    id="champ-name"
-                    required
-                    placeholder="Ej. Juegos Paranacionales"
-                  />
-                  <span class="error-msg" id="error-champ-name">Requerido.</span
-                  >
-                </div>
-              </div>
-              <div class="form-group-row" style="gap: 10px;">
-                <div class="form-group" style="flex: 1;">
-                  <label for="champ-country"
-                    >País <span class="required">*</span></label
-                  >
-                  <div class="custom-select-wrapper">
-                    <select id="champ-country" required>
-                      <option value="">Cargando países...</option>
-                    </select>
-                    <span class="material-icons-round select-arrow"
-                      >expand_more</span
-                    >
-                  </div>
-                  <span class="error-msg" id="error-champ-country"
-                    >Requerido.</span
-                  >
-                </div>
-                <div class="form-group" style="flex: 1;">
-                  <label for="champ-state"
-                    >Estado / Dpto <span class="required">*</span></label
-                  >
-                  <div class="custom-select-wrapper">
-                    <select id="champ-state" required disabled>
-                      <option value="">Elija país...</option>
-                    </select>
-                    <span class="material-icons-round select-arrow"
-                      >expand_more</span
-                    >
-                  </div>
-                  <span class="error-msg" id="error-champ-state"
-                    >Requerido.</span
-                  >
-                </div>
-                <div class="form-group" style="flex: 1;">
-                  <label for="champ-city"
-                    >Ciudad / Municipio <span class="required">*</span></label
-                  >
-                  <div class="custom-select-wrapper">
-                    <select id="champ-city" required disabled>
-                      <option value="">Elija estado...</option>
-                    </select>
-                    <span class="material-icons-round select-arrow"
-                      >expand_more</span
-                    >
-                  </div>
-                  <span class="error-msg" id="error-champ-city">Requerido.</span
-                  >
-                </div>
-              </div>
-
-              <div class="form-group-row">
-                <div class="form-group">
-                  <label for="champ-event"
-                    >Prueba <span class="required">*</span></label
-                  >
-                  <input
-                    type="text"
-                    id="champ-event"
-                    required
-                    placeholder="Ej. 100m Planos o Lanzamiento"
-                  />
-                  <span class="error-msg" id="error-champ-event"
-                    >Requerido.</span
-                  >
-                </div>
-                <div class="form-group">
-                  <label for="champ-result"
-                    >Tiempo / Marca <span class="required">*</span></label
-                  >
-                  <input
-                    type="text"
-                    id="champ-result"
-                    required
-                    placeholder="Ej. 11.45 s o 12.50 m"
-                  />
-                  <span class="error-msg" id="error-champ-result"
-                    >Requerido.</span
-                  >
-                </div>
-              </div>
-
-              <div class="form-group-row">
-                <div class="form-group">
-                  <label for="champ-date"
-                    >Fecha de Competencia <span class="required">*</span></label
-                  >
-                  <input type="date" id="champ-date" required />
-                  <span class="error-msg" id="error-champ-date">Requerido.</span
-                  >
-                </div>
-                <div class="form-group">
-                  <label for="champ-pos"
-                    >Posición / Medalla <span class="required">*</span></label
-                  >
-                  <div class="custom-select-wrapper">
-                    <select id="champ-pos" required>
-                      <option value="">Seleccione...</option>
-                      <option value="Oro">Oro (1° Lugar)</option>
-                      <option value="Plata">Plata (2° Lugar)</option>
-                      <option value="Bronce">Bronce (3° Lugar)</option>
-                      <option value="Cuarto">Cuarto Lugar</option>
-                      <option value="Quinto">Quinto Lugar</option>
-                      <option value="Finalista">Finalista</option>
-                      <option value="Participación">Participación</option>
-                    </select>
-                    <span class="material-icons-round select-arrow"
-                      >expand_more</span
-                    >
-                  </div>
-                  <span class="error-msg" id="error-champ-pos">Requerido.</span>
-                </div>
-              </div>
-
-              <div class="form-actions-right">
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm"
-                  id="btn-cancel-champ">Cancelar</button
-                >
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  id="btn-save-champ"
-                >
-                  <span class="material-icons-round">check</span>
-                  Añadir Registro
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Listado de Campeonatos -->
-          <div class="championships-timeline" id="detail-championships-list">
-            <!-- Inyectado dinámicamente por JS -->
-          </div>
-
-          <div
-            class="empty-championships-state"
-            id="empty-championships-msg"
-            style="display: none;"
-          >
-            <span class="material-icons-round">emoji_events</span>
-            <h4>Sin Historial Deportivo</h4>
-            <p>
-              Este atleta aún no tiene campeonatos ni marcas oficiales
-              registradas.
-            </p>
-            <button
-              class="btn btn-primary-outline btn-sm mt-3"
-              id="btn-empty-champ-trigger"
-            >
-              Registrar Primer Campeonato
-            </button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
