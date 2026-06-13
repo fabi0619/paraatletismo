@@ -1,0 +1,28 @@
+---
+interface Props {
+	title?: string;
+}
+
+const { title = "Valle Oro Puro - Paraatletismo" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title}</title>
+		<!-- Etiquetas Meta SEO -->
+		<meta name="description" content="Plataforma de gestión e historial deportivo de atletas de la selección de paraatletismo del Valle del Cauca. Registro, marcas, campeonatos y clasificaciones." />
+		<meta name="keywords" content="paraatletismo, valle del cauca, atletismo adaptado, clasificacion deportiva, indeportes valle" />
+
+		<!-- Fuentes e Iconos -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+	</head>
+	<body class="bg-[#f8fafc] text-[#0f172a] min-h-screen relative font-['Plus_Jakarta_Sans',sans-serif]">
+		<slot />
+	</body>
+</html>
