@@ -371,6 +371,15 @@ function actualizarInterfazPorRol(usuario) {
     btnRegistrar.style.display = (usuario.rol === "admin" || usuario.rol === "profesor") ? "inline-flex" : "none";
   }
 
+  if (enlaceTabEventos) {
+    enlaceTabEventos.style.display = (usuario.rol === "admin" || usuario.rol === "profesor") ? "inline-flex" : "none";
+  }
+
+  const statChampCard = document.getElementById("stat-championships");
+  if (statChampCard) {
+    statChampCard.style.cursor = (usuario.rol === "admin" || usuario.rol === "profesor") ? "pointer" : "default";
+  }
+
   contenedorVistaAtletas.style.display = "block";
   contenedorVistaLogros.style.display = "none";
   if (contenedorVistaEventos) contenedorVistaEventos.style.display = "none";
@@ -467,11 +476,7 @@ function autollenarLugarDesdeEvento() {
 
 function renderStats() {
   const totalAthletes = currentAthletes.length;
-  let totalChamps = 0;
-
-  currentAthletes.forEach(athlete => {
-    totalChamps += (athlete.campeonatos || []).length;
-  });
+  const totalChamps = currentEventos.length;
 
   const statAthletesVal = document.getElementById("stat-athletes").querySelector(".stat-value");
   const statChampsVal = document.getElementById("stat-championships").querySelector(".stat-value");
@@ -620,6 +625,21 @@ function adjuntarEventosLogin() {
     });
   }
 
+  const statChampCard = document.getElementById("stat-championships");
+  if (statChampCard) {
+    statChampCard.style.cursor = "pointer";
+    statChampCard.title = "Ver eventos creados";
+    statChampCard.addEventListener("click", () => {
+      contenedorVistaAtletas.style.display = "none";
+      contenedorVistaLogros.style.display = "none";
+      contenedorVistaEventos.style.display = "block";
+      if (enlaceTabAtletas) enlaceTabAtletas.classList.remove("activo");
+      if (enlaceTabLogros) enlaceTabLogros.classList.remove("activo");
+      if (enlaceTabEventos) enlaceTabEventos.classList.add("activo");
+      renderizarEventos();
+    });
+  }
+
   const btnRegistrarLogro = document.getElementById("btn-registrar-logro");
   const modalAgregarLogro = document.getElementById("modal-agregar-logro");
   const btnCerrarModalLogro = document.getElementById("btn-cerrar-modal-logro");
@@ -684,6 +704,8 @@ function adjuntarEventosLogin() {
 // ==========================================================================
 function abrirModalEvento() {
   if (!modalAgregarEvento || !formEvento) return;
+  const usuario = obtenerUsuarioActual();
+  if (!usuario || (usuario.rol !== "admin" && usuario.rol !== "profesor")) return;
   formEvento.reset();
   limpiarErroresEvento();
   actualizarPreviewFechaEvento();
@@ -796,6 +818,8 @@ function renderizarEventos() {
 
   eventosGrid.style.display = "grid";
   eventosVacioState.style.display = "none";
+  const usuarioActual = obtenerUsuarioActual();
+  const puedeEditar = usuarioActual && (usuarioActual.rol === "admin" || usuarioActual.rol === "profesor");
 
   const eventosOrdenados = [...currentEventos].sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio));
   eventosOrdenados.forEach(evento => {
@@ -820,19 +844,22 @@ function renderizarEventos() {
       <div class="evento-footer">
         <span>${evento.creadoPorNombre || "Registro del sistema"}</span>
         ${evento.origen === "local" ? '<span class="evento-local-badge">Local</span>' : ""}
+        ${puedeEditar ? `
         <button class="btn-icon-sm btn-delete-evento text-red" title="Eliminar evento">
           <span class="material-icons-round">delete</span>
-        </button>
+        </button>` : ""}
       </div>
     `;
 
-    card.querySelector(".btn-delete-evento").addEventListener("click", async () => {
-      if (confirm(`Â¿Eliminar el evento "${evento.nombre}"?`)) {
-        await eliminarEvento(evento.id);
-        currentEventos = await obtenerEventos();
-        renderizarEventos();
-      }
-    });
+    if (puedeEditar) {
+      card.querySelector(".btn-delete-evento").addEventListener("click", async () => {
+        if (confirm(`¿Eliminar el evento "${evento.nombre}"?`)) {
+          await eliminarEvento(evento.id);
+          currentEventos = await obtenerEventos();
+          renderizarEventos();
+        }
+      });
+    }
 
     eventosGrid.appendChild(card);
   });
