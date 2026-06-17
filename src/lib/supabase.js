@@ -118,6 +118,101 @@ export async function deleteChampionship(athleteId, championshipId) {
 }
 
 // ==========================================================================
+// CRUD EVENTOS
+// ==========================================================================
+
+const EVENTOS_STORAGE_KEY = "para_eventos_local";
+
+function leerEventosLocales() {
+  try {
+    return JSON.parse(localStorage.getItem(EVENTOS_STORAGE_KEY)) || [];
+  } catch (error) {
+    console.warn("No se pudieron leer eventos locales:", error);
+    return [];
+  }
+}
+
+function guardarEventosLocales(eventos) {
+  localStorage.setItem(EVENTOS_STORAGE_KEY, JSON.stringify(eventos));
+}
+
+function mapEvento(evento) {
+  return {
+    id: evento.id,
+    nombre: evento.nombre,
+    pais: evento.pais,
+    departamento: evento.departamento,
+    ciudad: evento.ciudad,
+    fechaInicio: evento.fecha_inicio || evento.fechaInicio,
+    fechaFin: evento.fecha_fin || evento.fechaFin,
+    fechaTexto: evento.fecha_texto || evento.fechaTexto,
+    creadoPor: evento.creado_por || evento.creadoPor,
+    creadoPorNombre: evento.creado_por_nombre || evento.creadoPorNombre,
+    origen: evento.origen || "supabase"
+  };
+}
+
+export async function obtenerEventos() {
+  const { data, error } = await supabase
+    .from('para_eventos')
+    .select('*')
+    .order('fecha_inicio', { ascending: false });
+
+  if (error) {
+    console.warn("Usando eventos locales. Para sincronizar en Supabase cree la tabla para_eventos:", error.message);
+    return leerEventosLocales();
+  }
+
+  return (data || []).map(mapEvento);
+}
+
+export async function guardarEvento(evento) {
+  const payload = {
+    nombre: evento.nombre,
+    pais: evento.pais,
+    departamento: evento.departamento,
+    ciudad: evento.ciudad,
+    fecha_inicio: evento.fechaInicio,
+    fecha_fin: evento.fechaFin,
+    fecha_texto: evento.fechaTexto,
+    creado_por: evento.creadoPor,
+    creado_por_nombre: evento.creadoPorNombre
+  };
+
+  const { data, error } = await supabase
+    .from('para_eventos')
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) {
+    console.warn("Guardando evento en respaldo local:", error.message);
+    const eventosLocales = leerEventosLocales();
+    const eventoLocal = {
+      ...evento,
+      id: `evento-${Date.now()}`,
+      origen: "local"
+    };
+    eventosLocales.unshift(eventoLocal);
+    guardarEventosLocales(eventosLocales);
+    return eventoLocal;
+  }
+
+  return mapEvento(data);
+}
+
+export async function eliminarEvento(eventoId) {
+  if (String(eventoId).startsWith("evento-")) {
+    guardarEventosLocales(leerEventosLocales().filter(evento => evento.id !== eventoId));
+    return true;
+  }
+
+  const { error } = await supabase.from('para_eventos').delete().eq('id', eventoId);
+  if (error) throw error;
+  return true;
+}
+
+// ==========================================================================
 // CRUD DOCUMENTOS
 // ==========================================================================
 

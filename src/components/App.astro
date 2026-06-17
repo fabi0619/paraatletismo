@@ -337,6 +337,15 @@ import "../styles/index.css";
       <span class="material-icons-round">emoji_events</span>
       Logros de Entrenadores
     </button>
+    <button
+      type="button"
+      class="btn btn-secondary tab-enlace"
+      id="enlace-tab-eventos"
+      style="border-radius: var(--radius-sm); font-size: 0.9rem; padding: 8px 16px;"
+    >
+      <span class="material-icons-round">event_available</span>
+      Eventos
+    </button>
   </nav>
 
   <!-- VISTA PRINCIPAL DE ATLETAS (Buscador y Grilla) -->
@@ -490,6 +499,50 @@ import "../styles/index.css";
       </div>
     </section>
   </div>
+
+  <!-- VISTA SECUNDARIA DE EVENTOS -->
+  <div id="contenedor-vista-eventos" style="display: none;">
+    <section class="filter-section">
+      <div
+        class="section-title-between"
+        style="margin-bottom: 0; display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 16px; flex-wrap: wrap;"
+      >
+        <div class="logo-text">
+          <h2 class="section-title" style="font-size: 1.25rem;">
+            Calendario de Eventos
+          </h2>
+          <p
+            style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;"
+          >
+            Registro oficial de eventos por ubicación y rango de fechas
+          </p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-registrar-evento">
+          <span class="material-icons-round">add_location_alt</span>
+          Registrar Evento
+        </button>
+      </div>
+    </section>
+
+    <section class="athletes-section eventos-section" style="margin-top: 25px;">
+      <div class="eventos-grid" id="eventos-grid">
+        <!-- Inyectado dinámicamente por JS -->
+      </div>
+
+      <div class="empty-state" id="eventos-vacio-state" style="display: none;">
+        <span class="material-icons-round empty-icon">event_busy</span>
+        <h3>Sin eventos registrados</h3>
+        <p>
+          Admin y profesores pueden crear el calendario de eventos desde esta
+          sección.
+        </p>
+        <button class="btn btn-primary" id="btn-empty-evento-trigger">
+          <span class="material-icons-round">add_location_alt</span>
+          Registrar Evento
+        </button>
+      </div>
+    </section>
+  </div>
 </main>
 
 <!-- Pie de Página -->
@@ -528,6 +581,104 @@ import "../styles/index.css";
 </footer>
 
 <!-- MODAL: REGISTRO / EDICIÓN DE ATLETA -->
+<div class="modal-overlay" id="modal-agregar-evento" style="display: none;">
+  <div class="modal-content" style="max-width: 680px;">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <span class="material-icons-round modal-icon">event_available</span>
+        <div>
+          <h3>Registrar Evento</h3>
+          <p>Nombre, ubicación y calendario del evento.</p>
+        </div>
+      </div>
+      <button class="btn-close-sm" id="btn-cerrar-modal-evento">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+
+    <form id="form-evento" class="compact-form" novalidate>
+      <div class="form-group">
+        <label for="evento-nombre"
+          >Nombre del Evento <span class="required">*</span></label
+        >
+        <input
+          type="text"
+          id="evento-nombre"
+          required
+          placeholder="Ej. Juegos Paranacionales"
+        />
+        <span class="error-msg" id="error-evento-nombre">Requerido.</span>
+      </div>
+
+      <div class="form-group-row" style="gap: 10px;">
+        <div class="form-group" style="flex: 1;">
+          <label for="evento-country">País <span class="required">*</span></label>
+          <div class="custom-select-wrapper">
+            <select id="evento-country" required>
+              <option value="">Cargando países...</option>
+            </select>
+            <span class="material-icons-round select-arrow">expand_more</span>
+          </div>
+          <span class="error-msg" id="error-evento-country">Requerido.</span>
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label for="evento-state"
+            >Departamento / Estado <span class="required">*</span></label
+          >
+          <div class="custom-select-wrapper">
+            <select id="evento-state" required disabled>
+              <option value="">Elija país...</option>
+            </select>
+            <span class="material-icons-round select-arrow">expand_more</span>
+          </div>
+          <span class="error-msg" id="error-evento-state">Requerido.</span>
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label for="evento-city">Ciudad <span class="required">*</span></label>
+          <div class="custom-select-wrapper">
+            <select id="evento-city" required disabled>
+              <option value="">Elija departamento...</option>
+            </select>
+            <span class="material-icons-round select-arrow">expand_more</span>
+          </div>
+          <span class="error-msg" id="error-evento-city">Requerido.</span>
+        </div>
+      </div>
+
+      <div class="form-group-row">
+        <div class="form-group">
+          <label for="evento-fecha-inicio"
+            >Fecha de Inicio <span class="required">*</span></label
+          >
+          <input type="date" id="evento-fecha-inicio" required />
+          <span class="error-msg" id="error-evento-fecha-inicio">Requerido.</span>
+        </div>
+        <div class="form-group">
+          <label for="evento-fecha-fin"
+            >Fecha de Finalización <span class="required">*</span></label
+          >
+          <input type="date" id="evento-fecha-fin" required />
+          <span class="error-msg" id="error-evento-fecha-fin">Requerido.</span>
+        </div>
+      </div>
+
+      <div class="evento-date-preview" id="evento-date-preview">
+        Seleccione inicio y finalización para ver cómo quedará la fecha.
+      </div>
+
+      <div class="form-actions-right">
+        <button type="button" class="btn btn-secondary" id="btn-cancelar-evento">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" id="btn-guardar-evento">
+          <span class="material-icons-round">save</span>
+          Guardar Evento
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-register">
   <div class="modal-card">
     <div class="modal-header">
@@ -1147,14 +1298,19 @@ import "../styles/index.css";
             <div class="form-group-row">
               <div class="form-group" style="width: 100%;">
                 <label for="champ-name"
-                  >Nombre del Campeonato <span class="required">*</span></label
+                  >Evento <span class="required">*</span></label
                 >
-                <input
-                  type="text"
+                <div class="custom-select-wrapper">
+                  <select
                   id="champ-name"
                   required
-                  placeholder="Ej. Juegos Paranacionales"
-                />
+                >
+                  <option value="">Seleccione un evento...</option>
+                </select>
+                  <span class="material-icons-round select-arrow"
+                    >expand_more</span
+                  >
+                </div>
                 <span class="error-msg" id="error-champ-name">Requerido.</span>
               </div>
             </div>
