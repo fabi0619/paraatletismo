@@ -1,4 +1,4 @@
-import {
+﻿import {
   getAthletes,
   saveAthlete,
   deleteAthlete,
@@ -12,16 +12,20 @@ import {
   registrarProfesor,
   obtenerLogros,
   guardarLogro,
-  eliminarLogro
+  eliminarLogro,
+  obtenerEventos,
+  guardarEvento,
+  eliminarEvento
 } from "./lib/supabase.js";
 import { CLASES_DEPORTIVAS, DISCAPACIDADES } from "./lib/classes.js";
 
 // ==========================================================================
-// ESTADO GLOBAL DE LA APLICACIÓN
+// ESTADO GLOBAL DE LA APLICACIÃ“N
 // ==========================================================================
 let currentAthletes = [];
 let selectedAthleteId = null;
 let currentProfilePhotoBase64 = null;
+let currentEventos = [];
 
 // Elementos del DOM - Dashboard
 const searchInput = document.getElementById("search-input");
@@ -34,7 +38,7 @@ const resultsCount = document.getElementById("results-count");
 const athletesGrid = document.getElementById("athletes-grid");
 const emptyState = document.getElementById("empty-state");
 
-// Elementos del DOM - Estadísticas
+// Elementos del DOM - EstadÃ­sticas
 const statChampsVal = document.getElementById("stat-championships").querySelector(".stat-value");
 
 // Elementos del DOM - Modal Registro
@@ -113,14 +117,15 @@ const btnCancelChamp = document.getElementById("btn-cancel-champ");
 const btnSaveChamp = document.getElementById("btn-save-champ");
 const detailChampsList = document.getElementById("detail-championships-table-body");
 const emptyChampsMsg = document.getElementById("empty-championships-msg");
+const champName = document.getElementById("champ-name");
 
-// Elementos de Ubicación (Logros)
+// Elementos de UbicaciÃ³n (Logros)
 const champCountry = document.getElementById("champ-country");
 const champState = document.getElementById("champ-state");
 const champCity = document.getElementById("champ-city");
 
 // ==========================================================================
-// REFERENCIAS AL DOM - AUTENTICACIÓN Y SESIÓN
+// REFERENCIAS AL DOM - AUTENTICACIÃ“N Y SESIÃ“N
 // ==========================================================================
 const contenedorLogin = document.getElementById("contenedor-login");
 const selectoresRol = document.getElementById("selectores-rol");
@@ -136,16 +141,35 @@ const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
 const navegacionPrincipal = document.getElementById("navegacion-principal");
 const enlaceTabAtletas = document.getElementById("enlace-tab-atletas");
 const enlaceTabLogros = document.getElementById("enlace-tab-logros");
+const enlaceTabEventos = document.getElementById("enlace-tab-eventos");
 const contenedorVistaAtletas = document.getElementById("contenedor-vista-atletas");
 const contenedorVistaLogros = document.getElementById("contenedor-vista-logros");
+const contenedorVistaEventos = document.getElementById("contenedor-vista-eventos");
 const btnPortalLogin = document.getElementById("btn-portal-login");
 const btnCerrarModalLogin = document.getElementById("btn-cerrar-modal-login");
+
+// Elementos del DOM - Eventos
+const btnRegistrarEvento = document.getElementById("btn-registrar-evento");
+const btnEmptyEventoTrigger = document.getElementById("btn-empty-evento-trigger");
+const modalAgregarEvento = document.getElementById("modal-agregar-evento");
+const formEvento = document.getElementById("form-evento");
+const btnCerrarModalEvento = document.getElementById("btn-cerrar-modal-evento");
+const btnCancelarEvento = document.getElementById("btn-cancelar-evento");
+const btnGuardarEvento = document.getElementById("btn-guardar-evento");
+const eventosGrid = document.getElementById("eventos-grid");
+const eventosVacioState = document.getElementById("eventos-vacio-state");
+const eventoCountry = document.getElementById("evento-country");
+const eventoState = document.getElementById("evento-state");
+const eventoCity = document.getElementById("evento-city");
+const eventoFechaInicio = document.getElementById("evento-fecha-inicio");
+const eventoFechaFin = document.getElementById("evento-fecha-fin");
+const eventoDatePreview = document.getElementById("evento-date-preview");
 
 // Variable que almacena el rol seleccionado en la pantalla de login
 let rolSeleccionado = "admin";
 
 // ==========================================================================
-// INICIALIZACIÓN Y CARGA DE DATOS
+// INICIALIZACIÃ“N Y CARGA DE DATOS
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
   verificarSesionActiva();
@@ -153,10 +177,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFilterSelects();
   attachEventListeners();
   adjuntarEventosLogin();
-  fetchCountries(); // Cargar países de la API mundial
+  fetchCountries(); // Cargar paÃ­ses de la API mundial
 });
 
-// Cache para los países y estados
+// Cache para los paÃ­ses y estados
 window.countriesData = [];
 
 async function fetchCountries() {
@@ -165,60 +189,79 @@ async function fetchCountries() {
     const data = await response.json();
     if (!data.error) {
       window.countriesData = data.data;
-      if (champCountry) {
-        champCountry.innerHTML = '<option value="">Seleccione país...</option>';
-        data.data.forEach(countryObj => {
-          const opt = document.createElement("option");
-          opt.value = countryObj.name;
-          opt.textContent = countryObj.name;
-          champCountry.appendChild(opt);
-        });
-      }
+      populateCountrySelect(champCountry);
+      populateCountrySelect(eventoCountry);
     }
   } catch (error) {
-    console.error("Error cargando países:", error);
-    if (champCountry) champCountry.innerHTML = '<option value="Error">Error cargando países</option>';
+    console.error("Error cargando paÃ­ses:", error);
+    if (champCountry) champCountry.innerHTML = '<option value="Error">Error cargando paÃ­ses</option>';
+    if (eventoCountry) eventoCountry.innerHTML = '<option value="Error">Error cargando paÃ­ses</option>';
   }
 }
 
+function populateCountrySelect(countrySelect) {
+  if (!countrySelect || !window.countriesData.length) return;
+  countrySelect.innerHTML = '<option value="">Seleccione paÃ­s...</option>';
+  window.countriesData.forEach(countryObj => {
+    const opt = document.createElement("option");
+    opt.value = countryObj.name;
+    opt.textContent = countryObj.name;
+    countrySelect.appendChild(opt);
+  });
+}
+
 async function handleCountryChange() {
-  const selectedCountryName = champCountry.value;
-  champState.innerHTML = '<option value="">Seleccione estado...</option>';
-  champCity.innerHTML = '<option value="">Seleccione estado primero...</option>';
-  champState.disabled = true;
-  champCity.disabled = true;
+  await updateStateSelect(champCountry, champState, champCity);
+}
+
+async function handleEventCountryChange() {
+  await updateStateSelect(eventoCountry, eventoState, eventoCity);
+}
+
+async function updateStateSelect(countrySelect, stateSelect, citySelect) {
+  const selectedCountryName = countrySelect.value;
+  stateSelect.innerHTML = '<option value="">Seleccione estado...</option>';
+  citySelect.innerHTML = '<option value="">Seleccione estado primero...</option>';
+  stateSelect.disabled = true;
+  citySelect.disabled = true;
 
   if (!selectedCountryName) return;
 
   const countryObj = window.countriesData.find(c => c.name === selectedCountryName);
   if (countryObj && countryObj.states && countryObj.states.length > 0) {
-    champState.disabled = false;
+    stateSelect.disabled = false;
     countryObj.states.forEach(stateObj => {
       const opt = document.createElement("option");
       opt.value = stateObj.name;
       opt.textContent = stateObj.name;
-      champState.appendChild(opt);
+      stateSelect.appendChild(opt);
     });
   } else {
-    // Si el país no tiene estados en la API
-    champState.innerHTML = '<option value="N/A">N/A</option>';
-    champState.disabled = false;
-    handleStateChange(); // Disparar la carga de ciudades
+    stateSelect.innerHTML = '<option value="N/A">N/A</option>';
+    stateSelect.disabled = false;
+    updateCitySelect(countrySelect, stateSelect, citySelect);
   }
 }
 
 async function handleStateChange() {
-  const selectedCountryName = champCountry.value;
-  const selectedStateName = champState.value;
+  await updateCitySelect(champCountry, champState, champCity);
+}
+
+async function handleEventStateChange() {
+  await updateCitySelect(eventoCountry, eventoState, eventoCity);
+}
+
+async function updateCitySelect(countrySelect, stateSelect, citySelect) {
+  const selectedCountryName = countrySelect.value;
+  const selectedStateName = stateSelect.value;
   
-  champCity.innerHTML = '<option value="">Cargando ciudades...</option>';
-  champCity.disabled = true;
+  citySelect.innerHTML = '<option value="">Cargando ciudades...</option>';
+  citySelect.disabled = true;
 
   if (!selectedStateName) return;
 
   if (selectedStateName === "N/A") {
-    // Intentar buscar ciudades directamente por país si no hay estado
-    fetchCitiesForCountry(selectedCountryName);
+    fetchCitiesForCountry(selectedCountryName, citySelect);
     return;
   }
 
@@ -229,28 +272,28 @@ async function handleStateChange() {
       body: JSON.stringify({ country: selectedCountryName, state: selectedStateName })
     });
     const data = await response.json();
-    champCity.innerHTML = '<option value="">Seleccione ciudad/municipio...</option>';
+    citySelect.innerHTML = '<option value="">Seleccione ciudad/municipio...</option>';
     
     if (!data.error && data.data && data.data.length > 0) {
-      champCity.disabled = false;
+      citySelect.disabled = false;
       data.data.forEach(city => {
         const opt = document.createElement("option");
         opt.value = city;
         opt.textContent = city;
-        champCity.appendChild(opt);
+        citySelect.appendChild(opt);
       });
     } else {
-      champCity.innerHTML = '<option value="N/A">N/A (No hay ciudades en este estado)</option>';
-      champCity.disabled = false;
+      citySelect.innerHTML = '<option value="N/A">N/A (No hay ciudades en este estado)</option>';
+      citySelect.disabled = false;
     }
   } catch (error) {
     console.error("Error fetching cities:", error);
-    champCity.innerHTML = '<option value="N/A">N/A</option>';
-    champCity.disabled = false;
+    citySelect.innerHTML = '<option value="N/A">N/A</option>';
+    citySelect.disabled = false;
   }
 }
 
-async function fetchCitiesForCountry(countryName) {
+async function fetchCitiesForCountry(countryName, citySelect = champCity) {
   try {
     const response = await fetch("https://countriesnow.space/api/v0.1/countries/cities", {
       method: "POST",
@@ -258,27 +301,27 @@ async function fetchCitiesForCountry(countryName) {
       body: JSON.stringify({ country: countryName })
     });
     const data = await response.json();
-    champCity.innerHTML = '<option value="">Seleccione ciudad...</option>';
+    citySelect.innerHTML = '<option value="">Seleccione ciudad...</option>';
     
     if (!data.error && data.data && data.data.length > 0) {
-      champCity.disabled = false;
+      citySelect.disabled = false;
       data.data.forEach(city => {
         const opt = document.createElement("option");
         opt.value = city;
         opt.textContent = city;
-        champCity.appendChild(opt);
+        citySelect.appendChild(opt);
       });
     } else {
-      champCity.innerHTML = '<option value="N/A">N/A</option>';
-      champCity.disabled = false;
+      citySelect.innerHTML = '<option value="N/A">N/A</option>';
+      citySelect.disabled = false;
     }
   } catch (error) {
-    champCity.innerHTML = '<option value="N/A">N/A</option>';
-    champCity.disabled = false;
+    citySelect.innerHTML = '<option value="N/A">N/A</option>';
+    citySelect.disabled = false;
   }
 }
 
-// Verifica si ya hay una sesión guardada y muestra/oculta la pantalla de login
+// Verifica si ya hay una sesiÃ³n guardada y muestra/oculta la pantalla de login
 function verificarSesionActiva() {
   const usuarioActual = obtenerUsuarioActual();
   if (usuarioActual) {
@@ -286,12 +329,12 @@ function verificarSesionActiva() {
     contenedorLogin.style.display = "none";
     actualizarInterfazPorRol(usuarioActual);
   } else {
-    // Si no hay sesión, la página de inicio sigue siendo pública
+    // Si no hay sesiÃ³n, la pÃ¡gina de inicio sigue siendo pÃºblica
     contenedorLogin.style.display = "none";
     if (btnPortalLogin) btnPortalLogin.style.display = "inline-flex";
     if (indicadorSesion) indicadorSesion.style.display = "none";
     
-    // Ocultar botones de administración pública
+    // Ocultar botones de administraciÃ³n pÃºblica
     const btnRegistrar = document.getElementById("btn-open-register");
     if (btnRegistrar) btnRegistrar.style.display = "none";
     
@@ -300,7 +343,7 @@ function verificarSesionActiva() {
   }
 }
 
-// Muestra los elementos correctos en la interfaz según el rol del usuario
+// Muestra los elementos correctos en la interfaz segÃºn el rol del usuario
 function actualizarInterfazPorRol(usuario) {
   indicadorSesion.style.display = "flex";
   sesionNombreUsuario.textContent = usuario.nombre;
@@ -330,14 +373,19 @@ function actualizarInterfazPorRol(usuario) {
 
   contenedorVistaAtletas.style.display = "block";
   contenedorVistaLogros.style.display = "none";
+  if (contenedorVistaEventos) contenedorVistaEventos.style.display = "none";
   enlaceTabAtletas.classList.add("activo");
   enlaceTabLogros.classList.remove("activo");
+  if (enlaceTabEventos) enlaceTabEventos.classList.remove("activo");
 }
 
 async function loadData() {
   currentAthletes = await getAthletes();
+  currentEventos = await obtenerEventos();
   renderStats();
   renderAthletesGrid();
+  renderizarEventos();
+  populateChampEventSelect();
 }
 
 function setupFilterSelects() {
@@ -365,6 +413,58 @@ function populateClasesSelect(selectElement, discapacityId, classType, defaultTe
   });
 }
 
+function populateChampEventSelect() {
+  if (!champName) return;
+  champName.innerHTML = '<option value="">Seleccione un evento...</option>';
+
+  const eventosOrdenados = [...currentEventos].sort((a, b) => {
+    const aFecha = a.fechaInicio || a.fecha_inicio || "";
+    const bFecha = b.fechaInicio || b.fecha_inicio || "";
+    return new Date(bFecha) - new Date(aFecha);
+  });
+
+  eventosOrdenados.forEach(evento => {
+    const option = document.createElement("option");
+    option.value = evento.nombre;
+    option.textContent = evento.fechaTexto
+      ? `${evento.nombre} - ${evento.fechaTexto}`
+      : evento.nombre;
+    champName.appendChild(option);
+  });
+}
+
+function autollenarLugarDesdeEvento() {
+  if (!champName || !champCountry || !champState || !champCity) return;
+
+  const eventoSeleccionado = currentEventos.find(evento => evento.nombre === champName.value);
+  if (!eventoSeleccionado) {
+    populateCountrySelect(champCountry);
+    champState.innerHTML = '<option value="">Seleccione estado...</option>';
+    champCity.innerHTML = '<option value="">Seleccione ciudad...</option>';
+    champCountry.value = "";
+    champState.value = "";
+    champCity.value = "";
+    champCountry.disabled = false;
+    champState.disabled = true;
+    champCity.disabled = true;
+    return;
+  }
+
+  champCountry.value = eventoSeleccionado.pais || "";
+  champState.innerHTML = `<option value="${eventoSeleccionado.departamento || ""}" selected>${eventoSeleccionado.departamento || "Sin departamento"}</option>`;
+  champCity.innerHTML = `<option value="${eventoSeleccionado.ciudad || ""}" selected>${eventoSeleccionado.ciudad || "Sin ciudad"}</option>`;
+  if (eventoSeleccionado.pais) {
+    const countryOptionExists = Array.from(champCountry.options).some(opt => opt.value === eventoSeleccionado.pais);
+    if (!countryOptionExists) {
+      populateCountrySelect(champCountry);
+    }
+    champCountry.value = eventoSeleccionado.pais;
+  }
+  champCountry.disabled = true;
+  champState.disabled = true;
+  champCity.disabled = true;
+}
+
 function renderStats() {
   const totalAthletes = currentAthletes.length;
   let totalChamps = 0;
@@ -381,7 +481,7 @@ function renderStats() {
 }
 
 // ==========================================================================
-// LÓGICA DE AUTENTICACIÓN - LOGIN, REGISTRO Y SESIÓN
+// LÃ“GICA DE AUTENTICACIÃ“N - LOGIN, REGISTRO Y SESIÃ“N
 // ==========================================================================
 function adjuntarEventosLogin() {
   const botonesRol = selectoresRol.querySelectorAll(".btn-rol");
@@ -407,13 +507,13 @@ function adjuntarEventosLogin() {
         switchRegistro.style.display = "none";
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
       } else if (rolSeleccionado === "profesor") {
-        etiquetaUsuario.textContent = "Correo Electrónico";
+        etiquetaUsuario.textContent = "Correo ElectrÃ³nico";
         inputLoginUsuario.placeholder = "ejemplo@valle.co";
         inputLoginUsuario.type = "email";
         switchRegistro.style.display = "block";
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
       } else if (rolSeleccionado === "atleta") {
-        etiquetaUsuario.textContent = "Correo Electrónico";
+        etiquetaUsuario.textContent = "Correo ElectrÃ³nico";
         inputLoginUsuario.placeholder = "ejemplo@valle.co";
         inputLoginUsuario.type = "email";
         switchRegistro.style.display = "none";
@@ -489,8 +589,10 @@ function adjuntarEventosLogin() {
     enlaceTabAtletas.addEventListener("click", () => {
       contenedorVistaAtletas.style.display = "block";
       contenedorVistaLogros.style.display = "none";
+      if (contenedorVistaEventos) contenedorVistaEventos.style.display = "none";
       enlaceTabAtletas.classList.add("activo");
       enlaceTabLogros.classList.remove("activo");
+      if (enlaceTabEventos) enlaceTabEventos.classList.remove("activo");
     });
   }
 
@@ -498,9 +600,23 @@ function adjuntarEventosLogin() {
     enlaceTabLogros.addEventListener("click", () => {
       contenedorVistaAtletas.style.display = "none";
       contenedorVistaLogros.style.display = "block";
+      if (contenedorVistaEventos) contenedorVistaEventos.style.display = "none";
       enlaceTabAtletas.classList.remove("activo");
       enlaceTabLogros.classList.add("activo");
+      if (enlaceTabEventos) enlaceTabEventos.classList.remove("activo");
       renderizarLogros();
+    });
+  }
+
+  if (enlaceTabEventos) {
+    enlaceTabEventos.addEventListener("click", () => {
+      contenedorVistaAtletas.style.display = "none";
+      contenedorVistaLogros.style.display = "none";
+      contenedorVistaEventos.style.display = "block";
+      enlaceTabAtletas.classList.remove("activo");
+      enlaceTabLogros.classList.remove("activo");
+      enlaceTabEventos.classList.add("activo");
+      renderizarEventos();
     });
   }
 
@@ -538,6 +654,221 @@ function adjuntarEventosLogin() {
       if (e.target === modalAgregarLogro) modalAgregarLogro.style.display = "none";
     });
   }
+
+  if (champCountry) champCountry.addEventListener("change", handleCountryChange);
+  if (champState) champState.addEventListener("change", handleStateChange);
+  if (eventoCountry) eventoCountry.addEventListener("change", handleEventCountryChange);
+  if (eventoState) eventoState.addEventListener("change", handleEventStateChange);
+  if (eventoFechaInicio) eventoFechaInicio.addEventListener("change", actualizarPreviewFechaEvento);
+  if (eventoFechaFin) eventoFechaFin.addEventListener("change", actualizarPreviewFechaEvento);
+  if (btnRegistrarEvento) btnRegistrarEvento.addEventListener("click", abrirModalEvento);
+  if (btnEmptyEventoTrigger) btnEmptyEventoTrigger.addEventListener("click", abrirModalEvento);
+  if (btnCerrarModalEvento) btnCerrarModalEvento.addEventListener("click", cerrarModalEvento);
+  if (btnCancelarEvento) btnCancelarEvento.addEventListener("click", cerrarModalEvento);
+  if (btnGuardarEvento) btnGuardarEvento.addEventListener("click", manejarGuardarEvento);
+  if (formEvento) {
+    formEvento.addEventListener("submit", (e) => {
+      e.preventDefault();
+      manejarGuardarEvento();
+    });
+  }
+  if (modalAgregarEvento) {
+    modalAgregarEvento.addEventListener("click", (e) => {
+      if (e.target === modalAgregarEvento) cerrarModalEvento();
+    });
+  }
+}
+
+// ==========================================================================
+// GESTIÃ“N DE EVENTOS
+// ==========================================================================
+function abrirModalEvento() {
+  if (!modalAgregarEvento || !formEvento) return;
+  formEvento.reset();
+  limpiarErroresEvento();
+  actualizarPreviewFechaEvento();
+  if (eventoState) {
+    eventoState.innerHTML = '<option value="">Elija paÃ­s...</option>';
+    eventoState.disabled = true;
+  }
+  if (eventoCity) {
+    eventoCity.innerHTML = '<option value="">Elija departamento...</option>';
+    eventoCity.disabled = true;
+  }
+  populateCountrySelect(eventoCountry);
+  modalAgregarEvento.style.display = "flex";
+  modalAgregarEvento.classList.add("active");
+}
+
+function cerrarModalEvento() {
+  if (!modalAgregarEvento) return;
+  modalAgregarEvento.classList.remove("active");
+  modalAgregarEvento.style.display = "none";
+}
+
+async function manejarGuardarEvento() {
+  if (!validarFormularioEvento()) return;
+
+  const usuario = obtenerUsuarioActual();
+  const fechaInicio = eventoFechaInicio.value;
+  const fechaFin = eventoFechaFin.value;
+
+  const evento = {
+    nombre: document.getElementById("evento-nombre").value.trim(),
+    pais: eventoCountry.value,
+    departamento: eventoState.value,
+    ciudad: eventoCity.value,
+    fechaInicio,
+    fechaFin,
+    fechaTexto: formatearRangoEvento(fechaInicio, fechaFin),
+    creadoPor: usuario ? usuario.id : "admin",
+    creadoPorNombre: usuario ? usuario.nombre : "Administrador"
+  };
+
+  await guardarEvento(evento);
+  currentEventos = await obtenerEventos();
+  renderizarEventos();
+  cerrarModalEvento();
+}
+
+function validarFormularioEvento() {
+  let isValid = true;
+  limpiarErroresEvento();
+
+  [
+    "evento-nombre",
+    "evento-country",
+    "evento-state",
+    "evento-city",
+    "evento-fecha-inicio",
+    "evento-fecha-fin"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || !el.value) {
+      if (el) el.closest(".form-group").classList.add("error");
+      isValid = false;
+    }
+  });
+
+  if (eventoFechaInicio.value && eventoFechaFin.value && eventoFechaFin.value < eventoFechaInicio.value) {
+    eventoFechaFin.closest(".form-group").classList.add("error");
+    eventoDatePreview.textContent = "La fecha de finalizaciÃ³n no puede ser anterior al inicio.";
+    eventoDatePreview.classList.add("error");
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+function limpiarErroresEvento() {
+  if (!formEvento) return;
+  formEvento.querySelectorAll(".form-group.error").forEach(group => group.classList.remove("error"));
+  if (eventoDatePreview) eventoDatePreview.classList.remove("error");
+}
+
+function actualizarPreviewFechaEvento() {
+  if (!eventoDatePreview) return;
+  if (!eventoFechaInicio.value || !eventoFechaFin.value) {
+    eventoDatePreview.textContent = "Seleccione inicio y finalizaciÃ³n para ver cÃ³mo quedarÃ¡ la fecha.";
+    eventoDatePreview.classList.remove("error");
+    return;
+  }
+
+  if (eventoFechaFin.value < eventoFechaInicio.value) {
+    eventoDatePreview.textContent = "La fecha de finalizaciÃ³n no puede ser anterior al inicio.";
+    eventoDatePreview.classList.add("error");
+    return;
+  }
+
+  eventoDatePreview.textContent = formatearRangoEvento(eventoFechaInicio.value, eventoFechaFin.value);
+  eventoDatePreview.classList.remove("error");
+}
+
+function renderizarEventos() {
+  if (!eventosGrid || !eventosVacioState) return;
+  eventosGrid.innerHTML = "";
+
+  if (!currentEventos.length) {
+    eventosGrid.style.display = "none";
+    eventosVacioState.style.display = "flex";
+    return;
+  }
+
+  eventosGrid.style.display = "grid";
+  eventosVacioState.style.display = "none";
+
+  const eventosOrdenados = [...currentEventos].sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio));
+  eventosOrdenados.forEach(evento => {
+    const card = document.createElement("article");
+    card.className = "evento-card animate-fade-in";
+    card.innerHTML = `
+      <div class="evento-card-top">
+        <div class="evento-icon-box">
+          <span class="material-icons-round">event_available</span>
+        </div>
+        <span class="evento-year">${obtenerAnoEvento(evento)}</span>
+      </div>
+      <h3>${evento.nombre}</h3>
+      <div class="evento-meta">
+        <span class="material-icons-round">calendar_month</span>
+        <strong>${evento.fechaTexto || formatearRangoEvento(evento.fechaInicio, evento.fechaFin)}</strong>
+      </div>
+      <div class="evento-meta">
+        <span class="material-icons-round">location_on</span>
+        <span>${formatearLugarEvento(evento)}</span>
+      </div>
+      <div class="evento-footer">
+        <span>${evento.creadoPorNombre || "Registro del sistema"}</span>
+        ${evento.origen === "local" ? '<span class="evento-local-badge">Local</span>' : ""}
+        <button class="btn-icon-sm btn-delete-evento text-red" title="Eliminar evento">
+          <span class="material-icons-round">delete</span>
+        </button>
+      </div>
+    `;
+
+    card.querySelector(".btn-delete-evento").addEventListener("click", async () => {
+      if (confirm(`Â¿Eliminar el evento "${evento.nombre}"?`)) {
+        await eliminarEvento(evento.id);
+        currentEventos = await obtenerEventos();
+        renderizarEventos();
+      }
+    });
+
+    eventosGrid.appendChild(card);
+  });
+}
+
+function obtenerAnoEvento(evento) {
+  if (!evento.fechaInicio) return "-";
+  return new Date(evento.fechaInicio + "T00:00:00").getFullYear();
+}
+
+function formatearLugarEvento(evento) {
+  return [evento.ciudad, evento.departamento, evento.pais]
+    .filter(valor => valor && valor !== "N/A")
+    .join(", ") || "-";
+}
+
+function formatearRangoEvento(inicioStr, finStr) {
+  if (!inicioStr || !finStr) return "-";
+  const inicio = crearFechaLocal(inicioStr);
+  const fin = crearFechaLocal(finStr);
+  const mesInicio = inicio.toLocaleDateString("es-CO", { month: "long" });
+  const mesFin = fin.toLocaleDateString("es-CO", { month: "long" });
+  const diaInicio = inicio.getDate();
+  const diaFin = fin.getDate();
+  const anoInicio = inicio.getFullYear();
+  const anoFin = fin.getFullYear();
+
+  if (inicioStr === finStr) return `${mesInicio} ${diaInicio} del ${anoInicio}`;
+  if (mesInicio === mesFin && anoInicio === anoFin) return `${mesInicio} ${diaInicio} - ${diaFin} del ${anoInicio}`;
+  if (anoInicio === anoFin) return `${mesInicio} ${diaInicio} - ${mesFin} ${diaFin} del ${anoInicio}`;
+  return `${mesInicio} ${diaInicio} del ${anoInicio} - ${mesFin} ${diaFin} del ${anoFin}`;
+}
+
+function crearFechaLocal(fechaStr) {
+  const [year, month, day] = fechaStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 async function manejarInicioSesion() {
@@ -565,7 +896,7 @@ async function manejarInicioSesion() {
     actualizarInterfazPorRol(sesion);
   } else {
     const errorEl = document.getElementById("error-login-usuario");
-    errorEl.textContent = "Usuario o contraseña incorrectos. Verifique sus credenciales.";
+    errorEl.textContent = "Usuario o contraseÃ±a incorrectos. Verifique sus credenciales.";
     errorEl.style.display = "block";
     inputLoginUsuario.focus();
   }
@@ -604,8 +935,8 @@ async function manejarRegistroProfesor() {
   });
 
   if (resultado.error) {
-    // Si la cédula ya existe, mostrar error en el campo de cédula, si no, en el de correo
-    if (resultado.error.toLowerCase().includes("cédula") || resultado.error.toLowerCase().includes("cedula")) {
+    // Si la cÃ©dula ya existe, mostrar error en el campo de cÃ©dula, si no, en el de correo
+    if (resultado.error.toLowerCase().includes("cÃ©dula") || resultado.error.toLowerCase().includes("cedula")) {
       const errEl = document.getElementById("error-registro-cedula");
       errEl.textContent = resultado.error;
       errEl.style.display = "block";
@@ -617,7 +948,7 @@ async function manejarRegistroProfesor() {
     return;
   }
 
-  // El inicio de sesión de profesores ahora es con el correo
+  // El inicio de sesiÃ³n de profesores ahora es con el correo
   const sesion = await iniciarSesion(correo, clave, "profesor");
   if (sesion) {
     contenedorLogin.style.display = "none";
@@ -674,7 +1005,7 @@ async function renderizarLogros() {
     `;
 
     card.querySelector(".btn-eliminar-logro").addEventListener("click", async () => {
-      if (confirm(`¿Deseas eliminar este logro de "${logro.campeonato}"?`)) {
+      if (confirm(`Â¿Deseas eliminar este logro de "${logro.campeonato}"?`)) {
         await eliminarLogro(logro.id);
         renderizarLogros();
       }
@@ -764,14 +1095,12 @@ function attachEventListeners() {
   btnTriggerDocUpload.addEventListener("click", () => docFileInput.click());
   docFileInput.addEventListener("change", handleDocUpload);
 
-  if (champCountry) champCountry.addEventListener("change", handleCountryChange);
-  if (champState) champState.addEventListener("change", handleStateChange);
-
   btnOpenChampForm.addEventListener("click", () => toggleChampForm(true));
   btnEmptyChampTrigger.addEventListener("click", () => toggleChampForm(true));
   btnCloseChampForm.addEventListener("click", () => toggleChampForm(false));
   btnCancelChamp.addEventListener("click", () => toggleChampForm(false));
   btnSaveChamp.addEventListener("click", handleSaveChampionship);
+  if (champName) champName.addEventListener("change", autollenarLugarDesdeEvento);
 
   btnEditAthleteProfile.addEventListener("click", () => {
     const athlete = currentAthletes.find(a => a.id === selectedAthleteId);
@@ -781,7 +1110,7 @@ function attachEventListeners() {
     }
   });
 
-  // Eventos para el botón de "Mi Perfil" (Atletas)
+  // Eventos para el botÃ³n de "Mi Perfil" (Atletas)
   const btnMiPerfil = document.getElementById("btn-mi-perfil");
   if (btnMiPerfil) {
     btnMiPerfil.addEventListener("click", () => {
@@ -792,7 +1121,7 @@ function attachEventListeners() {
     });
   }
 
-  // Eventos para el modal de Inicio de Sesión
+  // Eventos para el modal de Inicio de SesiÃ³n
   if (btnPortalLogin) {
     btnPortalLogin.addEventListener("click", () => {
       contenedorLogin.style.display = "flex";
@@ -815,7 +1144,7 @@ function attachEventListeners() {
 }
 
 // ==========================================================================
-// FILTRADO Y BÚSQUEDA REACTIVA
+// FILTRADO Y BÃšSQUEDA REACTIVA
 // ==========================================================================
 function handleSearchAndFilters() {
   const query = searchInput.value.toLowerCase().trim();
@@ -917,7 +1246,7 @@ function renderFilteredAthletes(athletes) {
 }
 
 // ==========================================================================
-// FORMULARIO: GESTIÓN DE DISCAPACIDAD Y CLASE DEPORTIVA
+// FORMULARIO: GESTIÃ“N DE DISCAPACIDAD Y CLASE DEPORTIVA
 // ==========================================================================
 function handleFormDiscapacidadChange() {
   const discapValue = fieldDiscap.value;
@@ -1011,14 +1340,14 @@ function updateLivePreview() {
 }
 
 // ==========================================================================
-// SUBIDA DE FOTO DE PERFIL (CONVERSIÓN BASE64)
+// SUBIDA DE FOTO DE PERFIL (CONVERSIÃ“N BASE64)
 // ==========================================================================
 function handlePhotoUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
-    alert("Por favor, suba únicamente archivos de imagen (.jpg, .png, .jpeg)");
+    alert("Por favor, suba Ãºnicamente archivos de imagen (.jpg, .png, .jpeg)");
     return;
   }
 
@@ -1054,7 +1383,7 @@ function openRegisterModal(athlete = null) {
   handleRemovePhoto();
 
   if (athlete) {
-    // Modo Edición
+    // Modo EdiciÃ³n
     modalRegisterTitle.textContent = "Editar Perfil";
     fieldId.value = athlete.id;
     fieldName.value = athlete.nombre;
@@ -1064,19 +1393,19 @@ function openRegisterModal(athlete = null) {
     fieldPhone.value = athlete.telefono || "";
     fieldEmail.value = athlete.correo || "";
     if(fieldClub) fieldClub.value = athlete.club || "";
-    // No prellenar la contraseña; sólo la cambia si el usuario la escribe
+    // No prellenar la contraseÃ±a; sÃ³lo la cambia si el usuario la escribe
     fieldPassword.value = "";
 
-    // Si el usuario es un atleta (self-edit), marcar el campo de contraseña como opcional
+    // Si el usuario es un atleta (self-edit), marcar el campo de contraseÃ±a como opcional
     const usuarioActual = obtenerUsuarioActual();
     const passwordGroup = fieldPassword.closest(".form-group-row") || fieldPassword.closest(".form-group");
     if (usuarioActual && usuarioActual.rol === "atleta") {
-      // Para atletas en self-edit: opcional — mostrar con indicación
+      // Para atletas en self-edit: opcional â€” mostrar con indicaciÃ³n
       const label = passwordGroup ? passwordGroup.querySelector("label") : null;
-      if (label) label.innerHTML = 'Nueva Contraseña <span style="color:var(--text-muted); font-weight:500; font-size:0.8em;">(dejar vacío para no cambiar)</span>';
+      if (label) label.innerHTML = 'Nueva ContraseÃ±a <span style="color:var(--text-muted); font-weight:500; font-size:0.8em;">(dejar vacÃ­o para no cambiar)</span>';
     } else {
       const label = passwordGroup ? passwordGroup.querySelector("label") : null;
-      if (label) label.innerHTML = 'Contraseña de Ingreso <span class="required">*</span>';
+      if (label) label.innerHTML = 'ContraseÃ±a de Ingreso <span class="required">*</span>';
     }
 
     fieldDiscap.value = athlete.discapacidad;
@@ -1145,7 +1474,7 @@ async function handleSaveAthlete() {
     foto: currentProfilePhotoBase64
   };
 
-  // Solo actualizar la contraseña si el usuario la escribió
+  // Solo actualizar la contraseÃ±a si el usuario la escribiÃ³
   if (fieldPassword.value.trim()) {
     athleteData.password = fieldPassword.value.trim();
   }
@@ -1156,7 +1485,7 @@ async function handleSaveAthlete() {
     closeRegisterModal();
 
     if (!obtenerUsuarioActual()) {
-      // Nuevo atleta registrado desde login — iniciar sesión automáticamente
+      // Nuevo atleta registrado desde login â€” iniciar sesiÃ³n automÃ¡ticamente
       contenedorLogin.style.display = "none";
       const sesion = await iniciarSesion(athleteData.correo, athleteData.password, "atleta");
       if (sesion) {
@@ -1169,7 +1498,7 @@ async function handleSaveAthlete() {
     }
   } catch (error) {
     console.error("Error al guardar atleta:", error);
-    const msg = error.message ? error.message : "Ocurrió un error al guardar los datos del atleta. Por favor, intente de nuevo.";
+    const msg = error.message ? error.message : "OcurriÃ³ un error al guardar los datos del atleta. Por favor, intente de nuevo.";
     alert(msg);
   }
 }
@@ -1193,7 +1522,7 @@ function validateAthleteForm() {
     requiredFields.push({ el: fieldClub, err: "error-athlete-club" });
   }
 
-  // La contraseña es obligatoria solo en el registro nuevo
+  // La contraseÃ±a es obligatoria solo en el registro nuevo
   if (!isEditing) {
     requiredFields.push({ el: fieldPassword, err: "error-athlete-password" });
   }
@@ -1232,11 +1561,11 @@ function openDetailModal(athleteId) {
   if (detailBadgeDiscap) detailBadgeDiscap.textContent = DISCAPACIDADES[athlete.discapacidad]?.nombre || athlete.discapacidad;
   if (detailBadgeClass) detailBadgeClass.textContent = athlete.claseDeportiva + ` (${athlete.tipoClase === "pista" ? "Pista" : "Campo"})`;
 
-  if (detailAgeFull) detailAgeFull.textContent = calcularEdad(athlete.fechaNacimiento) + " años (" + formatearFecha(athlete.fechaNacimiento) + ")";
+  if (detailAgeFull) detailAgeFull.textContent = calcularEdad(athlete.fechaNacimiento) + " aÃ±os (" + formatearFecha(athlete.fechaNacimiento) + ")";
   if (detailClub) detailClub.textContent = athlete.club || "Sin Club";
   if (detailGender) detailGender.textContent = athlete.genero;
 
-  // Pruebas únicas del atleta
+  // Pruebas Ãºnicas del atleta
   const uniquePruebas = [...new Set((athlete.campeonatos || []).map(c => c.prueba).filter(Boolean))];
   if (detailPruebasDinamicas) detailPruebasDinamicas.textContent = uniquePruebas.length > 0 ? uniquePruebas.join(", ") : "No registradas";
 
@@ -1397,14 +1726,14 @@ function openDetailModal(athleteId) {
     if (featuredBox) featuredBox.style.display = "none";
   }
 
-  // ── Privacidad: teléfono y correo solo para admin y profesor ──────────────
+  // â”€â”€ Privacidad: telÃ©fono y correo solo para admin y profesor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const usuarioPrivacidad = obtenerUsuarioActual();
   const puedeVerContacto = usuarioPrivacidad &&
     (usuarioPrivacidad.rol === "admin" || usuarioPrivacidad.rol === "profesor");
 
   const phoneRow = document.getElementById("detail-phone-row");
   const emailRow = document.getElementById("detail-email-row");
-  const PRIVADO_HTML = '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);font-size:0.82rem;"><span class=\'material-icons-round\' style=\'font-size:14px;\'>lock</span>Información privada</span>';
+  const PRIVADO_HTML = '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);font-size:0.82rem;"><span class=\'material-icons-round\' style=\'font-size:14px;\'>lock</span>InformaciÃ³n privada</span>';
 
   if (puedeVerContacto) {
     detailPhone.textContent = athlete.telefono || "No registrado";
@@ -1417,14 +1746,14 @@ function openDetailModal(athleteId) {
     if (phoneRow) phoneRow.style.display = "";
     if (emailRow) emailRow.style.display = "";
   }
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   toggleChampForm(false);
   renderDocumentsList(athlete);
   renderChampionshipsTimeline(athlete);
   renderAthleteChart(athlete);
 
-  // Controlar la visualización de botones de administración en el expediente detallado
+  // Controlar la visualizaciÃ³n de botones de administraciÃ³n en el expediente detallado
   const usuarioActual = obtenerUsuarioActual();
   const esAdminOProfesor = usuarioActual && (usuarioActual.rol === "admin" || usuarioActual.rol === "profesor");
   const esAtletaPropietario = usuarioActual && usuarioActual.rol === "atleta" && usuarioActual.id === athleteId;
@@ -1465,21 +1794,21 @@ function calcularEdad(fechaNacimiento) {
 }
 
 // ==========================================================================
-// GESTIÓN DE DOCUMENTOS PDF
+// GESTIÃ“N DE DOCUMENTOS PDF
 // ==========================================================================
 async function handleDocUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
 
   if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
-    alert("Por favor, suba únicamente archivos en formato PDF.");
+    alert("Por favor, suba Ãºnicamente archivos en formato PDF.");
     e.target.value = "";
     return;
   }
 
   const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
   if (file.size > MAX_FILE_SIZE) {
-    alert("El archivo es demasiado grande. Por favor, suba un documento PDF de máximo 2 MB para ahorrar espacio en el sistema.");
+    alert("El archivo es demasiado grande. Por favor, suba un documento PDF de mÃ¡ximo 2 MB para ahorrar espacio en el sistema.");
     e.target.value = "";
     return;
   }
@@ -1520,7 +1849,7 @@ function renderDocumentsList(athlete) {
         <span class="material-icons-round doc-icon">picture_as_pdf</span>
         <div class="doc-text">
           <p class="doc-name" title="${doc.nombre}">${doc.nombre}</p>
-          <p class="doc-meta">Cargado: ${doc.fecha} • ${doc.tamano}</p>
+          <p class="doc-meta">Cargado: ${doc.fecha} â€¢ ${doc.tamano}</p>
         </div>
       </div>
       <div class="doc-actions">
@@ -1538,7 +1867,7 @@ function renderDocumentsList(athlete) {
     });
 
     item.querySelector(".btn-delete-doc").addEventListener("click", async () => {
-      if (confirm(`¿Estás seguro de que deseas eliminar el documento "${doc.nombre}" del expediente del atleta?`)) {
+      if (confirm(`Â¿EstÃ¡s seguro de que deseas eliminar el documento "${doc.nombre}" del expediente del atleta?`)) {
         await deleteDocument(athlete.id, doc.id);
         await loadData();
         const updatedAthlete = currentAthletes.find(a => a.id === athlete.id);
@@ -1551,12 +1880,14 @@ function renderDocumentsList(athlete) {
 }
 
 // ==========================================================================
-// GESTIÓN DE HISTORIAL DE CAMPEONATOS
+// GESTIÃ“N DE HISTORIAL DE CAMPEONATOS
 // ==========================================================================
 function toggleChampForm(show) {
   if (show) {
     formChampionship.reset();
     clearChampFormErrors();
+    populateChampEventSelect();
+    autollenarLugarDesdeEvento();
     champFormCard.classList.add("active");
     champFormCard.style.display = "flex";
   } else {
@@ -1568,9 +1899,10 @@ function toggleChampForm(show) {
 async function handleSaveChampionship() {
   if (!validateChampForm()) return;
 
-  const country = document.getElementById("champ-country").value;
-  const state = document.getElementById("champ-state").value;
-  const city = document.getElementById("champ-city").value;
+  const eventoSeleccionado = currentEventos.find(evento => evento.nombre === document.getElementById("champ-name").value);
+  const country = eventoSeleccionado?.pais || document.getElementById("champ-country").value;
+  const state = eventoSeleccionado?.departamento || document.getElementById("champ-state").value;
+  const city = eventoSeleccionado?.ciudad || document.getElementById("champ-city").value;
   
   // Construir el string de lugar
   const place = `${city !== 'N/A' ? city + ', ' : ''}${state !== 'N/A' ? state + ', ' : ''}${country}`;
@@ -1594,7 +1926,7 @@ async function handleSaveChampionship() {
       renderAthleteChart(athlete);
     }
     
-    // No cerrar el formulario, solo resetearlo para añadir más rápido
+    // No cerrar el formulario, solo resetearlo para aÃ±adir mÃ¡s rÃ¡pido
     formChampionship.reset();
     clearChampFormErrors();
     // Reiniciar los selects de ciudad
@@ -1606,7 +1938,8 @@ async function handleSaveChampionship() {
       champCity.innerHTML = '<option value="">Seleccione estado primero...</option>';
       champCity.disabled = true;
     }
-    alert("¡Logro añadido con éxito! Puedes registrar otro a continuación.");
+    if (champCountry) champCountry.disabled = false;
+    alert("Â¡Logro aÃ±adido con Ã©xito! Puedes registrar otro a continuaciÃ³n.");
   }
 }
 
@@ -1685,7 +2018,7 @@ function renderChampionshipsTimeline(athlete) {
 
     if (esAdminOProfesor) {
       row.querySelector(".btn-delete-champ").addEventListener("click", async () => {
-        if (confirm(`¿Estás seguro de que deseas eliminar el registro de "${c.campeonato}" de este atleta?`)) {
+        if (confirm(`Â¿EstÃ¡s seguro de que deseas eliminar el registro de "${c.campeonato}" de este atleta?`)) {
           await deleteChampionship(athlete.id, c.id);
           await loadData();
           const updatedAthlete = currentAthletes.find(a => a.id === athlete.id);
@@ -1723,7 +2056,7 @@ function renderAthleteChart(athlete) {
 
   const champs = athlete.campeonatos || [];
   
-  // Filtrar por años >= 2023
+  // Filtrar por aÃ±os >= 2023
   const validChamps = champs.filter(c => {
     if (!c.fecha) return false;
     const year = new Date(c.fecha).getFullYear();
@@ -1734,13 +2067,13 @@ function renderAthleteChart(athlete) {
     chartWrapper.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 550; padding: 20px; text-align: center;">
         <span class="material-icons-round" style="font-size: 32px; color: var(--border-color);">show_chart</span>
-        <p>No hay marcas registradas desde 2023 para generar la gráfica de evolución.</p>
+        <p>No hay marcas registradas desde 2023 para generar la grÃ¡fica de evoluciÃ³n.</p>
       </div>
     `;
     return;
   }
 
-  // Encontrar la prueba con más registros
+  // Encontrar la prueba con mÃ¡s registros
   const pruebaCounts = {};
   validChamps.forEach(c => {
     if (c.prueba) {
@@ -1762,7 +2095,7 @@ function renderAthleteChart(athlete) {
   // Filtrar los campeonatos de esa prueba
   const pruebaChamps = validChamps.filter(c => c.prueba === primaryPrueba);
 
-  // Agrupar por año y obtener la mejor marca del año (2023 - presente)
+  // Agrupar por aÃ±o y obtener la mejor marca del aÃ±o (2023 - presente)
   const years = [2023, 2024, 2025, 2026];
   const currentYear = new Date().getFullYear();
   if (currentYear > 2026 && !years.includes(currentYear)) {
@@ -1811,13 +2144,13 @@ function renderAthleteChart(athlete) {
     chartWrapper.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 550; padding: 20px; text-align: center;">
         <span class="material-icons-round" style="font-size: 32px; color: var(--border-color);">show_chart</span>
-        <p>Registre marcas con valores numéricos para visualizar el gráfico de la prueba: <strong>${primaryPrueba}</strong></p>
+        <p>Registre marcas con valores numÃ©ricos para visualizar el grÃ¡fico de la prueba: <strong>${primaryPrueba}</strong></p>
       </div>
     `;
     return;
   }
 
-  // Dibujar gráfico SVG
+  // Dibujar grÃ¡fico SVG
   const width = 600;
   const height = 180;
   const paddingLeft = 50;
@@ -1909,9 +2242,10 @@ function renderAthleteChart(athlete) {
   }
 
   svgContent += `
-    <text x="${paddingLeft}" y="15" fill="var(--primary-red)" font-size="10" font-weight="800" text-anchor="start" style="text-transform: uppercase; letter-spacing: 0.5px;">Evolución: ${primaryPrueba}</text>
+    <text x="${paddingLeft}" y="15" fill="var(--primary-red)" font-size="10" font-weight="800" text-anchor="start" style="text-transform: uppercase; letter-spacing: 0.5px;">EvoluciÃ³n: ${primaryPrueba}</text>
     </svg>
   `;
 
   chartWrapper.innerHTML = svgContent;
 }
+
