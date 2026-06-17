@@ -20,7 +20,7 @@
 import { CLASES_DEPORTIVAS, DISCAPACIDADES } from "./lib/classes.js";
 
 // ==========================================================================
-// ESTADO GLOBAL DE LA APLICACIÃ“N
+// ESTADO GLOBAL DE LA APLICACIÓN
 // ==========================================================================
 let currentAthletes = [];
 let selectedAthleteId = null;
@@ -38,7 +38,7 @@ const resultsCount = document.getElementById("results-count");
 const athletesGrid = document.getElementById("athletes-grid");
 const emptyState = document.getElementById("empty-state");
 
-// Elementos del DOM - EstadÃ­sticas
+// Elementos del DOM - Estadisticas
 const statChampsVal = document.getElementById("stat-championships").querySelector(".stat-value");
 
 // Elementos del DOM - Modal Registro
@@ -119,13 +119,13 @@ const detailChampsList = document.getElementById("detail-championships-table-bod
 const emptyChampsMsg = document.getElementById("empty-championships-msg");
 const champName = document.getElementById("champ-name");
 
-// Elementos de UbicaciÃ³n (Logros)
+// Elementos de Ubicacion (Logros)
 const champCountry = document.getElementById("champ-country");
 const champState = document.getElementById("champ-state");
 const champCity = document.getElementById("champ-city");
 
 // ==========================================================================
-// REFERENCIAS AL DOM - AUTENTICACIÃ“N Y SESIÃ“N
+// REFERENCIAS AL DOM - AUTENTICACION Y SESION
 // ==========================================================================
 const contenedorLogin = document.getElementById("contenedor-login");
 const selectoresRol = document.getElementById("selectores-rol");
@@ -169,7 +169,7 @@ const eventoDatePreview = document.getElementById("evento-date-preview");
 let rolSeleccionado = "admin";
 
 // ==========================================================================
-// INICIALIZACIÃ“N Y CARGA DE DATOS
+// INICIALIZACION Y CARGA DE DATOS
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
   verificarSesionActiva();
@@ -177,10 +177,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFilterSelects();
   attachEventListeners();
   adjuntarEventosLogin();
-  fetchCountries(); // Cargar paÃ­ses de la API mundial
+  fetchCountries(); // Cargar países de la API mundial
 });
 
-// Cache para los paÃ­ses y estados
+// Cache para los países y estados
 window.countriesData = [];
 
 async function fetchCountries() {
@@ -193,15 +193,15 @@ async function fetchCountries() {
       populateCountrySelect(eventoCountry);
     }
   } catch (error) {
-    console.error("Error cargando paÃ­ses:", error);
-    if (champCountry) champCountry.innerHTML = '<option value="Error">Error cargando paÃ­ses</option>';
-    if (eventoCountry) eventoCountry.innerHTML = '<option value="Error">Error cargando paÃ­ses</option>';
+    console.error("Error cargando paises:", error);
+    if (champCountry) champCountry.innerHTML = '<option value="Error">Error cargando paises</option>';
+    if (eventoCountry) eventoCountry.innerHTML = '<option value="Error">Error cargando paises</option>';
   }
 }
 
 function populateCountrySelect(countrySelect) {
   if (!countrySelect || !window.countriesData.length) return;
-  countrySelect.innerHTML = '<option value="">Seleccione paÃ­s...</option>';
+  countrySelect.innerHTML = '<option value="">Seleccione país...</option>';
   window.countriesData.forEach(countryObj => {
     const opt = document.createElement("option");
     opt.value = countryObj.name;
@@ -254,7 +254,7 @@ async function handleEventStateChange() {
 async function updateCitySelect(countrySelect, stateSelect, citySelect) {
   const selectedCountryName = countrySelect.value;
   const selectedStateName = stateSelect.value;
-  
+
   citySelect.innerHTML = '<option value="">Cargando ciudades...</option>';
   citySelect.disabled = true;
 
@@ -273,7 +273,7 @@ async function updateCitySelect(countrySelect, stateSelect, citySelect) {
     });
     const data = await response.json();
     citySelect.innerHTML = '<option value="">Seleccione ciudad/municipio...</option>';
-    
+
     if (!data.error && data.data && data.data.length > 0) {
       citySelect.disabled = false;
       data.data.forEach(city => {
@@ -302,7 +302,7 @@ async function fetchCitiesForCountry(countryName, citySelect = champCity) {
     });
     const data = await response.json();
     citySelect.innerHTML = '<option value="">Seleccione ciudad...</option>';
-    
+
     if (!data.error && data.data && data.data.length > 0) {
       citySelect.disabled = false;
       data.data.forEach(city => {
@@ -321,7 +321,7 @@ async function fetchCitiesForCountry(countryName, citySelect = champCity) {
   }
 }
 
-// Verifica si ya hay una sesiÃ³n guardada y muestra/oculta la pantalla de login
+// Verifica si ya hay una sesion guardada y muestra/oculta la pantalla de login
 function verificarSesionActiva() {
   const usuarioActual = obtenerUsuarioActual();
   if (usuarioActual) {
@@ -329,26 +329,26 @@ function verificarSesionActiva() {
     contenedorLogin.style.display = "none";
     actualizarInterfazPorRol(usuarioActual);
   } else {
-    // Si no hay sesiÃ³n, la pÃ¡gina de inicio sigue siendo pÃºblica
+    // Si no hay sesion, la pagina de inicio sigue siendo publica
     contenedorLogin.style.display = "none";
     if (btnPortalLogin) btnPortalLogin.style.display = "inline-flex";
     if (indicadorSesion) indicadorSesion.style.display = "none";
-    
-    // Ocultar botones de administraciÃ³n pÃºblica
+
+    // Ocultar botones de administracion publica
     const btnRegistrar = document.getElementById("btn-open-register");
     if (btnRegistrar) btnRegistrar.style.display = "none";
-    
+
     const navig = document.getElementById("navegacion-principal");
     if (navig) navig.style.display = "none";
   }
 }
 
-// Muestra los elementos correctos en la interfaz segÃºn el rol del usuario
+// Muestra los elementos correctos en la interfaz segun el rol del usuario
 function actualizarInterfazPorRol(usuario) {
   indicadorSesion.style.display = "flex";
   sesionNombreUsuario.textContent = usuario.nombre;
   sesionBadgeRol.textContent = usuario.rol === "admin" ? "ADMIN" : usuario.rol === "profesor" ? "PROFESOR" : "ATLETA";
-  
+
   if (btnPortalLogin) btnPortalLogin.style.display = "none";
 
   if (usuario.rol === "admin" || usuario.rol === "profesor") {
@@ -481,12 +481,12 @@ function renderStats() {
   const statAthletesVal = document.getElementById("stat-athletes").querySelector(".stat-value");
   const statChampsVal = document.getElementById("stat-championships").querySelector(".stat-value");
 
-  if(statAthletesVal) statAthletesVal.textContent = totalAthletes;
-  if(statChampsVal) statChampsVal.textContent = totalChamps;
+  if (statAthletesVal) statAthletesVal.textContent = totalAthletes;
+  if (statChampsVal) statChampsVal.textContent = totalChamps;
 }
 
 // ==========================================================================
-// LÃ“GICA DE AUTENTICACIÃ“N - LOGIN, REGISTRO Y SESIÃ“N
+// LOGICA DE AUTENTICACION - LOGIN, REGISTRO Y SESION
 // ==========================================================================
 function adjuntarEventosLogin() {
   const botonesRol = selectoresRol.querySelectorAll(".btn-rol");
@@ -512,13 +512,13 @@ function adjuntarEventosLogin() {
         switchRegistro.style.display = "none";
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
       } else if (rolSeleccionado === "profesor") {
-        etiquetaUsuario.textContent = "Correo ElectrÃ³nico";
+        etiquetaUsuario.textContent = "Correo Electronico";
         inputLoginUsuario.placeholder = "ejemplo@valle.co";
         inputLoginUsuario.type = "email";
         switchRegistro.style.display = "block";
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
       } else if (rolSeleccionado === "atleta") {
-        etiquetaUsuario.textContent = "Correo ElectrÃ³nico";
+        etiquetaUsuario.textContent = "Correo Electronico";
         inputLoginUsuario.placeholder = "ejemplo@valle.co";
         inputLoginUsuario.type = "email";
         switchRegistro.style.display = "none";
@@ -700,7 +700,7 @@ function adjuntarEventosLogin() {
 }
 
 // ==========================================================================
-// GESTIÃ“N DE EVENTOS
+// GESTION DE EVENTOS
 // ==========================================================================
 function abrirModalEvento() {
   if (!modalAgregarEvento || !formEvento) return;
@@ -710,7 +710,7 @@ function abrirModalEvento() {
   limpiarErroresEvento();
   actualizarPreviewFechaEvento();
   if (eventoState) {
-    eventoState.innerHTML = '<option value="">Elija paÃ­s...</option>';
+    eventoState.innerHTML = '<option value="">Elija pais...</option>';
     eventoState.disabled = true;
   }
   if (eventoCity) {
@@ -774,7 +774,7 @@ function validarFormularioEvento() {
 
   if (eventoFechaInicio.value && eventoFechaFin.value && eventoFechaFin.value < eventoFechaInicio.value) {
     eventoFechaFin.closest(".form-group").classList.add("error");
-    eventoDatePreview.textContent = "La fecha de finalizaciÃ³n no puede ser anterior al inicio.";
+    eventoDatePreview.textContent = "La fecha de finalización no puede ser anterior al inicio.";
     eventoDatePreview.classList.add("error");
     isValid = false;
   }
@@ -791,13 +791,13 @@ function limpiarErroresEvento() {
 function actualizarPreviewFechaEvento() {
   if (!eventoDatePreview) return;
   if (!eventoFechaInicio.value || !eventoFechaFin.value) {
-    eventoDatePreview.textContent = "Seleccione inicio y finalizaciÃ³n para ver cÃ³mo quedarÃ¡ la fecha.";
+    eventoDatePreview.textContent = "Seleccione inicio y finalización para ver cómo quedará la fecha.";
     eventoDatePreview.classList.remove("error");
     return;
   }
 
   if (eventoFechaFin.value < eventoFechaInicio.value) {
-    eventoDatePreview.textContent = "La fecha de finalizaciÃ³n no puede ser anterior al inicio.";
+    eventoDatePreview.textContent = "La fecha de finalización no puede ser anterior al inicio.";
     eventoDatePreview.classList.add("error");
     return;
   }
@@ -923,7 +923,7 @@ async function manejarInicioSesion() {
     actualizarInterfazPorRol(sesion);
   } else {
     const errorEl = document.getElementById("error-login-usuario");
-    errorEl.textContent = "Usuario o contraseÃ±a incorrectos. Verifique sus credenciales.";
+    errorEl.textContent = "Usuario o contraseña incorrectos. Verifique sus credenciales.";
     errorEl.style.display = "block";
     inputLoginUsuario.focus();
   }
@@ -952,18 +952,18 @@ async function manejarRegistroProfesor() {
 
   if (!valido) return;
 
-  const resultado = await registrarProfesor({ 
-    nombre, 
-    cedula, 
-    fechaNacimiento, 
-    especialidad, 
-    correo, 
-    password: clave 
+  const resultado = await registrarProfesor({
+    nombre,
+    cedula,
+    fechaNacimiento,
+    especialidad,
+    correo,
+    password: clave
   });
 
   if (resultado.error) {
-    // Si la cÃ©dula ya existe, mostrar error en el campo de cÃ©dula, si no, en el de correo
-    if (resultado.error.toLowerCase().includes("cÃ©dula") || resultado.error.toLowerCase().includes("cedula")) {
+    // Si la cedula ya existe, mostrar error en el campo de cedula, si no, en el de correo
+    if (resultado.error.toLowerCase().includes("cedula") || resultado.error.toLowerCase().includes("cedula")) {
       const errEl = document.getElementById("error-registro-cedula");
       errEl.textContent = resultado.error;
       errEl.style.display = "block";
@@ -975,7 +975,7 @@ async function manejarRegistroProfesor() {
     return;
   }
 
-  // El inicio de sesiÃ³n de profesores ahora es con el correo
+  // El inicio de sesion de profesores ahora es con el correo
   const sesion = await iniciarSesion(correo, clave, "profesor");
   if (sesion) {
     contenedorLogin.style.display = "none";
@@ -1137,7 +1137,7 @@ function attachEventListeners() {
     }
   });
 
-  // Eventos para el botÃ³n de "Mi Perfil" (Atletas)
+  // Eventos para el boton de "Mi Perfil" (Atletas)
   const btnMiPerfil = document.getElementById("btn-mi-perfil");
   if (btnMiPerfil) {
     btnMiPerfil.addEventListener("click", () => {
@@ -1148,7 +1148,7 @@ function attachEventListeners() {
     });
   }
 
-  // Eventos para el modal de Inicio de SesiÃ³n
+  // Eventos para el modal de Inicio de Sesin
   if (btnPortalLogin) {
     btnPortalLogin.addEventListener("click", () => {
       contenedorLogin.style.display = "flex";
@@ -1171,7 +1171,7 @@ function attachEventListeners() {
 }
 
 // ==========================================================================
-// FILTRADO Y BÃšSQUEDA REACTIVA
+// FILTRADO Y BUSQUEDA REACTIVA
 // ==========================================================================
 function handleSearchAndFilters() {
   const query = searchInput.value.toLowerCase().trim();
@@ -1243,8 +1243,8 @@ function renderFilteredAthletes(athletes) {
     card.innerHTML = `
       <div class="card-image-container">
         ${athlete.foto
-          ? `<img src="${athlete.foto}" class="card-img-full" alt="Foto de ${athlete.nombre}" />`
-          : '<div class="card-img-placeholder"><span class="material-icons-round">person</span></div>'}
+        ? `<img src="${athlete.foto}" class="card-img-full" alt="Foto de ${athlete.nombre}" />`
+        : '<div class="card-img-placeholder"><span class="material-icons-round">person</span></div>'}
       </div>
       <div class="card-content-wrapper">
         <h3 class="card-athlete-name">${athlete.nombre}</h3>
@@ -1273,7 +1273,7 @@ function renderFilteredAthletes(athletes) {
 }
 
 // ==========================================================================
-// FORMULARIO: GESTIÃ“N DE DISCAPACIDAD Y CLASE DEPORTIVA
+// FORMULARIO: GESTIÓN DE DISCAPACIDAD Y CLASE DEPORTIVA
 // ==========================================================================
 function handleFormDiscapacidadChange() {
   const discapValue = fieldDiscap.value;
@@ -1367,14 +1367,14 @@ function updateLivePreview() {
 }
 
 // ==========================================================================
-// SUBIDA DE FOTO DE PERFIL (CONVERSIÃ“N BASE64)
+// SUBIDA DE FOTO DE PERFIL (CONVERSION BASE64)
 // ==========================================================================
 function handlePhotoUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
-    alert("Por favor, suba Ãºnicamente archivos de imagen (.jpg, .png, .jpeg)");
+    alert("Por favor, suba unicamente archivos de imagen (.jpg, .png, .jpeg)");
     return;
   }
 
@@ -1410,7 +1410,7 @@ function openRegisterModal(athlete = null) {
   handleRemovePhoto();
 
   if (athlete) {
-    // Modo EdiciÃ³n
+    // Modo Edición
     modalRegisterTitle.textContent = "Editar Perfil";
     fieldId.value = athlete.id;
     fieldName.value = athlete.nombre;
@@ -1419,20 +1419,20 @@ function openRegisterModal(athlete = null) {
     fieldGender.value = athlete.genero;
     fieldPhone.value = athlete.telefono || "";
     fieldEmail.value = athlete.correo || "";
-    if(fieldClub) fieldClub.value = athlete.club || "";
-    // No prellenar la contraseÃ±a; sÃ³lo la cambia si el usuario la escribe
+    if (fieldClub) fieldClub.value = athlete.club || "";
+    // No prellenar la contraseña; solo la cambia si el usuario la escribe
     fieldPassword.value = "";
 
-    // Si el usuario es un atleta (self-edit), marcar el campo de contraseÃ±a como opcional
+    // Si el usuario es un atleta (self-edit), marcar el campo de contrasena como opcional
     const usuarioActual = obtenerUsuarioActual();
     const passwordGroup = fieldPassword.closest(".form-group-row") || fieldPassword.closest(".form-group");
     if (usuarioActual && usuarioActual.rol === "atleta") {
-      // Para atletas en self-edit: opcional â€” mostrar con indicaciÃ³n
+      // Para atletas en self-edit: opcional — mostrar con indicación
       const label = passwordGroup ? passwordGroup.querySelector("label") : null;
-      if (label) label.innerHTML = 'Nueva ContraseÃ±a <span style="color:var(--text-muted); font-weight:500; font-size:0.8em;">(dejar vacÃ­o para no cambiar)</span>';
+      if (label) label.innerHTML = 'Nueva Contraseña <span style="color:var(--text-muted); font-weight:500; font-size:0.8em;">(dejar vacío para no cambiar)</span>';
     } else {
       const label = passwordGroup ? passwordGroup.querySelector("label") : null;
-      if (label) label.innerHTML = 'ContraseÃ±a de Ingreso <span class="required">*</span>';
+      if (label) label.innerHTML = 'Contraseña de Ingreso <span class="required">*</span>';
     }
 
     fieldDiscap.value = athlete.discapacidad;
@@ -1462,7 +1462,7 @@ function openRegisterModal(athlete = null) {
     modalRegisterTitle.textContent = "Registrar Nuevo Atleta";
     fieldId.value = "";
     fieldPassword.value = "";
-    if(fieldClub) fieldClub.value = "";
+    if (fieldClub) fieldClub.value = "";
     fieldTipoClase.innerHTML = `<option value="">Primero elija discapacidad...</option>`;
     fieldTipoClase.disabled = true;
     fieldClass.innerHTML = `<option value="">Primero elija modalidad...</option>`;
@@ -1501,7 +1501,7 @@ async function handleSaveAthlete() {
     foto: currentProfilePhotoBase64
   };
 
-  // Solo actualizar la contraseÃ±a si el usuario la escribiÃ³
+  // Solo actualizar la contraseña si el usuario la escribió
   if (fieldPassword.value.trim()) {
     athleteData.password = fieldPassword.value.trim();
   }
@@ -1512,7 +1512,7 @@ async function handleSaveAthlete() {
     closeRegisterModal();
 
     if (!obtenerUsuarioActual()) {
-      // Nuevo atleta registrado desde login â€” iniciar sesiÃ³n automÃ¡ticamente
+      // Nuevo atleta registrado desde login — iniciar sesión automáticamente
       contenedorLogin.style.display = "none";
       const sesion = await iniciarSesion(athleteData.correo, athleteData.password, "atleta");
       if (sesion) {
@@ -1525,7 +1525,7 @@ async function handleSaveAthlete() {
     }
   } catch (error) {
     console.error("Error al guardar atleta:", error);
-    const msg = error.message ? error.message : "OcurriÃ³ un error al guardar los datos del atleta. Por favor, intente de nuevo.";
+    const msg = error.message ? error.message : "Ocurrió un error al guardar los datos del atleta. Por favor, intente de nuevo.";
     alert(msg);
   }
 }
@@ -1545,11 +1545,11 @@ function validateAthleteForm() {
     { el: fieldTipoClase, err: "error-athlete-tipo-clase" },
     { el: fieldClass, err: "error-athlete-clase" }
   ];
-  if(fieldClub) {
+  if (fieldClub) {
     requiredFields.push({ el: fieldClub, err: "error-athlete-club" });
   }
 
-  // La contraseÃ±a es obligatoria solo en el registro nuevo
+  // La contraseña es obligatoria solo en el registro nuevo
   if (!isEditing) {
     requiredFields.push({ el: fieldPassword, err: "error-athlete-password" });
   }
@@ -1578,21 +1578,21 @@ function openDetailModal(athleteId) {
   if (!athlete) return;
 
   detailAvatar.src = athlete.foto || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23cbd5e1"><circle cx="50" cy="50" r="40"/></svg>`;
-  
+
   // Dividir nombre y apellido
   const nameParts = athlete.nombre.split(" ");
   if (detailFirstName) detailFirstName.textContent = nameParts[0] || "";
   if (detailLastName) detailLastName.textContent = nameParts.slice(1).join(" ") || "";
-  
+
   if (detailIdCard) detailIdCard.textContent = athlete.cedula;
   if (detailBadgeDiscap) detailBadgeDiscap.textContent = DISCAPACIDADES[athlete.discapacidad]?.nombre || athlete.discapacidad;
   if (detailBadgeClass) detailBadgeClass.textContent = athlete.claseDeportiva + ` (${athlete.tipoClase === "pista" ? "Pista" : "Campo"})`;
 
-  if (detailAgeFull) detailAgeFull.textContent = calcularEdad(athlete.fechaNacimiento) + " aÃ±os (" + formatearFecha(athlete.fechaNacimiento) + ")";
+  if (detailAgeFull) detailAgeFull.textContent = calcularEdad(athlete.fechaNacimiento) + " años (" + formatearFecha(athlete.fechaNacimiento) + ")";
   if (detailClub) detailClub.textContent = athlete.club || "Sin Club";
   if (detailGender) detailGender.textContent = athlete.genero;
 
-  // Pruebas Ãºnicas del atleta
+  // Pruebas únicas del atleta
   const uniquePruebas = [...new Set((athlete.campeonatos || []).map(c => c.prueba).filter(Boolean))];
   if (detailPruebasDinamicas) detailPruebasDinamicas.textContent = uniquePruebas.length > 0 ? uniquePruebas.join(", ") : "No registradas";
 
@@ -1619,7 +1619,7 @@ function openDetailModal(athleteId) {
 
   const isPista = athlete.tipoClase === "pista";
   const validChamps = (athlete.campeonatos || []).filter(c => c.marca && c.prueba);
-  
+
   const pruebaCounts = {};
   validChamps.forEach(c => {
     pruebaCounts[c.prueba] = (pruebaCounts[c.prueba] || 0) + 1;
@@ -1698,7 +1698,7 @@ function openDetailModal(athleteId) {
 
   const detailPersonalBest = document.getElementById("detail-personal-best");
   if (detailPersonalBest) detailPersonalBest.textContent = personalBest;
-  
+
   const detailSeasonBest = document.getElementById("detail-season-best");
   if (detailSeasonBest) detailSeasonBest.textContent = seasonBest;
 
@@ -1737,12 +1737,12 @@ function openDetailModal(athleteId) {
   if (bestChamp) {
     if (featuredBox) featuredBox.style.display = "flex";
     if (featuredTitle) {
-      featuredTitle.textContent = bestChamp.posicion === "Oro" 
-        ? "GOLD MEDAL" 
-        : bestChamp.posicion === "Plata" 
-          ? "SILVER MEDAL" 
-          : bestChamp.posicion === "Bronce" 
-            ? "BRONZE MEDAL" 
+      featuredTitle.textContent = bestChamp.posicion === "Oro"
+        ? "GOLD MEDAL"
+        : bestChamp.posicion === "Plata"
+          ? "SILVER MEDAL"
+          : bestChamp.posicion === "Bronce"
+            ? "BRONZE MEDAL"
             : bestChamp.posicion.toUpperCase();
     }
     if (featuredEvent) featuredEvent.textContent = bestChamp.prueba;
@@ -1753,18 +1753,18 @@ function openDetailModal(athleteId) {
     if (featuredBox) featuredBox.style.display = "none";
   }
 
-  // â”€â”€ Privacidad: telÃ©fono y correo solo para admin y profesor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Privacidad: teléfono y correo solo para admin y profesor 
   const usuarioPrivacidad = obtenerUsuarioActual();
   const puedeVerContacto = usuarioPrivacidad &&
     (usuarioPrivacidad.rol === "admin" || usuarioPrivacidad.rol === "profesor");
 
   const phoneRow = document.getElementById("detail-phone-row");
   const emailRow = document.getElementById("detail-email-row");
-  const PRIVADO_HTML = '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);font-size:0.82rem;"><span class=\'material-icons-round\' style=\'font-size:14px;\'>lock</span>InformaciÃ³n privada</span>';
+  const PRIVADO_HTML = '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);font-size:0.82rem;"><span class=\'material-icons-round\' style=\'font-size:14px;\'>lock</span>Informacion privada</span>';
 
   if (puedeVerContacto) {
     detailPhone.textContent = athlete.telefono || "No registrado";
-    detailEmail.textContent = athlete.correo  || "No registrado";
+    detailEmail.textContent = athlete.correo || "No registrado";
     if (phoneRow) phoneRow.style.display = "";
     if (emailRow) emailRow.style.display = "";
   } else {
@@ -1773,14 +1773,13 @@ function openDetailModal(athleteId) {
     if (phoneRow) phoneRow.style.display = "";
     if (emailRow) emailRow.style.display = "";
   }
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   toggleChampForm(false);
   renderDocumentsList(athlete);
   renderChampionshipsTimeline(athlete);
   renderAthleteChart(athlete);
 
-  // Controlar la visualizaciÃ³n de botones de administraciÃ³n en el expediente detallado
+  // Controlar la visualización de botones de administración en el expediente detallado
   const usuarioActual = obtenerUsuarioActual();
   const esAdminOProfesor = usuarioActual && (usuarioActual.rol === "admin" || usuarioActual.rol === "profesor");
   const esAtletaPropietario = usuarioActual && usuarioActual.rol === "atleta" && usuarioActual.id === athleteId;
@@ -1821,21 +1820,21 @@ function calcularEdad(fechaNacimiento) {
 }
 
 // ==========================================================================
-// GESTIÃ“N DE DOCUMENTOS PDF
+// GESTIÓN DE DOCUMENTOS PDF
 // ==========================================================================
 async function handleDocUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
 
   if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
-    alert("Por favor, suba Ãºnicamente archivos en formato PDF.");
+    alert("Por favor, suba únicamente archivos en formato PDF.");
     e.target.value = "";
     return;
   }
 
   const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
   if (file.size > MAX_FILE_SIZE) {
-    alert("El archivo es demasiado grande. Por favor, suba un documento PDF de mÃ¡ximo 2 MB para ahorrar espacio en el sistema.");
+    alert("El archivo es demasiado grande. Por favor, suba un documento PDF de máximo 2 MB para ahorrar espacio en el sistema.");
     e.target.value = "";
     return;
   }
@@ -1894,7 +1893,7 @@ function renderDocumentsList(athlete) {
     });
 
     item.querySelector(".btn-delete-doc").addEventListener("click", async () => {
-      if (confirm(`Â¿EstÃ¡s seguro de que deseas eliminar el documento "${doc.nombre}" del expediente del atleta?`)) {
+      if (confirm(`¿Estás seguro de que deseas eliminar el documento "${doc.nombre}" del expediente del atleta?`)) {
         await deleteDocument(athlete.id, doc.id);
         await loadData();
         const updatedAthlete = currentAthletes.find(a => a.id === athlete.id);
@@ -1907,7 +1906,7 @@ function renderDocumentsList(athlete) {
 }
 
 // ==========================================================================
-// GESTIÃ“N DE HISTORIAL DE CAMPEONATOS
+// GESTIÓN DE HISTORIAL DE CAMPEONATOS
 // ==========================================================================
 function toggleChampForm(show) {
   if (show) {
@@ -1930,7 +1929,7 @@ async function handleSaveChampionship() {
   const country = eventoSeleccionado?.pais || document.getElementById("champ-country").value;
   const state = eventoSeleccionado?.departamento || document.getElementById("champ-state").value;
   const city = eventoSeleccionado?.ciudad || document.getElementById("champ-city").value;
-  
+
   // Construir el string de lugar
   const place = `${city !== 'N/A' ? city + ', ' : ''}${state !== 'N/A' ? state + ', ' : ''}${country}`;
 
@@ -1952,8 +1951,8 @@ async function handleSaveChampionship() {
       renderChampionshipsTimeline(athlete);
       renderAthleteChart(athlete);
     }
-    
-    // No cerrar el formulario, solo resetearlo para aÃ±adir mÃ¡s rÃ¡pido
+
+    // No cerrar el formulario, solo resetearlo para añadir más rápido
     formChampionship.reset();
     clearChampFormErrors();
     // Reiniciar los selects de ciudad
@@ -1966,7 +1965,7 @@ async function handleSaveChampionship() {
       champCity.disabled = true;
     }
     if (champCountry) champCountry.disabled = false;
-    alert("Â¡Logro aÃ±adido con Ã©xito! Puedes registrar otro a continuaciÃ³n.");
+    alert("¡Logro añadido con éxito! Puedes registrar otro a continuación.");
   }
 }
 
@@ -2045,7 +2044,7 @@ function renderChampionshipsTimeline(athlete) {
 
     if (esAdminOProfesor) {
       row.querySelector(".btn-delete-champ").addEventListener("click", async () => {
-        if (confirm(`Â¿EstÃ¡s seguro de que deseas eliminar el registro de "${c.campeonato}" de este atleta?`)) {
+        if (confirm(`¿Estás seguro de que deseas eliminar el registro de "${c.campeonato}" de este atleta?`)) {
           await deleteChampionship(athlete.id, c.id);
           await loadData();
           const updatedAthlete = currentAthletes.find(a => a.id === athlete.id);
@@ -2082,8 +2081,8 @@ function renderAthleteChart(athlete) {
   chartWrapper.innerHTML = "";
 
   const champs = athlete.campeonatos || [];
-  
-  // Filtrar por aÃ±os >= 2023
+
+  // Filtrar por años >= 2023
   const validChamps = champs.filter(c => {
     if (!c.fecha) return false;
     const year = new Date(c.fecha).getFullYear();
@@ -2094,13 +2093,13 @@ function renderAthleteChart(athlete) {
     chartWrapper.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 550; padding: 20px; text-align: center;">
         <span class="material-icons-round" style="font-size: 32px; color: var(--border-color);">show_chart</span>
-        <p>No hay marcas registradas desde 2023 para generar la grÃ¡fica de evoluciÃ³n.</p>
+        <p>No hay marcas registradas desde 2023 para generar la gráfica de evolución.</p>
       </div>
     `;
     return;
   }
 
-  // Encontrar la prueba con mÃ¡s registros
+  // Encontrar la prueba con más registros
   const pruebaCounts = {};
   validChamps.forEach(c => {
     if (c.prueba) {
@@ -2122,7 +2121,7 @@ function renderAthleteChart(athlete) {
   // Filtrar los campeonatos de esa prueba
   const pruebaChamps = validChamps.filter(c => c.prueba === primaryPrueba);
 
-  // Agrupar por aÃ±o y obtener la mejor marca del aÃ±o (2023 - presente)
+  // Agrupar por año y obtener la mejor marca del año (2023 - presente)
   const years = [2023, 2024, 2025, 2026];
   const currentYear = new Date().getFullYear();
   if (currentYear > 2026 && !years.includes(currentYear)) {
@@ -2137,7 +2136,7 @@ function renderAthleteChart(athlete) {
   };
 
   const isPista = athlete.tipoClase === "pista"; // Si es pista, menor tiempo es mejor.
-  
+
   const bestMarksByYear = {};
   pruebaChamps.forEach(c => {
     const year = new Date(c.fecha).getFullYear();
@@ -2171,13 +2170,13 @@ function renderAthleteChart(athlete) {
     chartWrapper.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 550; padding: 20px; text-align: center;">
         <span class="material-icons-round" style="font-size: 32px; color: var(--border-color);">show_chart</span>
-        <p>Registre marcas con valores numÃ©ricos para visualizar el grÃ¡fico de la prueba: <strong>${primaryPrueba}</strong></p>
+        <p>Registre marcas con valores numéricos para visualizar el gráfico de la prueba: <strong>${primaryPrueba}</strong></p>
       </div>
     `;
     return;
   }
 
-  // Dibujar grÃ¡fico SVG
+  // Dibujar gráfico SVG
   const width = 600;
   const height = 180;
   const paddingLeft = 50;
@@ -2195,8 +2194,8 @@ function renderAthleteChart(athlete) {
   const getX = (idx) => paddingLeft + (idx / (years.length - 1)) * chartW;
   const getY = (val) => {
     const ratio = (val - minVal) / valRange;
-    return isPista 
-      ? paddingTop + ratio * chartH 
+    return isPista
+      ? paddingTop + ratio * chartH
       : paddingTop + (1 - ratio) * chartH;
   };
 
@@ -2269,7 +2268,7 @@ function renderAthleteChart(athlete) {
   }
 
   svgContent += `
-    <text x="${paddingLeft}" y="15" fill="var(--primary-red)" font-size="10" font-weight="800" text-anchor="start" style="text-transform: uppercase; letter-spacing: 0.5px;">EvoluciÃ³n: ${primaryPrueba}</text>
+    <text x="${paddingLeft}" y="15" fill="var(--primary-red)" font-size="10" font-weight="800" text-anchor="start" style="text-transform: uppercase; letter-spacing: 0.5px;">Evolución: ${primaryPrueba}</text>
     </svg>
   `;
 
