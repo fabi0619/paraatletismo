@@ -1,4 +1,4 @@
-﻿import {
+import {
   getAthletes,
   saveAthlete,
   deleteAthlete,
@@ -28,15 +28,15 @@ let currentProfilePhotoBase64 = null;
 let currentEventos = [];
 
 // Elementos del DOM - Dashboard
-const searchInput = document.getElementById("search-input");
-const btnClearSearch = document.getElementById("btn-clear-search");
-const filterDiscapacidad = document.getElementById("filter-discapacidad");
-const filterTipoClase = document.getElementById("filter-tipo-clase");
-const filterClase = document.getElementById("filter-clase");
-const btnResetFilters = document.getElementById("btn-reset-filters");
-const resultsCount = document.getElementById("results-count");
-const athletesGrid = document.getElementById("athletes-grid");
-const emptyState = document.getElementById("empty-state");
+const searchInput = document.getElementById("search-input") || document.createElement("input");
+const btnClearSearch = document.getElementById("btn-clear-search") || document.createElement("button");
+const filterDiscapacidad = document.getElementById("filter-discapacidad") || document.createElement("select");
+const filterTipoClase = document.getElementById("filter-tipo-clase") || document.createElement("select");
+const filterClase = document.getElementById("filter-clase") || document.createElement("select");
+const btnResetFilters = document.getElementById("btn-reset-filters") || document.createElement("button");
+const resultsCount = document.getElementById("results-count") || document.createElement("span");
+const athletesGrid = document.getElementById("athletes-grid") || document.createElement("div");
+const emptyState = document.getElementById("empty-state") || document.createElement("div");
 
 // Elementos del DOM - Estadisticas
 const statChampsVal = document.getElementById("stat-championships").querySelector(".stat-value");
@@ -178,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
   attachEventListeners();
   adjuntarEventosLogin();
   fetchCountries(); // Cargar países de la API mundial
+  window.refreshAthletesData = loadData;
 });
 
 // Cache para los países y estados
@@ -489,60 +490,68 @@ function renderStats() {
 // LOGICA DE AUTENTICACION - LOGIN, REGISTRO Y SESION
 // ==========================================================================
 function adjuntarEventosLogin() {
-  const botonesRol = selectoresRol.querySelectorAll(".btn-rol");
-  botonesRol.forEach(btn => {
-    btn.addEventListener("click", () => {
-      botonesRol.forEach(b => b.classList.remove("activo"));
-      btn.classList.add("activo");
-      rolSeleccionado = btn.dataset.rol;
+  if (selectoresRol) {
+    const botonesRol = selectoresRol.querySelectorAll(".btn-rol");
+    botonesRol.forEach(btn => {
+      btn.addEventListener("click", () => {
+        botonesRol.forEach(b => b.classList.remove("activo"));
+        btn.classList.add("activo");
+        rolSeleccionado = btn.dataset.rol;
 
-      const etiquetaUsuario = document.getElementById("etiqueta-usuario");
-      const switchRegistro = document.getElementById("login-switch-registro");
-      const switchRegistroAtleta = document.getElementById("login-switch-registro-atleta");
+        const etiquetaUsuario = document.getElementById("etiqueta-usuario");
+        const switchRegistro = document.getElementById("login-switch-registro");
+        const switchRegistroAtleta = document.getElementById("login-switch-registro-atleta");
 
-      formLogin.style.display = "block";
-      formRegistroProfesor.style.display = "none";
-      inputLoginUsuario.value = "";
-      inputLoginClave.value = "";
+        if (formLogin) formLogin.style.display = "block";
+        if (formRegistroProfesor) formRegistroProfesor.style.display = "none";
+        if (inputLoginUsuario) {
+          inputLoginUsuario.value = "";
+          inputLoginClave.value = "";
+        }
 
-      if (rolSeleccionado === "admin") {
-        etiquetaUsuario.textContent = "Usuario";
-        inputLoginUsuario.placeholder = "admin";
-        inputLoginUsuario.type = "text";
-        switchRegistro.style.display = "none";
-        if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
-      } else if (rolSeleccionado === "profesor") {
-        etiquetaUsuario.textContent = "Correo Electronico";
-        inputLoginUsuario.placeholder = "ejemplo@valle.co";
-        inputLoginUsuario.type = "email";
-        switchRegistro.style.display = "block";
-        if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
-      } else if (rolSeleccionado === "atleta") {
-        etiquetaUsuario.textContent = "Correo Electronico";
-        inputLoginUsuario.placeholder = "ejemplo@valle.co";
-        inputLoginUsuario.type = "email";
-        switchRegistro.style.display = "none";
-        if (switchRegistroAtleta) switchRegistroAtleta.style.display = "block";
-      }
+        if (rolSeleccionado === "admin" && etiquetaUsuario && inputLoginUsuario && switchRegistro) {
+          etiquetaUsuario.textContent = "Usuario";
+          inputLoginUsuario.placeholder = "admin";
+          inputLoginUsuario.type = "text";
+          switchRegistro.style.display = "none";
+          if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
+        } else if (rolSeleccionado === "profesor" && etiquetaUsuario && inputLoginUsuario && switchRegistro) {
+          etiquetaUsuario.textContent = "Correo Electronico";
+          inputLoginUsuario.placeholder = "ejemplo@valle.co";
+          inputLoginUsuario.type = "email";
+          switchRegistro.style.display = "block";
+          if (switchRegistroAtleta) switchRegistroAtleta.style.display = "none";
+        } else if (rolSeleccionado === "atleta" && etiquetaUsuario && inputLoginUsuario && switchRegistro) {
+          etiquetaUsuario.textContent = "Correo Electronico";
+          inputLoginUsuario.placeholder = "ejemplo@valle.co";
+          inputLoginUsuario.type = "email";
+          switchRegistro.style.display = "none";
+          if (switchRegistroAtleta) switchRegistroAtleta.style.display = "block";
+        }
+      });
     });
-  });
+  }
 
-  formLogin.addEventListener("submit", (e) => {
-    e.preventDefault();
-    manejarInicioSesion();
-  });
+  if (formLogin) {
+    formLogin.addEventListener("submit", (e) => {
+      e.preventDefault();
+      manejarInicioSesion();
+    });
+  }
 
-  btnIniciarSesion.addEventListener("click", (e) => {
-    e.preventDefault();
-    manejarInicioSesion();
-  });
+  if (btnIniciarSesion) {
+    btnIniciarSesion.addEventListener("click", (e) => {
+      e.preventDefault();
+      manejarInicioSesion();
+    });
+  }
 
   const enlaceIrARegistro = document.getElementById("enlace-ir-a-registro");
   if (enlaceIrARegistro) {
     enlaceIrARegistro.addEventListener("click", (e) => {
       e.preventDefault();
-      formLogin.style.display = "none";
-      formRegistroProfesor.style.display = "block";
+      if (formLogin) formLogin.style.display = "none";
+      if (formRegistroProfesor) formRegistroProfesor.style.display = "block";
     });
   }
 
@@ -552,9 +561,7 @@ function adjuntarEventosLogin() {
     enlaceIrARegistroAtleta.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Enlace registro atleta clickeado");
-      console.log("contenedorLogin antes:", contenedorLogin.style.display);
-      contenedorLogin.style.display = "none";
-      console.log("contenedorLogin despues:", contenedorLogin.style.display);
+      if (contenedorLogin) contenedorLogin.style.display = "none";
       openRegisterModal();
     });
   }
@@ -563,8 +570,8 @@ function adjuntarEventosLogin() {
   if (enlaceIrALogin) {
     enlaceIrALogin.addEventListener("click", (e) => {
       e.preventDefault();
-      formRegistroProfesor.style.display = "none";
-      formLogin.style.display = "block";
+      if (formRegistroProfesor) formRegistroProfesor.style.display = "none";
+      if (formLogin) formLogin.style.display = "block";
     });
   }
 
@@ -1405,79 +1412,15 @@ function handleRemovePhoto() {
 // CONTROL DE MODALES (REGISTRO Y DETALLE)
 // ==========================================================================
 function openRegisterModal(athlete = null) {
-  formAthlete.reset();
-  clearValidationErrors();
-  handleRemovePhoto();
-
-  if (athlete) {
-    // Modo Edición
-    modalRegisterTitle.textContent = "Editar Perfil";
-    fieldId.value = athlete.id;
-    fieldName.value = athlete.nombre;
-    fieldDoc.value = athlete.cedula;
-    fieldBirth.value = athlete.fechaNacimiento;
-    fieldGender.value = athlete.genero;
-    fieldPhone.value = athlete.telefono || "";
-    fieldEmail.value = athlete.correo || "";
-    if (fieldClub) fieldClub.value = athlete.club || "";
-    // No prellenar la contraseña; solo la cambia si el usuario la escribe
-    fieldPassword.value = "";
-
-    // Si el usuario es un atleta (self-edit), marcar el campo de contrasena como opcional
-    const usuarioActual = obtenerUsuarioActual();
-    const passwordGroup = fieldPassword.closest(".form-group-row") || fieldPassword.closest(".form-group");
-    if (usuarioActual && usuarioActual.rol === "atleta") {
-      // Para atletas en self-edit: opcional — mostrar con indicación
-      const label = passwordGroup ? passwordGroup.querySelector("label") : null;
-      if (label) label.innerHTML = 'Nueva Contraseña <span style="color:var(--text-muted); font-weight:500; font-size:0.8em;">(dejar vacío para no cambiar)</span>';
-    } else {
-      const label = passwordGroup ? passwordGroup.querySelector("label") : null;
-      if (label) label.innerHTML = 'Contraseña de Ingreso <span class="required">*</span>';
-    }
-
-    fieldDiscap.value = athlete.discapacidad;
-
-    fieldTipoClase.disabled = false;
-    fieldTipoClase.innerHTML = `
-      <option value="">Seleccione...</option>
-      <option value="pista">Pista (T)</option>
-      <option value="campo">Campo (F)</option>
-    `;
-    fieldTipoClase.value = athlete.tipoClase || "";
-
-    fieldClass.disabled = false;
-    populateClasesSelect(fieldClass, athlete.discapacidad, athlete.tipoClase, "Seleccione la clase deportiva...");
-    fieldClass.value = athlete.claseDeportiva;
-
-    handleFormClassChange();
-
-    if (athlete.foto) {
-      currentProfilePhotoBase64 = athlete.foto;
-      photoPreview.style.backgroundImage = "none";
-      photoPreview.innerHTML = `<img src="${athlete.foto}" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md);" />`;
-      btnRemovePhoto.style.display = "inline-flex";
-    }
-  } else {
-    // Modo Registro Nuevo
-    modalRegisterTitle.textContent = "Registrar Nuevo Atleta";
-    fieldId.value = "";
-    fieldPassword.value = "";
-    if (fieldClub) fieldClub.value = "";
-    fieldTipoClase.innerHTML = `<option value="">Primero elija discapacidad...</option>`;
-    fieldTipoClase.disabled = true;
-    fieldClass.innerHTML = `<option value="">Primero elija modalidad...</option>`;
-    fieldClass.disabled = true;
-    classInfoBox.style.display = "none";
+  if (window.openAthleteModal) {
+    window.openAthleteModal(athlete);
   }
-
-  updateLivePreview();
-  modalRegister.classList.add("active");
-  modalRegister.style.display = "flex";
 }
 
 function closeRegisterModal() {
-  modalRegister.classList.remove("active");
-  modalRegister.style.display = "none";
+  if (window.closeAthleteModal) {
+    window.closeAthleteModal();
+  }
 }
 
 // ==========================================================================

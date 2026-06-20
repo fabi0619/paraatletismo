@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { RegisterForm } from "../features/auth/components/RegisterForm";
+import "../styles/index.css";
+import "../styles/styles.css";
+---
+
+<Layout title="Registro de Atletas y Entrenadores - Valle Paraatletismo">
+  <div class="bg-glow"></div>
+  <div class="min-h-screen flex items-center justify-center p-4 md:p-8 relative z-10">
+    <RegisterForm client:load />
+  </div>
+</Layout>
