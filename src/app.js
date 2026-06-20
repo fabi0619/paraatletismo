@@ -525,7 +525,7 @@ function adjuntarEventosLogin() {
         if (switchRegistroAtleta) switchRegistroAtleta.style.display = "block";
       }
     });
-  }
+  });
 
   if (formLogin) {
     formLogin.addEventListener("submit", (e) => {
