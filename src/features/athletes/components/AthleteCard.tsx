@@ -31,7 +31,7 @@ export const AthleteCard: React.FC<AthleteCardProps> = ({
       className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-b-none border-b-4 border-b-red-500 pt-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
     >
       <AspectRatio ratio={4 / 5}>
-        <div className="relative h-full w-full overflow-hidden bg-slate-900">
+        <div className="relative h-full w-full overflow-hidden rounded-b-4xl bg-slate-900">
           {athlete.foto ? (
             <>
               <img
