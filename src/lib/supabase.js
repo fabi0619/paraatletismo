@@ -270,10 +270,10 @@ export async function iniciarSesion(usuario, clave, rol) {
       .maybeSingle();
 
     if (data) {
-      const sesion = { 
-        id: data.id, 
-        nombre: data.nombre, 
-        rol: rol, 
+      const sesion = {
+        id: data.id,
+        nombre: data.nombre,
+        rol: rol,
         cedula: data.cedula,
         ...(rol === "profesor" ? { especialidad: data.especialidad } : {})
       };

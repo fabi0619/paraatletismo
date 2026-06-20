@@ -1,204 +1,12 @@
 ---
-import "../styles/index.css";
+import { AthleteModal } from "../features/auth/components/AthleteModal";
+import { AthletesView } from "../features/athletes/components/AthletesView";
 ---
 
 <!-- Elemento decorativo de fondo -->
 <div class="bg-glow"></div>
 
-<!-- PANTALLA DE INICIO DE SESIÓN (LOGIN Y REGISTRO) EN ESPAÑOL -->
-<div class="contenedor-login" id="contenedor-login" style="display: none;">
-  <div class="tarjeta-login animate-fade-in">
-    <div class="login-encabezado">
-      <h2>VALLE <span class="highlight">PARAATLETISMO</span></h2>
-      <p>Portal de Gestión Deportiva</p>
-    </div>
-
-    <!-- Selector de Rol -->
-    <div class="selectores-rol" id="selectores-rol">
-      <button type="button" class="btn-rol activo" data-rol="admin"
-        >Admin</button
-      >
-      <button type="button" class="btn-rol" data-rol="profesor">Profesor</button
-      >
-      <button type="button" class="btn-rol" data-rol="atleta">Atleta</button>
-    </div>
-
-    <!-- Formulario de Login -->
-    <form id="formulario-login" novalidate>
-      <div class="form-group">
-        <label for="login-usuario" id="etiqueta-usuario">Usuario</label>
-        <input type="text" id="login-usuario" required placeholder="admin" />
-        <span class="error-msg" id="error-login-usuario"
-          >El usuario es requerido.</span
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="login-clave">Contraseña</label>
-        <input
-          type="password"
-          id="login-clave"
-          required
-          placeholder="••••••••"
-        />
-        <span class="error-msg" id="error-login-clave"
-          >La contraseña es requerida.</span
-        >
-      </div>
-
-      <button
-        type="submit"
-        class="btn btn-primary"
-        id="btn-iniciar-sesion"
-        style="width: 100%; margin-top: 10px;"
-      >
-        <span class="material-icons-round">login</span>
-        Iniciar Sesión
-      </button>
-
-      <p
-        class="login-switch-text"
-        id="login-switch-registro"
-        style="display: none;"
-      >
-        ¿No tienes cuenta? <a href="#" id="enlace-ir-a-registro"
-          >Regístrate aquí</a
-        >
-      </p>
-
-      <p
-        class="login-switch-text"
-        id="login-switch-registro-atleta"
-        style="display: none;"
-      >
-        ¿No tienes cuenta? <a href="#" id="enlace-ir-a-registro-atleta"
-          >Regístrate aquí</a
-        >
-      </p>
-    </form>
-
-    <!-- Formulario de Registro para Profesores -->
-    <form id="formulario-registro-profesor" style="display: none;" novalidate>
-      <h3
-        class="form-section-title"
-        style="margin-bottom: 12px; font-size: 0.95rem;"
-      >
-        Registro de Entrenador
-      </h3>
-
-      <div class="form-group">
-        <label for="registro-nombre"
-          >Nombre Completo <span class="required">*</span></label
-        >
-        <input
-          type="text"
-          id="registro-nombre"
-          required
-          placeholder="Ej. Carlos Arias"
-        />
-        <span class="error-msg" id="error-registro-nombre"
-          >El nombre es requerido.</span
-        >
-      </div>
-
-      <div class="form-group-row" style="display: flex; gap: 10px;">
-        <div class="form-group" style="flex: 1;">
-          <label for="registro-cedula"
-            >Cédula <span class="required">*</span></label
-          >
-          <input
-            type="text"
-            id="registro-cedula"
-            required
-            placeholder="Ej. 111820495"
-          />
-          <span class="error-msg" id="error-registro-cedula"
-            >La cédula es requerida.</span
-          >
-        </div>
-        <div class="form-group" style="flex: 1;">
-          <label for="registro-nacimiento"
-            >Fecha de Nacimiento <span class="required">*</span></label
-          >
-          <input type="date" id="registro-nacimiento" required />
-          <span class="error-msg" id="error-registro-nacimiento"
-            >La fecha es requerida.</span
-          >
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="registro-especialidad"
-          >Modalidad/Especialidad <span class="required">*</span></label
-        >
-        <input
-          type="text"
-          id="registro-especialidad"
-          required
-          placeholder="Ej. Lanzamientos / Pista"
-        />
-        <span class="error-msg" id="error-registro-especialidad"
-          >La especialidad es requerida.</span
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="registro-correo"
-          >Correo Electrónico <span class="required">*</span></label
-        >
-        <input
-          type="email"
-          id="registro-correo"
-          required
-          placeholder="Ej. entrenador@valle.co"
-        />
-        <span class="error-msg" id="error-registro-correo"
-          >Ingrese un correo válido.</span
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="registro-clave"
-          >Contraseña <span class="required">*</span></label
-        >
-        <input
-          type="password"
-          id="registro-clave"
-          required
-          placeholder="••••••••"
-        />
-        <span class="error-msg" id="error-registro-clave"
-          >La contraseña es requerida.</span
-        >
-      </div>
-
-      <button
-        type="submit"
-        class="btn btn-primary"
-        id="btn-guardar-registro"
-        style="width: 100%; margin-top: 10px;"
-      >
-        <span class="material-icons-round">how_to_reg</span>
-        Crear Cuenta
-      </button>
-
-      <p class="login-switch-text" style="margin-top: 12px;">
-        ¿Ya tienes cuenta? <a href="#" id="enlace-ir-a-login">Inicia Sesión</a>
-      </p>
-    </form>
-
-    <div
-      class="modal-footer"
-      style="padding: 15px 0 0 0; border-top: 1px solid var(--border-color); margin-top: 15px; display: flex; justify-content: flex-end;"
-    >
-      <button
-        type="button"
-        class="btn btn-secondary btn-sm"
-        id="btn-cerrar-modal-login">Cerrar</button
-      >
-    </div>
-  </div>
-</div>
+<!-- Pantalla de Login antigua eliminada (migrada a /login) -->
 
 <!-- Sección de Encabezado -->
 <header class="app-header">
@@ -239,14 +47,15 @@ import "../styles/index.css";
       style="display: flex; align-items: center; gap: 12px;"
     >
       <!-- Botón de Ingreso Elegante (Visible por defecto cuando no hay sesión) -->
-      <button
+      <a
+        href="/login"
         class="btn btn-secondary"
         id="btn-portal-login"
-        style="border: 1.5px solid var(--primary-red); color: var(--primary-red); font-weight: 700; border-radius: var(--radius-md);"
+        style="border: 1.5px solid var(--primary-red); color: var(--primary-red); font-weight: 700; border-radius: var(--radius-md); display: inline-flex; align-items: center; gap: 8px;"
       >
         <span class="material-icons-round">login</span>
         Ingresar al Portal
-      </button>
+      </a>
 
       <!-- Indicador de Sesión Activa -->
       <div
@@ -348,110 +157,9 @@ import "../styles/index.css";
     </button>
   </nav>
 
-  <!-- VISTA PRINCIPAL DE ATLETAS (Buscador y Grilla) -->
+  <!-- VISTA PRINCIPAL DE ATLETAS (React + Tanstack Query) -->
   <div id="contenedor-vista-atletas">
-    <!-- Barra de Búsqueda y Filtros de Selección -->
-    <section class="filter-section">
-      <div class="search-bar">
-        <span class="material-icons-round search-icon">search</span>
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Buscar atleta por nombre o cédula..."
-        />
-        <button
-          class="clear-search-btn"
-          id="btn-clear-search"
-          style="display:none;"
-        >
-          <span class="material-icons-round">close</span>
-        </button>
-      </div>
-
-      <div class="filters-container">
-        <!-- Discapacidad Filter -->
-        <div class="filter-group">
-          <label for="filter-discapacidad">Discapacidad</label>
-          <div class="custom-select-wrapper">
-            <select id="filter-discapacidad">
-              <option value="all">Todas las discapacidades</option>
-              <option value="fisica">Física</option>
-              <option value="visual">Visual</option>
-              <option value="intelectual">Intelectual</option>
-              <option value="auditiva">Auditiva</option>
-            </select>
-            <span class="material-icons-round select-arrow">expand_more</span>
-          </div>
-        </div>
-
-        <!-- Tipo de Clase Filter -->
-        <div class="filter-group">
-          <label for="filter-tipo-clase">Modalidad</label>
-          <div class="custom-select-wrapper">
-            <select id="filter-tipo-clase">
-              <option value="all">Todas (T / F)</option>
-              <option value="pista">Pista (T)</option>
-              <option value="campo">Campo (F)</option>
-            </select>
-            <span class="material-icons-round select-arrow">expand_more</span>
-          </div>
-        </div>
-
-        <!-- Clase Deportiva Filter -->
-        <div class="filter-group">
-          <label for="filter-clase">Clase Deportiva</label>
-          <div class="custom-select-wrapper">
-            <select id="filter-clase">
-              <option value="all">Todas las clases</option>
-            </select>
-            <span class="material-icons-round select-arrow">expand_more</span>
-          </div>
-        </div>
-
-        <!-- Indicador de filtros activos / Restablecer -->
-        <button
-          class="btn btn-secondary btn-icon"
-          id="btn-reset-filters"
-          title="Limpiar filtros"
-        >
-          <span class="material-icons-round">restart_alt</span>
-          <span>Restablecer</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Sección de la Grilla de Atletas -->
-    <section class="athletes-section">
-      <div class="section-header">
-        <h2 class="section-title" style="font-size: 1.25rem;">
-          Nuestros Atletas
-        </h2>
-        <span class="results-count" id="results-count">Mostrando 0 atletas</span
-        >
-      </div>
-
-      <!-- Grilla de Tarjetas -->
-      <div class="athletes-grid" id="athletes-grid">
-        <!-- Tarjetas dinámicas inyectadas por JS -->
-      </div>
-
-      <!-- Estado Vacío -->
-      <div class="empty-state" id="empty-state" style="display: none;">
-        <span class="material-icons-round empty-icon"
-          >sentiment_dissatisfied</span
-        >
-        <h3>No se encontraron atletas</h3>
-        <p>Intenta ajustar los criterios de búsqueda o filtros.</p>
-        <button
-          class="btn btn-primary"
-          id="btn-empty-register"
-          style="display: none;"
-        >
-          <span class="material-icons-round">person_add</span>
-          Registrar Atleta
-        </button>
-      </div>
-    </section>
+    <AthletesView client:load />
   </div>
 
   <!-- VISTA SECUNDARIA DE LOGROS DE PROFESORES -->
@@ -612,7 +320,9 @@ import "../styles/index.css";
 
       <div class="form-group-row" style="gap: 10px;">
         <div class="form-group" style="flex: 1;">
-          <label for="evento-country">País <span class="required">*</span></label>
+          <label for="evento-country"
+            >País <span class="required">*</span></label
+          >
           <div class="custom-select-wrapper">
             <select id="evento-country" required>
               <option value="">Cargando países...</option>
@@ -634,7 +344,8 @@ import "../styles/index.css";
           <span class="error-msg" id="error-evento-state">Requerido.</span>
         </div>
         <div class="form-group" style="flex: 1;">
-          <label for="evento-city">Ciudad <span class="required">*</span></label>
+          <label for="evento-city">Ciudad <span class="required">*</span></label
+          >
           <div class="custom-select-wrapper">
             <select id="evento-city" required disabled>
               <option value="">Elija departamento...</option>
@@ -651,7 +362,9 @@ import "../styles/index.css";
             >Fecha de Inicio <span class="required">*</span></label
           >
           <input type="date" id="evento-fecha-inicio" required />
-          <span class="error-msg" id="error-evento-fecha-inicio">Requerido.</span>
+          <span class="error-msg" id="error-evento-fecha-inicio"
+            >Requerido.</span
+          >
         </div>
         <div class="form-group">
           <label for="evento-fecha-fin"
@@ -667,7 +380,11 @@ import "../styles/index.css";
       </div>
 
       <div class="form-actions-right">
-        <button type="button" class="btn btn-secondary" id="btn-cancelar-evento">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="btn-cancelar-evento"
+        >
           Cancelar
         </button>
         <button type="button" class="btn btn-primary" id="btn-guardar-evento">
@@ -679,331 +396,7 @@ import "../styles/index.css";
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-register">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title-group">
-        <span class="material-icons-round modal-icon">person_add</span>
-        <h2 id="modal-register-title">Registrar Nuevo Atleta</h2>
-      </div>
-      <button class="btn-close-modal" id="btn-close-register-modal">
-        <span class="material-icons-round">close</span>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <form id="form-athlete" novalidate>
-        <input type="hidden" id="athlete-id" value="" />
-
-        <!-- Layout de dos columnas -->
-        <div class="form-grid">
-          <!-- Columna Izquierda: Foto y Cargas -->
-          <div class="form-col-left">
-            <div class="photo-upload-container">
-              <label class="photo-upload-label">Foto de Perfil</label>
-              <div class="photo-preview-box" id="photo-preview">
-                <span class="material-icons-round photo-placeholder-icon"
-                  >add_a_photo</span
-                >
-                <p class="photo-placeholder-text">Subir foto (.png, .jpg)</p>
-              </div>
-              <input
-                type="file"
-                id="photo-input"
-                accept="image/*"
-                style="display: none;"
-              />
-              <div class="photo-actions">
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm"
-                  id="btn-select-photo"
-                >
-                  <span class="material-icons-round">file_upload</span> Seleccionar
-                  Foto
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-danger-outline btn-sm"
-                  id="btn-remove-photo"
-                  style="display: none;"
-                >
-                  <span class="material-icons-round">delete</span> Eliminar
-                </button>
-              </div>
-            </div>
-
-            <!-- Vista previa interactiva de la tarjeta del atleta -->
-            <div class="live-preview-container">
-              <label class="photo-upload-label">Vista Previa de Tarjeta</label>
-              <div class="athlete-card preview-card">
-                <div
-                  class="preview-card-inner"
-                  style="display: flex; gap: 16px; padding: 20px;"
-                >
-                  <div class="card-image-wrapper-small">
-                    <div
-                      class="card-img-small"
-                      id="preview-card-img"
-                      style="background-image: none;"
-                    >
-                      <span
-                        class="material-icons-round"
-                        style="font-size: 35px; color: #cbd5e1;">person</span
-                      >
-                    </div>
-                  </div>
-                  <div class="card-details" style="padding: 0;">
-                    <h3 id="preview-card-name">Nombre del Atleta</h3>
-                    <div class="card-badges">
-                      <span
-                        class="badge badge-discapacidad"
-                        id="preview-card-badge-discap">Discapacidad</span
-                      >
-                      <span
-                        class="badge badge-clase"
-                        id="preview-card-badge-class">Clase</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Columna Derecha: Información del Atleta -->
-          <div class="form-col-right">
-            <h3 class="form-section-title">Datos Personales</h3>
-
-            <div class="form-group-row">
-              <div class="form-group flex-2">
-                <label for="athlete-name"
-                  >Nombre Completo <span class="required">*</span></label
-                >
-                <input
-                  type="text"
-                  id="athlete-name"
-                  required
-                  placeholder="Ej. Mauricio Valencia"
-                />
-                <span class="error-msg" id="error-athlete-name"
-                  >El nombre es requerido.</span
-                >
-              </div>
-              <div class="form-group flex-1">
-                <label for="athlete-doc"
-                  >Cédula / Identificación <span class="required">*</span
-                  ></label
-                >
-                <input
-                  type="text"
-                  id="athlete-doc"
-                  required
-                  placeholder="Ej. 111820495"
-                />
-                <span class="error-msg" id="error-athlete-doc"
-                  >La cédula es requerida.</span
-                >
-              </div>
-            </div>
-
-            <div class="form-group-row">
-              <div class="form-group">
-                <label for="athlete-birth"
-                  >Fecha de Nacimiento <span class="required">*</span></label
-                >
-                <input type="date" id="athlete-birth" required />
-                <span class="error-msg" id="error-athlete-birth"
-                  >La fecha es requerida.</span
-                >
-              </div>
-              <div class="form-group">
-                <label for="athlete-gender"
-                  >Género <span class="required">*</span></label
-                >
-                <div class="custom-select-wrapper">
-                  <select id="athlete-gender" required>
-                    <option value="">Seleccione...</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Femenino">Femenino</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                  <span class="material-icons-round select-arrow"
-                    >expand_more</span
-                  >
-                </div>
-                <span class="error-msg" id="error-athlete-gender"
-                  >El género es requerido.</span
-                >
-              </div>
-            </div>
-
-            <div class="form-group-row">
-              <div class="form-group">
-                <label for="athlete-phone">Teléfono de Contacto</label>
-                <input
-                  type="tel"
-                  id="athlete-phone"
-                  placeholder="Ej. +57 300 123 4567"
-                />
-              </div>
-              <div class="form-group">
-                <label for="athlete-email"
-                  >Correo Electrónico <span class="required">*</span></label
-                >
-                <input
-                  type="email"
-                  id="athlete-email"
-                  required
-                  placeholder="Ej. atleta@valle.co"
-                />
-                <span
-                  class="error-msg"
-                  id="error-athlete-email"
-                  style="display: none;"
-                  >El correo es requerido para el login.</span
-                >
-              </div>
-            </div>
-
-            <div class="form-group-row">
-              <div class="form-group">
-                <label for="athlete-password"
-                  >Contraseña de Ingreso <span class="required">*</span></label
-                >
-                <input
-                  type="password"
-                  id="athlete-password"
-                  required
-                  placeholder="Crea tu contraseña"
-                />
-                <span class="error-msg" id="error-athlete-password"
-                  >La contraseña es requerida para el ingreso.</span
-                >
-              </div>
-              <div class="form-group">
-                <label for="athlete-club"
-                  >Club <span class="required">*</span></label
-                >
-                <div class="custom-select-wrapper">
-                  <select id="athlete-club" required>
-                    <option value="">Seleccione un club...</option>
-                    <!-- aqui van los club -->
-                    <option value="Club Deportivo Imparables a la Meta"
-                      >Club Deportivo Imparables a la Meta</option
-                    >
-                    <option value="Club Deportivo Minas del Paraatletismo"
-                      >Club Deportivo Minas del Paraatletismo</option
-                    >
-                    <option value="Club Deportivo Discatle"
-                      >Club Deportivo Discatle</option
-                    >
-                    <option value="Club Deportivo de Paraatletismo PC Yumbo"
-                      >Club Deportivo de Paraatletismo PC Yumbo</option
-                    >
-                    <option value="Club Deportivo Casin"
-                      >Club Deportivo Casin</option
-                    >
-                  </select>
-                  <span class="material-icons-round select-arrow"
-                    >expand_more</span
-                  >
-                </div>
-                <span class="error-msg" id="error-athlete-club"
-                  >El club es requerido.</span
-                >
-              </div>
-            </div>
-
-            <h3 class="form-section-title">Clasificación Deportiva</h3>
-
-            <div class="form-group-row">
-              <div class="form-group">
-                <label for="athlete-discapacidad"
-                  >Tipo de Discapacidad <span class="required">*</span></label
-                >
-                <div class="custom-select-wrapper">
-                  <select id="athlete-discapacidad" required>
-                    <option value="">Seleccione...</option>
-                    <option value="fisica">Física</option>
-                    <option value="visual">Visual</option>
-                    <option value="intelectual">Intelectual</option>
-                    <option value="auditiva">Auditiva</option>
-                    <option value="guia">Guía</option>
-                  </select>
-                  <span class="material-icons-round select-arrow"
-                    >expand_more</span
-                  >
-                </div>
-                <span class="error-msg" id="error-athlete-discapacidad"
-                  >La discapacidad es requerida.</span
-                >
-              </div>
-
-              <div class="form-group">
-                <label for="athlete-tipo-clase"
-                  >Modalidad <span class="required">*</span></label
-                >
-                <div class="custom-select-wrapper">
-                  <select id="athlete-tipo-clase" required disabled>
-                    <option value="">Primero elija discapacidad...</option>
-                    <option value="pista">Pista (T)</option>
-                    <option value="campo">Campo (F)</option>
-                  </select>
-                  <span class="material-icons-round select-arrow"
-                    >expand_more</span
-                  >
-                </div>
-                <span class="error-msg" id="error-athlete-tipo-clase"
-                  >La modalidad es requerida.</span
-                >
-              </div>
-
-              <div class="form-group">
-                <label for="athlete-clase"
-                  >Clase Deportiva <span class="required">*</span></label
-                >
-                <div class="custom-select-wrapper">
-                  <select id="athlete-clase" required disabled>
-                    <option value="">Primero elija modalidad...</option>
-                  </select>
-                  <span class="material-icons-round select-arrow"
-                    >expand_more</span
-                  >
-                </div>
-                <span class="error-msg" id="error-athlete-clase"
-                  >La clase es requerida.</span
-                >
-              </div>
-            </div>
-
-            <!-- Cuadro informativo para la descripción de la clase actual -->
-            <div
-              class="class-info-box"
-              id="class-info-box"
-              style="display: none;"
-            >
-              <span class="material-icons-round info-icon">info</span>
-              <p id="class-info-text">
-                Descripción técnica de la clasificación...
-              </p>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" id="btn-cancel-register"
-        >Cancelar</button
-      >
-      <button type="button" class="btn btn-primary" id="btn-save-athlete">
-        <span class="material-icons-round">save</span>
-        Guardar Atleta
-      </button>
-    </div>
-  </div>
-</div>
+<AthleteModal client:load />
 
 <!-- MODAL: AGREGAR LOGRO DE PROFESOR EN ESPAÑOL -->
 <div class="modal-overlay" id="modal-agregar-logro">
@@ -1301,12 +694,9 @@ import "../styles/index.css";
                   >Evento <span class="required">*</span></label
                 >
                 <div class="custom-select-wrapper">
-                  <select
-                  id="champ-name"
-                  required
-                >
-                  <option value="">Seleccione un evento...</option>
-                </select>
+                  <select id="champ-name" required>
+                    <option value="">Seleccione un evento...</option>
+                  </select>
                   <span class="material-icons-round select-arrow"
                     >expand_more</span
                   >

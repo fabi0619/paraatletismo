@@ -1,4 +1,4 @@
-﻿import {
+import {
   getAthletes,
   saveAthlete,
   deleteAthlete,
@@ -527,22 +527,26 @@ function adjuntarEventosLogin() {
     });
   });
 
-  formLogin.addEventListener("submit", (e) => {
-    e.preventDefault();
-    manejarInicioSesion();
-  });
+  if (formLogin) {
+    formLogin.addEventListener("submit", (e) => {
+      e.preventDefault();
+      manejarInicioSesion();
+    });
+  }
 
-  btnIniciarSesion.addEventListener("click", (e) => {
-    e.preventDefault();
-    manejarInicioSesion();
-  });
+  if (btnIniciarSesion) {
+    btnIniciarSesion.addEventListener("click", (e) => {
+      e.preventDefault();
+      manejarInicioSesion();
+    });
+  }
 
   const enlaceIrARegistro = document.getElementById("enlace-ir-a-registro");
   if (enlaceIrARegistro) {
     enlaceIrARegistro.addEventListener("click", (e) => {
       e.preventDefault();
-      formLogin.style.display = "none";
-      formRegistroProfesor.style.display = "block";
+      if (formLogin) formLogin.style.display = "none";
+      if (formRegistroProfesor) formRegistroProfesor.style.display = "block";
     });
   }
 
@@ -552,9 +556,7 @@ function adjuntarEventosLogin() {
     enlaceIrARegistroAtleta.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Enlace registro atleta clickeado");
-      console.log("contenedorLogin antes:", contenedorLogin.style.display);
-      contenedorLogin.style.display = "none";
-      console.log("contenedorLogin despues:", contenedorLogin.style.display);
+      if (contenedorLogin) contenedorLogin.style.display = "none";
       openRegisterModal();
     });
   }
@@ -563,8 +565,8 @@ function adjuntarEventosLogin() {
   if (enlaceIrALogin) {
     enlaceIrALogin.addEventListener("click", (e) => {
       e.preventDefault();
-      formRegistroProfesor.style.display = "none";
-      formLogin.style.display = "block";
+      if (formRegistroProfesor) formRegistroProfesor.style.display = "none";
+      if (formLogin) formLogin.style.display = "block";
     });
   }
 
@@ -1469,15 +1471,12 @@ function openRegisterModal(athlete = null) {
     fieldClass.disabled = true;
     classInfoBox.style.display = "none";
   }
-
-  updateLivePreview();
-  modalRegister.classList.add("active");
-  modalRegister.style.display = "flex";
 }
 
 function closeRegisterModal() {
-  modalRegister.classList.remove("active");
-  modalRegister.style.display = "none";
+  if (window.closeAthleteModal) {
+    window.closeAthleteModal();
+  }
 }
 
 // ==========================================================================
