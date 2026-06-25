@@ -1,6 +1,7 @@
 ---
 import { AthleteModal } from "../features/auth/components/AthleteModal";
 import { AthletesView } from "../features/athletes/components/AthletesView";
+import { Header } from "./layout/Header";
 ---
 
 <!-- Elemento decorativo de fondo -->
@@ -8,117 +9,8 @@ import { AthletesView } from "../features/athletes/components/AthletesView";
 
 <!-- Pantalla de Login antigua eliminada (migrada a /login) -->
 
-<!-- Sección de Encabezado -->
-<header class="app-header">
-  <div class="header-container">
-    <div class="logo-area">
-      <div class="logo-badge">
-        <div class="logo-badge-icon">
-          <span class="material-icons-round">sports_athletics</span>
-        </div>
-        <div class="logo-badge-text">
-          <h1>VALLE <span class="highlight">PARAATLETISMO</span></h1>
-          <p>Portal de Gestión Deportiva</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Panel de Estadísticas en el Encabezado -->
-    <div class="stats-panel">
-      <div class="stat-card" id="stat-athletes">
-        <span class="material-icons-round text-red">groups</span>
-        <div>
-          <h3 class="stat-value">0</h3>
-          <p class="stat-label">Atletas</p>
-        </div>
-      </div>
-      <div class="stat-card" id="stat-championships">
-        <span class="material-icons-round text-red">emoji_events</span>
-        <div>
-          <h3 class="stat-value">0</h3>
-          <p class="stat-label">Eventos creados</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Acciones del Header -->
-    <div
-      class="header-actions"
-      style="display: flex; align-items: center; gap: 12px;"
-    >
-      <!-- Botón de Ingreso Elegante (Visible por defecto cuando no hay sesión) -->
-      <a
-        href="/login"
-        class="btn btn-secondary"
-        id="btn-portal-login"
-        style="border: 1.5px solid var(--primary-red); color: var(--primary-red); font-weight: 700; border-radius: var(--radius-md); display: inline-flex; align-items: center; gap: 8px;"
-      >
-        <span class="material-icons-round">login</span>
-        Ingresar al Portal
-      </a>
-
-      <!-- Indicador de Sesión Activa -->
-      <div
-        class="indicador-sesion"
-        id="indicador-sesion"
-        style="display: none;"
-      >
-        <div class="usuario-info">
-          <span class="material-icons-round text-red" style="font-size: 32px;"
-            >account_circle</span
-          >
-          <div
-            class="usuario-textos"
-            style="display: flex; flex-direction: column;"
-          >
-            <h4
-              id="sesion-nombre-usuario"
-              style="font-size: 0.85rem; font-weight: 700; line-height: 1.1; color: var(--bg-dark);"
-            >
-              Nombre Usuario
-            </h4>
-            <span
-              class="badge"
-              id="sesion-badge-rol"
-              style="font-size: 0.65rem; padding: 1px 6px; width: fit-content; margin-top: 3px; background-color: var(--primary-red-light); color: var(--primary-red); font-weight: bold; border-radius: 4px;"
-              >ADMIN</span
-            >
-          </div>
-        </div>
-        <button
-          class="btn btn-primary btn-sm"
-          id="btn-mi-perfil"
-          title="Mi Perfil"
-          style="padding: 6px 10px; border-radius: 8px; display: none; margin-right: 5px; font-weight: 700; gap: 4px;"
-        >
-          <span class="material-icons-round" style="font-size: 18px;"
-            >account_box</span
-          >
-          Perfil
-        </button>
-        <button
-          class="btn btn-secondary btn-sm"
-          id="btn-cerrar-sesion"
-          title="Cerrar Sesión"
-          style="padding: 6px; border-radius: 8px;"
-        >
-          <span class="material-icons-round" style="font-size: 18px;"
-            >logout</span
-          >
-        </button>
-      </div>
-
-      <button
-        class="btn btn-primary"
-        id="btn-open-register"
-        style="display: none;"
-      >
-        <span class="material-icons-round">person_add</span>
-        Registrar Atleta
-      </button>
-    </div>
-  </div>
-</header>
+<!-- Encabezado React (sesión + estadísticas en tiempo real) -->
+<Header client:load />
 
 <!-- Diseño del Contenido Principal -->
 <main class="app-content">
