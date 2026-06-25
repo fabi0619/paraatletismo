@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { athletesService, type Athlete } from "../../features/athletes/api/athletesService";
 import { professorsService, type Professor } from "../../features/professors/api/professorsService";
