@@ -5,7 +5,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/card";
+} from "@/components/ui/card";
 import { Medal, UserRound } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 

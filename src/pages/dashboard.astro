@@ -1,0 +1,26 @@
+---
+/**
+ * /dashboard — Panel de Control
+ * ─────────────────────────────────────────────────────────
+ * Panel privado para usuarios autenticados (atletas,
+ * entrenadores, y administradores).
+ *
+ * Si el usuario NO tiene sesión activa, el componente React
+ * lo redirige automáticamente a /login.
+ *
+ * Muestra:
+ *   - Saludo personalizado con nombre y rol
+ *   - Estadísticas generales (atletas, medallas, etc.)
+ *   - Accesos rápidos según el rol del usuario
+ *   - Preview de atletas recientes
+ *
+ * Componente React:
+ *   DashboardView — carga vía client:load
+ */
+import MainLayout from "../layouts/MainLayout.astro";
+import { DashboardView } from "../features/dashboard/components/DashboardView";
+---
+
+<MainLayout title="Dashboard - Valle Paraatletismo">
+  <DashboardView client:load />
+</MainLayout>

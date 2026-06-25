@@ -265,6 +265,15 @@ const HeaderInner: React.FC = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => window.location.href = "/dashboard"}>
+                  <span
+                    className="material-icons-round mr-2"
+                    style={{ fontSize: "16px" }}
+                  >
+                    dashboard
+                  </span>
+                  Dashboard
+                </DropdownMenuItem>
                 {session.rol === "atleta" && (
                   <DropdownMenuItem onClick={handleProfile}>
                     <span

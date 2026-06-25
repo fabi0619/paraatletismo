@@ -1,0 +1,91 @@
+---
+/**
+ * MainLayout.astro
+ * ─────────────────────────────────────────────────────────
+ * Layout principal reutilizable para TODAS las páginas
+ * que necesitan el Header (sesión + stats) y el Footer.
+ *
+ * Uso:
+ *   <MainLayout title="Mi Página">
+ *     <!-- contenido aquí -->
+ *   </MainLayout>
+ *
+ * Props:
+ *   title  - Título de la pestaña del navegador
+ *   class  - Clase CSS adicional para el <main>
+ */
+
+interface Props {
+  title?: string;
+  class?: string;
+}
+
+const { title = "Valle Oro Puro - Paraatletismo", class: className } = Astro.props;
+
+import "../styles/global.css";
+import "../styles/styles.css";
+import { Header } from "../components/layout/Header";
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta
+      name="description"
+      content="Plataforma de gestión e historial deportivo de atletas de la selección de paraatletismo del Valle del Cauca."
+    />
+    <meta
+      name="keywords"
+      content="paraatletismo, valle del cauca, atletismo adaptado, clasificacion deportiva, indeportes valle"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen relative">
+    <!-- Fondo decorativo -->
+    <div class="bg-glow"></div>
+
+    <!-- Header React con sesión + estadísticas -->
+    <Header client:load />
+
+    <!-- Contenido de la página -->
+    <main class:list={["app-content", className]}>
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <h3>Atletas del Valle del Cauca</h3>
+          <p>Impulsando el deporte y el talento regional.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Navegación</h4>
+          <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/atletas">Atletas</a></li>
+            <li><a href="/login">Ingresar</a></li>
+          </ul>
+        </div>
+        <div class="footer-social">
+          <h4>Síguenos</h4>
+          <div class="social-icons">
+            <a href="#">Facebook</a>
+            <a href="#">Instagram</a>
+            <a href="#">X</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Atletas del Valle del Cauca. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </body>
+</html>

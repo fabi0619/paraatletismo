@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "../schemas/authSchemas";
-import { iniciarSesion } from "../../../lib/supabase";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
-import { Button } from "../../../components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { iniciarSesion } from "@/lib/supabase";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const LoginForm: React.FC = () => {
   const [generalError, setGeneralError] = useState<string | null>(null);
@@ -34,7 +34,7 @@ export const LoginForm: React.FC = () => {
       if (session) {
         // Notify the header so it updates without a full reload
         window.dispatchEvent(new Event("sesion_change"));
-        window.location.href = "/";
+        window.location.href = "/dashboard";
       } else {
         setGeneralError("Usuario o contraseña incorrectos. Verifique sus credenciales.");
       }
@@ -205,7 +205,7 @@ export const LoginForm: React.FC = () => {
               <p className="text-center text-sm text-slate-500">
                 ¿No tienes cuenta?{" "}
                 <a
-                  href="/register"
+                  href="/registro"
                   className="font-semibold underline-offset-4 hover:underline"
                   style={{ color: "hsl(0,68%,50%)" }}
                 >

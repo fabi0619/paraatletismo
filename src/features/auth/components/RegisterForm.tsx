@@ -56,7 +56,7 @@ export const RegisterForm: React.FC = () => {
                       "atleta",
                     );
                     if (sesion) {
-                      window.location.href = "/";
+                      window.location.href = "/dashboard";
                     }
                   } catch (error: any) {
                     setGeneralError(
