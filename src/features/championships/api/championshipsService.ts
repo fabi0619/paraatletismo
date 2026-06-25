@@ -37,5 +37,43 @@ export const championshipsService = {
       creadoPor: e.creado_por,
       creadoPorNombre: e.creado_por_nombre || 'Organización'
     }));
+  },
+
+  saveChampionship: async (championship: Omit<ChampionshipExtended, 'id'>): Promise<ChampionshipExtended> => {
+    const payload = {
+      nombre: championship.nombre,
+      pais: championship.pais,
+      departamento: championship.departamento,
+      ciudad: championship.ciudad,
+      fecha_inicio: championship.fechaInicio,
+      fecha_fin: championship.fechaFin,
+      fecha_texto: championship.fechaTexto,
+      creado_por: championship.creadoPor,
+      creado_por_nombre: championship.creadoPorNombre
+    };
+
+    const { data, error } = await supabase
+      .from('para_eventos')
+      .insert([payload])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving championship:', error);
+      throw new Error(error.message);
+    }
+
+    return {
+      id: data.id,
+      nombre: data.nombre,
+      pais: data.pais,
+      departamento: data.departamento,
+      ciudad: data.ciudad,
+      fechaInicio: data.fecha_inicio,
+      fechaFin: data.fecha_fin,
+      fechaTexto: data.fecha_texto,
+      creadoPor: data.creado_por,
+      creadoPorNombre: data.creado_por_nombre || 'Organización'
+    };
   }
 };

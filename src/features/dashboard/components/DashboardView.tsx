@@ -248,7 +248,7 @@ const DashboardInner: React.FC = () => {
               icon="workspace_premium"
               title="Gestión de Logros"
               description="Registra y consulta logros con tus atletas"
-              href="/"
+              href="/logros"
             />
           )}
         </div>
