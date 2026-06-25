@@ -158,7 +158,7 @@ const LogrosInner: React.FC = () => {
       return;
     }
 
-    const event = championships?.find((c) => c.id === selectedChampionshipId);
+    const event = championships?.find((c) => String(c.id) === String(selectedChampionshipId));
     if (!event) {
       setFormError("El campeonato seleccionado no es válido.");
       return;
