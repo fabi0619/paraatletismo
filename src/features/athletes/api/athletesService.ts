@@ -48,8 +48,7 @@ export const athletesService = {
       .select(`
         id, nombre, cedula, fecha_nacimiento, genero, telefono, correo, 
         discapacidad, tipo_clase, clase_deportiva, foto, club,
-        documentos:para_documentos(*),
-        campeonatos:para_campeonatos(*)
+        documentos:para_documentos(*)
       `);
 
     if (error) {
@@ -71,7 +70,7 @@ export const athletesService = {
       club: a.club,
       foto: a.foto,
       documentos: a.documentos || [],
-      campeonatos: a.campeonatos || []
+      campeonatos: []
     }));
   },
 
@@ -81,8 +80,7 @@ export const athletesService = {
       .select(`
         id, nombre, cedula, fecha_nacimiento, genero, telefono, correo, 
         discapacidad, tipo_clase, clase_deportiva, foto, club,
-        documentos:para_documentos(*),
-        campeonatos:para_campeonatos(*)
+        documentos:para_documentos(*)
       `)
       .eq('id', id)
       .maybeSingle();
@@ -108,7 +106,7 @@ export const athletesService = {
       club: a.club,
       foto: a.foto,
       documentos: a.documentos || [],
-      campeonatos: a.campeonatos || []
+      campeonatos: []
     };
   }
 };
