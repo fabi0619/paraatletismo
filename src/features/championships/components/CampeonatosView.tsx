@@ -5,7 +5,7 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { Badge } from "../../../components/ui/badge";
 import { QueryProvider } from "../../../components/providers/QueryProvider";
 import { SearchInput } from "../../../components/search-input";
-import { Trophy, MapPin, Calendar, Activity, User, Medal } from "lucide-react";
+import { Trophy, MapPin, Calendar, UserRound } from "lucide-react";
 
 function ChampionshipsGridSkeleton() {
   return (
@@ -41,28 +41,6 @@ function ChampionshipsEmptyState() {
   );
 }
 
-function getMedalColor(posicion: string) {
-  const pos = String(posicion).toLowerCase().trim();
-  if (pos === "1" || pos === "oro") {
-    return "bg-yellow-100 text-yellow-800 border-yellow-200";
-  }
-  if (pos === "2" || pos === "plata") {
-    return "bg-slate-100 text-slate-800 border-slate-200";
-  }
-  if (pos === "3" || pos === "bronce") {
-    return "bg-orange-100 text-orange-800 border-orange-200";
-  }
-  return "bg-red-50 text-red-700 border-red-100";
-}
-
-function getMedalText(posicion: string) {
-  const pos = String(posicion).toLowerCase().trim();
-  if (pos === "1" || pos === "oro") return "1° Lugar (Oro)";
-  if (pos === "2" || pos === "plata") return "2° Lugar (Plata)";
-  if (pos === "3" || pos === "bronce") return "3° Lugar (Bronce)";
-  return `Posición: ${posicion}`;
-}
-
 const CampeonatosInner: React.FC = () => {
   const { data: championships, isLoading, isError, error } = useChampionships();
   const [search, setSearch] = useState("");
@@ -73,10 +51,11 @@ const CampeonatosInner: React.FC = () => {
     if (!query) return championships;
     return championships.filter(
       (c) =>
-        c.campeonato.toLowerCase().includes(query) ||
-        c.athleteName?.toLowerCase().includes(query) ||
-        c.prueba.toLowerCase().includes(query) ||
-        c.lugar.toLowerCase().includes(query)
+        c.nombre.toLowerCase().includes(query) ||
+        c.ciudad.toLowerCase().includes(query) ||
+        c.departamento.toLowerCase().includes(query) ||
+        c.pais.toLowerCase().includes(query) ||
+        (c.creadoPorNombre && c.creadoPorNombre.toLowerCase().includes(query))
     );
   }, [championships, search]);
 
@@ -96,7 +75,7 @@ const CampeonatosInner: React.FC = () => {
         <SearchInput
           value={search}
           onChange={setSearch}
-          placeholder="Buscar campeonato por nombre, atleta, prueba, lugar..."
+          placeholder="Buscar campeonato por nombre, lugar, creador..."
           resultsCount={isLoading ? undefined : filteredChampionships.length}
           className="w-full"
         />
@@ -106,7 +85,7 @@ const CampeonatosInner: React.FC = () => {
         <div className="mb-6 flex items-end justify-between border-b border-slate-100 pb-2">
           <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
             <span className="material-icons-round text-red-500">emoji_events</span>
-            Historial de Campeonatos
+            Campeonatos y Eventos Oficiales
           </h2>
           <Badge
             variant="secondary"
@@ -114,7 +93,7 @@ const CampeonatosInner: React.FC = () => {
           >
             {isLoading
               ? "Cargando..."
-              : `Mostrando ${filteredChampionships.length} participaciones`}
+              : `Mostrando ${filteredChampionships.length} campeonatos`}
           </Badge>
         </div>
 
@@ -132,36 +111,22 @@ const CampeonatosInner: React.FC = () => {
                     <Trophy size={20} />
                   </div>
                   <CardTitle className="pr-10 text-lg font-black leading-tight text-slate-800 group-hover:text-red-600 transition-colors">
-                    {c.campeonato}
+                    {c.nombre}
                   </CardTitle>
-                  <p className="mt-2 flex items-center gap-1.5 text-xs font-bold text-slate-500">
-                    <User size={14} className="text-red-500" />
-                    <span>Atleta: </span>
-                    <span className="text-red-500 font-extrabold">{c.athleteName}</span>
-                  </p>
                 </div>
 
                 <CardContent className="flex flex-col gap-3 p-6 pt-5">
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <MapPin size={14} className="text-slate-400 shrink-0" />
-                    <span>Lugar: {c.lugar}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-600">
-                    <Activity size={14} className="text-slate-400 shrink-0" />
-                    <span>Prueba: {c.prueba}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-600">
-                    <Medal size={14} className="text-slate-400 shrink-0" />
-                    <span>Marca: <strong className="text-slate-800">{c.marca}</strong></span>
+                    <span>Lugar: {c.ciudad}, {c.departamento}, {c.pais}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <Calendar size={14} className="text-slate-400 shrink-0" />
-                    <span>Fecha: {c.fecha}</span>
+                    <span>Fecha: {c.fechaTexto || `${c.fechaInicio} / ${c.fechaFin}`}</span>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-slate-100">
-                    <span className={`inline-block rounded px-2.5 py-1 text-xs font-black uppercase border ${getMedalColor(c.posicion)}`}>
-                      {getMedalText(c.posicion)}
-                    </span>
+                  <div className="mt-2 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs text-slate-500">
+                    <UserRound size={12} className="text-slate-400" />
+                    <span>Organizado por: <strong>{c.creadoPorNombre}</strong></span>
                   </div>
                 </CardContent>
               </Card>

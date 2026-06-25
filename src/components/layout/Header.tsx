@@ -154,12 +154,7 @@ const HeaderInner: React.FC = () => {
   const totalAthletes = athletes?.length ?? 0;
   const totalProfessors = professors?.length ?? 0;
   
-  // Use distinct championships by name
-  const totalChampionships = useMemo(() => {
-    if (!championships) return 0;
-    const names = new Set(championships.map(c => c.campeonato.trim().toLowerCase()));
-    return names.size;
-  }, [championships]);
+  const totalChampionships = championships?.length ?? 0;
 
   const handleLogout = useCallback(() => {
     clearSession();
