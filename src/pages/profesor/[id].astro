@@ -1,0 +1,19 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { ProfessorProfile } from "../../features/professors/components/ProfessorProfile";
+import { supabase } from "../../features/athletes/api/athletesService";
+
+export async function getStaticPaths() {
+  const { data: professors } = await supabase.from('para_profesores').select('id');
+  const paths = (professors || []).map((professor) => ({
+    params: { id: professor.id },
+  }));
+  return paths.length ? paths : [{ params: { id: "undefined" } }];
+}
+
+const { id } = Astro.params;
+---
+
+<Layout title="Perfil del Entrenador">
+  {id ? <ProfessorProfile client:only="react" id={id} /> : <p>ID no proporcionado</p>}
+</Layout>

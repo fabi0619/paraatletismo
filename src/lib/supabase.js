@@ -15,8 +15,7 @@ export async function getAthletes() {
     .select(`
       id, nombre, cedula, fecha_nacimiento, genero, telefono, correo, 
       discapacidad, tipo_clase, clase_deportiva, foto, club,
-      documentos:para_documentos(*),
-      campeonatos:para_campeonatos(*)
+      documentos:para_documentos(*)
     `);
 
   if (relError) {
@@ -39,7 +38,7 @@ export async function getAthletes() {
     club: a.club,
     foto: a.foto,
     documentos: a.documentos || [],
-    campeonatos: a.campeonatos || []
+    campeonatos: []
   }));
 }
 
@@ -96,24 +95,12 @@ export async function deleteAthlete(id) {
 // ==========================================================================
 
 export async function addChampionship(athleteId, championship) {
-  const payload = {
-    atleta_id: athleteId,
-    campeonato: championship.campeonato,
-    lugar: championship.lugar,
-    prueba: championship.prueba,
-    marca: championship.marca,
-    fecha: championship.fecha,
-    posicion: championship.posicion
-  };
-
-  const { error } = await supabase.from('para_campeonatos').insert([payload]);
-  if (error) throw error;
+  // Tabla para_campeonatos eliminada. Los eventos oficiales se gestionan por para_eventos
   return true;
 }
 
 export async function deleteChampionship(athleteId, championshipId) {
-  const { error } = await supabase.from('para_campeonatos').delete().eq('id', championshipId);
-  if (error) throw error;
+  // Tabla para_campeonatos eliminada
   return true;
 }
 
@@ -270,10 +257,10 @@ export async function iniciarSesion(usuario, clave, rol) {
       .maybeSingle();
 
     if (data) {
-      const sesion = { 
-        id: data.id, 
-        nombre: data.nombre, 
-        rol: rol, 
+      const sesion = {
+        id: data.id,
+        nombre: data.nombre,
+        rol: rol,
         cedula: data.cedula,
         ...(rol === "profesor" ? { especialidad: data.especialidad } : {})
       };
@@ -334,7 +321,10 @@ export async function registrarProfesor(nuevoProfesor) {
     especialidad: nuevoProfesor.especialidad,
     correo: nuevoProfesor.correo,
     cedula: nuevoProfesor.cedula,
-    fecha_nacimiento: nuevoProfesor.fechaNacimiento
+    fecha_nacimiento: nuevoProfesor.fechaNacimiento,
+    genero: nuevoProfesor.genero,
+    telefono: nuevoProfesor.telefono,
+    foto: nuevoProfesor.foto
   };
 
   const { data, error } = await supabase.from('para_profesores').insert([payload]).select().single();
@@ -343,6 +333,31 @@ export async function registrarProfesor(nuevoProfesor) {
   }
   return data;
 }
+
+export async function saveProfessor(professor) {
+  let isUpdate = !!professor.id && !professor.id.startsWith("temp-");
+
+  const payload = {
+    nombre: professor.nombre,
+    cedula: professor.cedula,
+    fecha_nacimiento: professor.fechaNacimiento,
+    genero: professor.genero,
+    telefono: professor.telefono,
+    correo: professor.correo,
+    especialidad: professor.especialidad,
+    foto: professor.foto
+  };
+
+  if (isUpdate) {
+    const { data, error } = await supabase.from('para_profesores').update(payload).eq('id', professor.id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error(`No se encontró el profesor con id ${professor.id} para actualizar.`);
+    return data;
+  } else {
+    return registrarProfesor(professor);
+  }
+}
+
 
 // ==========================================================================
 // CRUD DE LOGROS DE PROFESORES

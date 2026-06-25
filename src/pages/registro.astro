@@ -1,0 +1,23 @@
+---
+/**
+ * /registro — Página de Registro
+ * ─────────────────────────────────────────────────────────
+ * Permite a nuevos atletas y entrenadores crear su cuenta
+ * en la plataforma. Contiene tabs para elegir el tipo de
+ * registro (Atleta o Entrenador).
+ *
+ * Componente React:
+ *   RegisterForm — formulario con validación Zod + React
+ *   Hook Form y registro vía Supabase Auth.
+ */
+import Layout from "../layouts/Layout.astro";
+import { RegisterForm } from "../features/auth/components/RegisterForm";
+import "../styles/styles.css";
+---
+
+<Layout title="Registro - Valle Paraatletismo">
+  <div class="bg-glow"></div>
+  <div class="min-h-screen flex items-center justify-center p-4 md:p-8 relative z-10">
+    <RegisterForm client:load />
+  </div>
+</Layout>

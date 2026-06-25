@@ -1,0 +1,13 @@
+---
+/**
+ * /profesores — Página pública de Profesores
+ * ─────────────────────────────────────────────────────────
+ * Muestra la lista de entrenadores registrados en la plataforma.
+ */
+import MainLayout from "../layouts/MainLayout.astro";
+import { ProfesoresView } from "../features/professors/components/ProfesoresView";
+---
+
+<MainLayout title="Entrenadores - Valle Paraatletismo">
+  <ProfesoresView client:load />
+</MainLayout>

@@ -3,78 +3,9 @@
    Paleta de Colores: Rojo Valle (#D32F2F) y Blanco, con acentos modernos.
    ========================================================================== */
 
-/* 1. CONFIGURACIÓN DE VARIABLES & DISEÑO DEL SISTEMA */
-:root {
-  /* Paleta de Colores Valle */
-  --primary-red: hsl(0, 68%, 50%);
-  /* #D32F2F - Rojo Valle */
-  --primary-red-hover: hsl(348, 100%, 54%);
-  /* Rojo enérgico hover */
-  --primary-red-light: hsl(0, 68%, 96%);
-  /* Fondo rojo muy suave */
-  --primary-red-glow: hsla(0, 68%, 50%, 0.15);
-  /* Resplandor rojo */
+/* Variables de diseño del sistema centralizadas en global.css */
 
-  /* Escala de Grises Premium */
-  --bg-dark: hsl(222, 47%, 11%);
-  /* Slate 900 */
-  --text-main: hsl(215, 25%, 27%);
-  /* Slate 700 */
-  --text-muted: hsl(215, 16%, 47%);
-  /* Slate 500 */
-  --bg-light: hsl(210, 40%, 98%);
-  /* Slate 50 */
-  --bg-card: hsl(0, 0%, 100%);
-  /* Blanco Puro */
-  --border-color: hsl(214, 32%, 91%);
-  /* Slate 200 */
-
-  /* Colores de Estado */
-  --gold: hsl(45, 100%, 51%);
-  /* Medalla Oro */
-  --silver: hsl(210, 16%, 82%);
-  /* Medalla Plata */
-  --bronze: hsl(28, 56%, 60%);
-  /* Medalla Bronce */
-  --success: hsl(142, 71%, 45%);
-  /* Verde */
-
-  /* Fuentes e Interacciones */
-  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-full: 9999px;
-
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 16px -6px rgba(15, 23, 42, 0.05);
-  --shadow-lg: 0 25px 50px -12px rgba(15, 23, 42, 0.08);
-  --shadow-glow: 0 0 40px rgba(211, 47, 47, 0.12);
-
-  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* 2. RESET & ESTILOS BASE */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: var(--font-family);
-  background-color: var(--bg-light);
-  color: var(--text-main);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-  position: relative;
-  line-height: 1.5;
-}
+/* Estilos base del body centralizados en global.css */
 
 /* Efecto de brillo de fondo para dar profundidad */
 .bg-glow {
@@ -83,7 +14,11 @@ body {
   right: -50px;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, var(--primary-red-glow) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    var(--primary-red-glow) 0%,
+    transparent 70%
+  );
   z-index: -1;
   pointer-events: none;
 }
@@ -236,7 +171,11 @@ body {
   gap: 6px;
   padding: 8px 12px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, hsl(0, 45%, 93%) 0%, hsl(350, 35%, 90%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(0, 45%, 93%) 0%,
+    hsl(350, 35%, 90%) 100%
+  );
   border: 1.5px solid hsl(0, 40%, 82%);
   box-shadow: 0 2px 10px hsla(0, 40%, 60%, 0.12);
 }
@@ -637,17 +576,17 @@ body {
 }
 
 .medal-circle.gold {
-  background-color: #FFD700;
+  background-color: #ffd700;
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
 }
 
 .medal-circle.silver {
-  background-color: #C0C0C0;
+  background-color: #c0c0c0;
   box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.3);
 }
 
 .medal-circle.bronze {
-  background-color: #CD7F32;
+  background-color: #cd7f32;
   box-shadow: 0 0 0 2px rgba(205, 127, 50, 0.3);
 }
 
@@ -1335,7 +1274,9 @@ body {
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.1);
   position: relative;
   animation: modalSlideIn 0.25s ease;
 }
@@ -1671,8 +1612,17 @@ body {
   width: 100%;
   height: 100%;
   background-color: var(--bg-dark);
-  background-image: radial-gradient(circle at 80% 20%, var(--primary-red-glow) 0%, transparent 50%),
-    radial-gradient(circle at 10% 80%, rgba(211, 47, 47, 0.05) 0%, transparent 40%);
+  background-image:
+    radial-gradient(
+      circle at 80% 20%,
+      var(--primary-red-glow) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 10% 80%,
+      rgba(211, 47, 47, 0.05) 0%,
+      transparent 40%
+    );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2700,7 +2650,7 @@ body {
   border-radius: 50%;
   object-fit: cover;
   border: 5px solid var(--bg-card);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   background-color: #f1f5f9;
 }
 
@@ -2751,13 +2701,21 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2), 0 3px 6px rgba(0,0,0,0.15);
+  box-shadow:
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2),
+    0 3px 6px rgba(0, 0, 0, 0.15);
   margin-bottom: 4px;
 }
 
-.profile-medals-section .medal-circle.gold { background: linear-gradient(135deg, #FFE066, #F5AF19); }
-.profile-medals-section .medal-circle.silver { background: linear-gradient(135deg, #E2E8F0, #94A3B8); }
-.profile-medals-section .medal-circle.bronze { background: linear-gradient(135deg, #FDBA74, #C2410C); }
+.profile-medals-section .medal-circle.gold {
+  background: linear-gradient(135deg, #ffe066, #f5af19);
+}
+.profile-medals-section .medal-circle.silver {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+}
+.profile-medals-section .medal-circle.bronze {
+  background: linear-gradient(135deg, #fdba74, #c2410c);
+}
 
 .profile-chart-section {
   background-color: var(--bg-card);
@@ -2788,7 +2746,8 @@ body {
   gap: 24px;
 }
 
-.championships-section, .docs-section {
+.championships-section,
+.docs-section {
   background-color: var(--bg-card);
   border-radius: var(--radius-lg);
   padding: 24px;

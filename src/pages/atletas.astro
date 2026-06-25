@@ -1,0 +1,19 @@
+---
+/**
+ * /atletas — Página pública de Atletas
+ * ─────────────────────────────────────────────────────────
+ * Muestra la grilla completa de atletas registrados en la
+ * plataforma del Valle del Cauca. Cualquier visitante puede
+ * ver esta página sin necesidad de iniciar sesión.
+ *
+ * Componente React:
+ *   AthletesView — carga datos vía TanStack Query y renderiza
+ *   filtros + tarjetas de cada atleta.
+ */
+import MainLayout from "../layouts/MainLayout.astro";
+import { AthletesView } from "../features/athletes/components/AthletesView";
+---
+
+<MainLayout title="Atletas - Valle Paraatletismo">
+  <AthletesView client:load />
+</MainLayout>
