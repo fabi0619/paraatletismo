@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLogros, useCreateLogro } from "../hooks/useLogros";
 import { useAthletes } from "../../athletes/hooks/useAthletes";
+import { useChampionships } from "../../championships/hooks/useChampionships";
 import { Card, CardTitle, CardContent } from "../../../components/ui/card";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import { QueryProvider } from "../../../components/providers/QueryProvider";
 import { SearchInput } from "../../../components/search-input";
-import { Trophy, Calendar, UserRound, Plus, X, Award, ChevronRight } from "lucide-react";
+import { Trophy, Calendar, UserRound, Plus, X, Award, Medal } from "lucide-react";
 
 interface Session {
   id: string;
@@ -49,9 +50,18 @@ function LogrosEmptyState() {
   );
 }
 
+function getMedalBadgeColor(logroText: string) {
+  const text = logroText.toLowerCase();
+  if (text.includes("oro")) return "bg-yellow-100 text-yellow-800 border-yellow-200";
+  if (text.includes("plata")) return "bg-slate-100 text-slate-800 border-slate-200";
+  if (text.includes("bronce")) return "bg-orange-100 text-orange-800 border-orange-200";
+  return "bg-red-50 text-red-700 border-red-100";
+}
+
 const LogrosInner: React.FC = () => {
   const { data: logros, isLoading, isError, error } = useLogros();
   const { data: athletes } = useAthletes();
+  const { data: championships } = useChampionships();
   const createLogroMutation = useCreateLogro();
 
   const [search, setSearch] = useState("");
@@ -60,9 +70,10 @@ const LogrosInner: React.FC = () => {
 
   // Form states
   const [atletaId, setAtletaId] = useState("");
-  const [campeonato, setCampeonato] = useState("");
-  const [ano, setAno] = useState(new Date().getFullYear().toString());
-  const [logroText, setLogroText] = useState("");
+  const [selectedChampionshipId, setSelectedChampionshipId] = useState("");
+  const [prueba, setPrueba] = useState("");
+  const [medalla, setMedalla] = useState("Oro");
+  const [detalles, setDetalles] = useState("");
   const [formError, setFormError] = useState("");
 
   useEffect(() => {
@@ -90,29 +101,88 @@ const LogrosInner: React.FC = () => {
 
   const canCreate = session?.rol === "profesor" || session?.rol === "admin";
 
+  // Dynamic test events (pruebas) based on selected athlete
+  const availablePruebas = useMemo(() => {
+    if (!atletaId || !athletes) return [];
+    const athlete = athletes.find((a) => a.id === atletaId);
+    if (!athlete) return [];
+    const cl = (athlete.claseDeportiva || "").trim().toUpperCase();
+
+    if (!cl || cl === "GUIA" || cl === "AUXILIAR") {
+      // General fallbacks if guiding or no class
+      return ["100m", "200m", "400m", "Salto Largo", "Lanzamiento de Bala"];
+    }
+
+    if (cl.startsWith("T")) {
+      // Track (Pista) athlete
+      return [
+        `100m ${cl}`,
+        `200m ${cl}`,
+        `400m ${cl}`,
+        `800m ${cl}`,
+        `1500m ${cl}`,
+        `5000m ${cl}`,
+        `10000m ${cl}`,
+        `Relevos ${cl}`
+      ];
+    } else if (cl.startsWith("F")) {
+      // Field (Campo) athlete
+      return [
+        `Lanzamiento de Bala ${cl}`,
+        `Lanzamiento de Disco ${cl}`,
+        `Lanzamiento de Jabalina ${cl}`,
+        `Lanzamiento de Maza ${cl}`,
+        `Salto Largo ${cl}`,
+        `Salto Alto ${cl}`
+      ];
+    }
+
+    return [`100m ${cl}`, `Salto Largo ${cl}`, `Lanzamiento de Bala ${cl}`];
+  }, [atletaId, athletes]);
+
+  // Reset selected event test if it's not in the new available list
+  useEffect(() => {
+    if (availablePruebas.length > 0) {
+      setPrueba(availablePruebas[0]);
+    } else {
+      setPrueba("");
+    }
+  }, [availablePruebas]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
 
-    if (!atletaId || !campeonato.trim() || !ano.trim() || !logroText.trim()) {
-      setFormError("Por favor completa todos los campos requeridos.");
+    if (!atletaId || !selectedChampionshipId || !prueba || !medalla) {
+      setFormError("Por favor completa los campos requeridos.");
       return;
     }
+
+    const event = championships?.find((c) => c.id === selectedChampionshipId);
+    if (!event) {
+      setFormError("El campeonato seleccionado no es válido.");
+      return;
+    }
+
+    // Extract year from event date
+    const ano = event.fechaInicio ? event.fechaInicio.split("-")[0] : new Date().getFullYear().toString();
+
+    // Auto-generate the logro description based on inputs
+    const logroText = `Obtuvo Medalla de ${medalla} en la prueba de ${prueba}.${detalles.trim() ? ` Detalle: ${detalles.trim()}` : ""}`;
 
     try {
       await createLogroMutation.mutateAsync({
         profesorId: session?.id || "admin",
         atletaId,
-        campeonato,
+        campeonato: event.nombre,
         logro: logroText,
         ano
       });
 
       // Reset form
       setAtletaId("");
-      setCampeonato("");
-      setLogroText("");
-      setAno(new Date().getFullYear().toString());
+      setSelectedChampionshipId("");
+      setDetalles("");
       setShowModal(false);
     } catch (err: any) {
       setFormError(err.message || "Error al registrar el logro deportivo.");
@@ -200,8 +270,12 @@ const LogrosInner: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className="text-sm text-slate-600 leading-relaxed font-medium mt-1">
-                      {l.logro}
+                    <div className="text-sm text-slate-600 leading-relaxed font-medium mt-1 flex flex-col gap-2">
+                      <span className={`inline-flex items-center gap-1.5 self-start rounded-full px-2.5 py-0.5 text-xs font-black border ${getMedalBadgeColor(l.logro)}`}>
+                        <Medal size={12} />
+                        {l.logro.toLowerCase().includes("oro") ? "Medalla de Oro" : l.logro.toLowerCase().includes("plata") ? "Medalla de Plata" : l.logro.toLowerCase().includes("bronce") ? "Medalla de Bronce" : "Resultado"}
+                      </span>
+                      <p className="text-slate-700 font-semibold">{l.logro}</p>
                     </div>
                   </div>
 
@@ -241,6 +315,7 @@ const LogrosInner: React.FC = () => {
                 </div>
               )}
 
+              {/* 1. Atleta */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                   Deportista Asociado <span className="text-red-500">*</span>
@@ -254,51 +329,86 @@ const LogrosInner: React.FC = () => {
                   <option value="">Selecciona el atleta...</option>
                   {athletes?.map((a) => (
                     <option key={a.id} value={a.id}>
-                      {a.nombre} ({a.claseDeportiva || 'Sin clase'})
+                      {a.nombre} ({a.claseDeportiva ? `Clase ${a.claseDeportiva}` : 'Sin clasificación'})
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2 flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                    Campeonato / Evento <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Ej. Juegos Paranacionales"
-                    value={campeonato}
-                    onChange={(e) => setCampeonato(e.target.value)}
-                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-red-500 focus:outline-hidden"
-                    required
-                  />
-                </div>
+              {/* 2. Campeonato / Evento */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                  Campeonato / Evento Oficial <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={selectedChampionshipId}
+                  onChange={(e) => setSelectedChampionshipId(e.target.value)}
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-red-500 focus:outline-hidden bg-white"
+                  required
+                >
+                  <option value="">Selecciona el campeonato...</option>
+                  {championships?.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nombre} ({c.ciudad}, {c.fechaInicio.split("-")[0]})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* 3. Medalla */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                    Año <span className="text-red-500">*</span>
+                    Medalla lograda <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="number"
-                    value={ano}
-                    onChange={(e) => setAno(e.target.value)}
-                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-red-500 focus:outline-hidden"
+                  <select
+                    value={medalla}
+                    onChange={(e) => setMedalla(e.target.value)}
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-red-500 focus:outline-hidden bg-white"
                     required
-                  />
+                  >
+                    <option value="Oro">Oro</option>
+                    <option value="Plata">Plata</option>
+                    <option value="Bronce">Bronce</option>
+                  </select>
+                </div>
+
+                {/* 4. Prueba */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                    Prueba en la que compitió <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={prueba}
+                    onChange={(e) => setPrueba(e.target.value)}
+                    disabled={!atletaId}
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-red-500 focus:outline-hidden bg-white disabled:bg-slate-50 disabled:text-slate-400"
+                    required
+                  >
+                    {!atletaId ? (
+                      <option value="">Selecciona primero un atleta...</option>
+                    ) : (
+                      availablePruebas.map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))
+                    )}
+                  </select>
                 </div>
               </div>
 
+              {/* 5. Detalles adicionales */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                  Descripción del Logro Obtenido <span className="text-red-500">*</span>
+                  Detalles Adicionales (Opcional)
                 </label>
                 <textarea
-                  placeholder="Ej. Medalla de Oro en 100m Planos T11 con una marca de 11.45s."
-                  value={logroText}
-                  onChange={(e) => setLogroText(e.target.value)}
-                  rows={4}
+                  placeholder="Ej. Logró una marca de 11.45s superando su récord personal."
+                  value={detalles}
+                  onChange={(e) => setDetalles(e.target.value)}
+                  rows={3}
                   className="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-red-500 focus:outline-hidden resize-none"
-                  required
                 />
               </div>
 
