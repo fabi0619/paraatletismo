@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { athletesService, type Athlete } from "../../features/athletes/api/athletesService";
+import { professorsService, type Professor } from "../../features/professors/api/professorsService";
+import { championshipsService, type ChampionshipExtended } from "../../features/championships/api/championshipsService";
 import { QueryProvider } from "../providers/QueryProvider";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -68,14 +70,16 @@ function StatChip({
   value,
   label,
   isLoading,
+  href,
 }: {
   icon: string;
   value: number | string;
   label: string;
   isLoading?: boolean;
+  href?: string;
 }) {
-  return (
-    <div className="flex items-center gap-2 rounded-xl bg-white/70 backdrop-blur-sm border border-slate-200/60 px-3 py-2 shadow-sm">
+  const content = (
+    <div className="flex items-center gap-2 rounded-xl bg-white/70 backdrop-blur-sm border border-slate-200/60 px-3 py-2 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:border-red-200 hover:shadow-md cursor-pointer">
       <span
         className="material-icons-round text-[var(--primary-red)]"
         style={{ fontSize: "18px" }}
@@ -96,6 +100,16 @@ function StatChip({
       </div>
     </div>
   );
+
+  if (href) {
+    return (
+      <a href={href} className="no-underline hover:no-underline">
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }
 
 // ─── Inner header (needs QueryProvider context) ────────────────────────────────
@@ -124,18 +138,28 @@ const HeaderInner: React.FC = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const { data: professors, isLoading: professorsLoading } = useQuery<Professor[], Error>({
+    queryKey: ["professors"],
+    queryFn: professorsService.getProfessors,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: championships, isLoading: championshipsLoading } = useQuery<ChampionshipExtended[], Error>({
+    queryKey: ["championships"],
+    queryFn: championshipsService.getChampionships,
+    staleTime: 1000 * 60 * 5,
+  });
+
   // Compute stats
   const totalAthletes = athletes?.length ?? 0;
-  const totalMedals =
-    athletes?.reduce((acc, a) => {
-      return (
-        acc +
-        (a.campeonatos?.filter((c) => {
-          const pos = String(c.posicion).trim();
-          return pos === "1" || pos === "2" || pos === "3" || pos === "Oro" || pos === "Plata" || pos === "Bronce";
-        }).length ?? 0)
-      );
-    }, 0) ?? 0;
+  const totalProfessors = professors?.length ?? 0;
+  
+  // Use distinct championships by name
+  const totalChampionships = useMemo(() => {
+    if (!championships) return 0;
+    const names = new Set(championships.map(c => c.campeonato.trim().toLowerCase()));
+    return names.size;
+  }, [championships]);
 
   const handleLogout = useCallback(() => {
     clearSession();
@@ -202,12 +226,21 @@ const HeaderInner: React.FC = () => {
             value={totalAthletes}
             label="Atletas"
             isLoading={athletesLoading}
+            href="/atletas"
+          />
+          <StatChip
+            icon="sports"
+            value={totalProfessors}
+            label="Profesores"
+            isLoading={professorsLoading}
+            href="/profesores"
           />
           <StatChip
             icon="emoji_events"
-            value={totalMedals}
-            label="Medallas"
-            isLoading={athletesLoading}
+            value={totalChampionships}
+            label="Campeonatos"
+            isLoading={championshipsLoading}
+            href="/campeonatos"
           />
         </div>
 
