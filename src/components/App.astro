@@ -1,5 +1,6 @@
 ---
 import { AthleteModal } from "../features/auth/components/AthleteModal";
+import { CoachModal } from "../features/auth/components/CoachModal";
 import { AthletesView } from "../features/athletes/components/AthletesView";
 import { Header } from "./layout/Header";
 ---
@@ -289,6 +290,7 @@ import { Header } from "./layout/Header";
 </div>
 
 <AthleteModal client:load />
+<CoachModal client:load />
 
 <!-- MODAL: AGREGAR LOGRO DE PROFESOR EN ESPAÑOL -->
 <div class="modal-overlay" id="modal-agregar-logro">

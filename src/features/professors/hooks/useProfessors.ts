@@ -7,3 +7,21 @@ export function useProfessors() {
     queryFn: professorsService.getProfessors,
   });
 }
+
+export function useProfessor(id: string) {
+  return useQuery<Professor | null, Error>({
+    queryKey: ['professor', id],
+    queryFn: () => professorsService.getProfessorById(id),
+    enabled: !!id,
+  });
+}
+
+export function useProfessorAchievements(id: string) {
+  return useQuery<any[], Error>({
+    queryKey: ['professorAchievements', id],
+    queryFn: () => professorsService.getProfessorAchievements(id),
+    enabled: !!id,
+  });
+}
+
+

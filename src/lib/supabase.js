@@ -321,7 +321,10 @@ export async function registrarProfesor(nuevoProfesor) {
     especialidad: nuevoProfesor.especialidad,
     correo: nuevoProfesor.correo,
     cedula: nuevoProfesor.cedula,
-    fecha_nacimiento: nuevoProfesor.fechaNacimiento
+    fecha_nacimiento: nuevoProfesor.fechaNacimiento,
+    genero: nuevoProfesor.genero,
+    telefono: nuevoProfesor.telefono,
+    foto: nuevoProfesor.foto
   };
 
   const { data, error } = await supabase.from('para_profesores').insert([payload]).select().single();
@@ -330,6 +333,31 @@ export async function registrarProfesor(nuevoProfesor) {
   }
   return data;
 }
+
+export async function saveProfessor(professor) {
+  let isUpdate = !!professor.id && !professor.id.startsWith("temp-");
+
+  const payload = {
+    nombre: professor.nombre,
+    cedula: professor.cedula,
+    fecha_nacimiento: professor.fechaNacimiento,
+    genero: professor.genero,
+    telefono: professor.telefono,
+    correo: professor.correo,
+    especialidad: professor.especialidad,
+    foto: professor.foto
+  };
+
+  if (isUpdate) {
+    const { data, error } = await supabase.from('para_profesores').update(payload).eq('id', professor.id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error(`No se encontró el profesor con id ${professor.id} para actualizar.`);
+    return data;
+  } else {
+    return registrarProfesor(professor);
+  }
+}
+
 
 // ==========================================================================
 // CRUD DE LOGROS DE PROFESORES

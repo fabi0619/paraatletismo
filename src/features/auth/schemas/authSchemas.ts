@@ -35,6 +35,15 @@ export const registerCoachSchema = z.object({
   fechaNacimiento: z
     .string()
     .min(1, "La fecha de nacimiento es requerida"),
+  genero: z.enum(["Masculino", "Femenino", "Otro"], {
+    errorMap: () => ({ message: "Seleccione un género válido" }),
+  }),
+  telefono: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^[+\d\s-]+$/.test(val), {
+      message: "Ingrese un número de teléfono válido",
+    }),
   especialidad: z.string().min(1, "La especialidad/modalidad es requerida"),
   correo: z
     .string()
@@ -43,9 +52,22 @@ export const registerCoachSchema = z.object({
   password: z
     .string()
     .min(6, "La contraseña debe tener al menos 6 caracteres"),
+  foto: z.string().optional(),
 });
 
 export type RegisterCoachInput = z.infer<typeof registerCoachSchema>;
+
+// Esquema de Edición de Profesores
+export const editCoachSchema = registerCoachSchema.extend({
+  password: z
+    .string()
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .optional()
+    .or(z.literal("")),
+});
+
+export type EditCoachInput = z.infer<typeof editCoachSchema>;
+
 
 // Esquema de Registro de Atletas
 export const registerAthleteSchema = z.object({

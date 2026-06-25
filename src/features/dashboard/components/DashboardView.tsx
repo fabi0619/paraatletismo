@@ -209,8 +209,6 @@ const DashboardInner: React.FC = () => {
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard icon="groups" label="Atletas Registrados" value={stats.total} isLoading={isLoading} />
-          <StatCard icon="emoji_events" label="Medallas Totales" value={stats.medals} isLoading={isLoading} />
-          <StatCard icon="military_tech" label="Oros Obtenidos" value={stats.golds} isLoading={isLoading} />
           <StatCard icon="stadium" label="Campeonatos" value={stats.championships} isLoading={isLoading} />
         </div>
       </section>

@@ -167,6 +167,8 @@ const HeaderInner: React.FC = () => {
   const handleProfile = useCallback(() => {
     if (session?.rol === "atleta" && session?.id) {
       window.location.href = `/atleta/${session.id}`;
+    } else if (session?.rol === "profesor" && session?.id) {
+      window.location.href = `/profesor/${session.id}`;
     }
   }, [session]);
 
@@ -311,7 +313,7 @@ const HeaderInner: React.FC = () => {
                   </span>
                   Logros Deportivos
                 </DropdownMenuItem>
-                {session.rol === "atleta" && (
+                {(session.rol === "atleta" || session.rol === "profesor") && (
                   <DropdownMenuItem onClick={handleProfile}>
                     <span
                       className="material-icons-round mr-2"

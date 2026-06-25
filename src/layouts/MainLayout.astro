@@ -25,6 +25,8 @@ const { title = "Valle Oro Puro - Paraatletismo", class: className } = Astro.pro
 import "../styles/global.css";
 import "../styles/styles.css";
 import { Header } from "../components/layout/Header";
+import { AthleteModal } from "../features/auth/components/AthleteModal";
+import { CoachModal } from "../features/auth/components/CoachModal";
 ---
 
 <!doctype html>
@@ -59,8 +61,13 @@ import { Header } from "../components/layout/Header";
       <slot />
     </main>
 
+    <!-- Modals de Edición/Registro de Cuentas -->
+    <AthleteModal client:load />
+    <CoachModal client:load />
+
     <!-- Footer -->
     <footer class="app-footer">
+
       <div class="footer-container">
         <div class="footer-brand">
           <h3>Atletas del Valle del Cauca</h3>
