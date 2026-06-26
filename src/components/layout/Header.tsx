@@ -304,15 +304,7 @@ const HeaderInner: React.FC = () => {
                   </span>
                   Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = "/logros"}>
-                  <span
-                    className="material-icons-round mr-2"
-                    style={{ fontSize: "16px" }}
-                  >
-                    workspace_premium
-                  </span>
-                  Logros Deportivos
-                </DropdownMenuItem>
+
                 {(session.rol === "atleta" || session.rol === "profesor") && (
                   <DropdownMenuItem onClick={handleProfile}>
                     <span

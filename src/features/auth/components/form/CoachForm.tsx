@@ -123,6 +123,7 @@ export const CoachForm: React.FC<CoachFormProps> = ({
     setGeneralError(null);
     try {
       const payload = { ...data };
+      if (isEditing && initialData?.id) payload.id = initialData.id;
       if (isEditing && !payload.password) delete payload.password;
       const saved = await saveProfessor(payload);
 

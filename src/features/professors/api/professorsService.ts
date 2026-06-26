@@ -1,5 +1,5 @@
 import { supabase } from '../../athletes/api/athletesService';
-import { saveProfessor as saveProfessorDb, obtenerLogros } from '../../../lib/supabase';
+import { saveProfessor as saveProfessorDb, obtenerLogros, actualizarLogro, eliminarLogro } from '../../../lib/supabase';
 
 export interface Professor {
   id: string;
@@ -66,6 +66,18 @@ export const professorsService = {
 
   getProfessorAchievements: async (profesorId: string): Promise<any[]> => {
     return obtenerLogros(profesorId);
+  },
+
+  updateAchievement: async (logroId: string, payload: any): Promise<any> => {
+    const res = await actualizarLogro(logroId, payload);
+    if (res?.error) throw new Error(res.error);
+    return res;
+  },
+
+  deleteAchievement: async (logroId: string): Promise<boolean> => {
+    const res = await eliminarLogro(logroId);
+    if (res?.error) throw new Error(res.error);
+    return true;
   },
 
   saveProfessor: async (professor: any): Promise<any> => {

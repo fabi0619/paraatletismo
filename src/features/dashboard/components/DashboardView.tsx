@@ -216,17 +216,7 @@ const DashboardInner: React.FC = () => {
 
       <Separator />
 
-      {/* ── Stats Grid ── */}
-      <section>
-        <h2 className="mb-4 text-base font-bold text-slate-700">
-          Estadísticas Generales
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard icon="groups" label="Atletas Registrados" value={athletes?.length ?? 0} isLoading={athletesLoading} />
-          <StatCard icon="sports" label="Entrenadores" value={professors?.length ?? 0} isLoading={professorsLoading} />
-          <StatCard icon="stadium" label="Campeonatos" value={championships?.length ?? 0} isLoading={championshipsLoading} />
-        </div>
-      </section>
+
 
       {/* ── Quick Links ── */}
       <section>
@@ -246,6 +236,14 @@ const DashboardInner: React.FC = () => {
               title="Mi Perfil"
               description="Revisa tu información personal y campeonatos"
               href={`/atleta/${session.id}`}
+            />
+          )}
+          {session.rol === "atleta" && (
+            <QuickLink
+              icon="upload_file"
+              title="Cargar Documentos"
+              description="Sube tus documentos PDF requeridos"
+              href={`/atleta/documentos`}
             />
           )}
           {(session.rol === "profesor" || session.rol === "admin") && (
