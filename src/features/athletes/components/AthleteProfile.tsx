@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { championshipsService } from "../../championships/api/championshipsService";
 import { useAthlete } from "../hooks/useAthletes";
 import { QueryProvider } from "../../../components/providers/QueryProvider";
 import {
@@ -9,6 +11,14 @@ import {
 } from "../../../components/ui/card";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { Medal } from "lucide-react";
+import { PerformancesDashboard } from "../../dashboard/components/PerformancesDashboard";
+
+const BASE_PRUEBAS = [
+  "100m", "200m", "400m", "800m", "1500m", "5000m", "10000m", "Maratón", "Marcha 20km",
+  "Salto Largo", "Salto Alto", "Salto Triple",
+  "Lanzamiento Bala", "Lanzamiento Disco", "Lanzamiento Jabalina", "Lanzamiento Club", "Lanzamiento Martillo",
+  "Pentatlón", "Heptatlón"
+];
 
 const ProfileSkeleton: React.FC = () => (
   <div className="min-h-screen bg-slate-50 px-4 py-6 md:px-8">
@@ -46,6 +56,70 @@ const ProfileSkeleton: React.FC = () => (
 
 const AthleteProfileInner: React.FC<{ id: string }> = ({ id }) => {
   const { data: athlete, isLoading, isError, error } = useAthlete(id);
+  const queryClient = useQueryClient();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [marcaForm, setMarcaForm] = useState({
+    eventoId: "",
+    prueba: "",
+    marca: "",
+    posicion: "",
+  });
+
+  // Calculate permissions based on current session
+  const sesionStr = typeof window !== 'undefined' ? localStorage.getItem('sesion_usuario') : null;
+  const sesion = sesionStr ? JSON.parse(sesionStr) : null;
+  const canEdit = sesion && (
+    sesion.rol === 'admin' || 
+    sesion.rol === 'profesor' || 
+    (sesion.rol === 'atleta' && sesion.id === id)
+  );
+
+  const { data: eventos, isLoading: isLoadingEventos } = useQuery({
+    queryKey: ["eventos"],
+    queryFn: championshipsService.getChampionships,
+  });
+
+  const handleSaveMarca = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    
+    try {
+      // Buscar el evento seleccionado (comparando como string por si acaso el ID es numérico)
+      const evt = eventos?.find((ev: any) => String(ev.id) === String(marcaForm.eventoId));
+      
+      // Crear el nuevo registro de campeonato
+      const newChamp = {
+        atleta_id: id,
+        campeonato: evt?.nombre || "Campeonato Registrado",
+        lugar: evt?.ciudad ? `${evt.ciudad}, ${evt.pais}` : "Local",
+        prueba: marcaForm.prueba,
+        marca: marcaForm.marca,
+        fecha: evt?.fechaInicio || new Date().toISOString().split("T")[0],
+        posicion: marcaForm.posicion,
+      };
+
+      // Guardar en la base de datos (se usa el ID del admin o profesor actual)
+      const sesionStr = typeof window !== 'undefined' ? localStorage.getItem('sesion_usuario') : null;
+      const sesion = sesionStr ? JSON.parse(sesionStr) : null;
+      const profesorId = sesion?.id || "admin";
+      
+      // Import the service dynamically or use it if imported
+      const { athletesService } = await import('../../athletes/api/athletesService');
+      await athletesService.saveChampionship(newChamp, profesorId);
+
+      // Invalidate cache to force a refetch from backend
+      queryClient.invalidateQueries({ queryKey: ['athletes'] });
+
+      setIsModalOpen(false);
+      setMarcaForm({ eventoId: "", prueba: "", marca: "", posicion: "" });
+    } catch (err) {
+      console.error("Error guardando marca:", err);
+      alert("Hubo un error al guardar la marca. Por favor intenta de nuevo.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) return <ProfileSkeleton />;
 
@@ -214,35 +288,47 @@ const AthleteProfileInner: React.FC<{ id: string }> = ({ id }) => {
             </Card>
           </div>
         </div>
+                  
+        {/* Performances Dashboard Section */}
+        <PerformancesDashboard athlete={athlete} />
 
         {/* Championship History */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="flex items-center gap-2">
               <span className="material-icons-round text-red-600">history</span>
               Historial Deportivo
             </CardTitle>
+            {canEdit && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center gap-1 rounded-md bg-red-600 px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-red-700 shadow-sm"
+              >
+                <span className="material-icons-round text-sm">add</span>
+                Registrar Marca
+              </button>
+            )}
           </CardHeader>
           <CardContent>
             {athlete.campeonatos && athlete.campeonatos.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {athlete.campeonatos.map((camp) => (
+                {athlete.campeonatos.map((camp: any) => (
                   <div
                     key={camp.id}
                     className="rounded-xl border border-slate-200 bg-slate-50 p-4"
                   >
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-bold text-muted-foreground">
-                        {camp.fecha?.split("-")[0]}
-                      </span>
+                    <div className="mb-2 flex items-start justify-between gap-2">
+                      <h4 className="text-sm font-black text-slate-800 leading-tight">
+                        {camp.campeonato}
+                      </h4>
                       {camp.posicion && (
                         <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-black ${
-                            camp.posicion === "1"
+                          className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-black ${
+                            camp.posicion === "1" || String(camp.posicion).toLowerCase() === "oro"
                               ? "bg-yellow-100 text-yellow-800"
-                              : camp.posicion === "2"
+                              : camp.posicion === "2" || String(camp.posicion).toLowerCase() === "plata"
                                 ? "bg-slate-200 text-slate-800"
-                                : camp.posicion === "3"
+                                : camp.posicion === "3" || String(camp.posicion).toLowerCase() === "bronce"
                                   ? "bg-orange-100 text-orange-800"
                                   : "bg-slate-100 text-slate-600"
                           }`}
@@ -251,18 +337,21 @@ const AthleteProfileInner: React.FC<{ id: string }> = ({ id }) => {
                         </span>
                       )}
                     </div>
-                    <h4 className="mb-2 text-sm font-black text-slate-800">
-                      {camp.campeonato}
-                    </h4>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">
-                        Prueba:{" "}
+                    <div className="space-y-1.5 mt-3">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <span className="material-icons-round text-[14px]">event</span>
+                        <span className="font-medium text-slate-700">
+                          {camp.fecha}
+                        </span>
+                      </p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <span className="material-icons-round text-[14px]">directions_run</span>
                         <span className="font-medium text-slate-700">
                           {camp.prueba}
                         </span>
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        Marca:{" "}
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <span className="material-icons-round text-[14px]">timer</span>
                         <span className="font-bold text-red-600">
                           {camp.marca}
                         </span>
@@ -284,6 +373,127 @@ const AthleteProfileInner: React.FC<{ id: string }> = ({ id }) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Floating Modal for Registering Marca */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-red-600"></div>
+            
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                <span className="material-icons-round text-red-600">emoji_events</span>
+                Registrar Marca
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors"
+              >
+                <span className="material-icons-round text-sm">close</span>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveMarca} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-700">Campeonato / Evento</label>
+                <select
+                  required
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  value={marcaForm.eventoId}
+                  onChange={(e) => setMarcaForm({ ...marcaForm, eventoId: e.target.value })}
+                >
+                  <option value="">Seleccione un evento...</option>
+                  {!isLoadingEventos && eventos?.map((evt: any) => (
+                    <option key={evt.id} value={evt.id}>
+                      {evt.nombre} ({evt.fechaTexto || evt.fechaInicio})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-700">Prueba</label>
+                <select
+                  required
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  value={marcaForm.prueba}
+                  onChange={(e) => setMarcaForm({ ...marcaForm, prueba: e.target.value })}
+                >
+                  <option value="">Seleccione una prueba...</option>
+                  {BASE_PRUEBAS.map((prueba) => {
+                    const label = athlete.claseDeportiva ? `${prueba} ${athlete.claseDeportiva}` : prueba;
+                    return (
+                      <option key={prueba} value={label}>
+                        {label}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-700">Marca / Resultado</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej. 11.45"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                    value={marcaForm.marca}
+                    onChange={(e) => {
+                      // Permitir solo números y punto decimal
+                      const val = e.target.value.replace(/[^0-9.]/g, '');
+                      setMarcaForm({ ...marcaForm, marca: val });
+                    }}
+                  />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-700">Posición</label>
+                  <select
+                    required
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                    value={marcaForm.posicion}
+                    onChange={(e) => setMarcaForm({ ...marcaForm, posicion: e.target.value })}
+                  >
+                    <option value="">Seleccionar...</option>
+                    <option value="1">1° (Oro)</option>
+                    <option value="2">2° (Plata)</option>
+                    <option value="3">3° (Bronce)</option>
+                    <option value="4">4° Lugar</option>
+                    <option value="5">5° Lugar</option>
+                    <option value="6">6° Lugar</option>
+                    <option value="7">7° Lugar</option>
+                    <option value="8">8° Lugar</option>
+                    <option value="Participación">Participación</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className={`flex items-center gap-1.5 rounded-lg px-6 py-2 text-sm font-bold text-white transition-colors shadow-md ${isSaving ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
+                >
+                  <span className="material-icons-round text-[16px]">
+                    {isSaving ? 'hourglass_empty' : 'save'}
+                  </span>
+                  {isSaving ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

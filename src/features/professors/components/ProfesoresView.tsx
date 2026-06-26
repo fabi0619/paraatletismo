@@ -103,7 +103,8 @@ const ProfesoresInner: React.FC = () => {
             {filteredProfessors.map((professor) => (
               <Card
                 key={professor.id}
-                className="group flex h-full flex-col overflow-hidden rounded-b-none border-b-4 border-b-red-500 pt-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                onClick={() => window.location.href = `/profesor/${professor.id}`}
+                className="group flex h-full flex-col overflow-hidden rounded-b-none border-b-4 border-b-red-500 pt-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
               >
                 <div className="relative p-6 pb-4 bg-gradient-to-br from-slate-50 to-slate-100 border-b border-slate-100">
                   <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500">

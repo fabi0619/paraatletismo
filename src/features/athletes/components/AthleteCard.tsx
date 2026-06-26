@@ -12,11 +12,17 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 interface AthleteCardProps {
   athlete: Athlete;
   onClick: () => void;
+  canEdit?: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export const AthleteCard: React.FC<AthleteCardProps> = ({
   athlete,
   onClick,
+  canEdit = false,
+  onEdit,
+  onDelete,
 }) => {
   const gold =
     athlete.campeonatos?.filter((c) => c.posicion === "1").length || 0;
@@ -40,11 +46,36 @@ export const AthleteCard: React.FC<AthleteCardProps> = ({
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
             </>
           ) : (
             <div className="flex h-full items-center justify-center bg-slate-800">
               <UserRound size={64} className="text-slate-400" />
+            </div>
+          )}
+
+          {canEdit && (
+            <div className="absolute top-2 right-2 flex gap-1 z-10">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.();
+                }}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur shadow hover:bg-white text-slate-700 transition-colors"
+                title="Editar atleta"
+              >
+                <span className="material-icons-round text-sm">edit</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.();
+                }}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur shadow hover:bg-red-50 text-red-600 transition-colors"
+                title="Eliminar atleta"
+              >
+                <span className="material-icons-round text-sm">delete</span>
+              </button>
             </div>
           )}
         </div>

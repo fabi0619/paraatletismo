@@ -59,15 +59,20 @@ export async function saveAthlete(athlete) {
     foto: athlete.foto
   };
 
+  // Crear un cliente temporal sin sesión para evitar bloqueos de RLS al editar otro usuario
+  const localSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+
   if (isUpdate) {
-    const { data, error } = await supabase.from('para_athletes').update(payload).eq('id', athlete.id).select().maybeSingle();
+    const { data, error } = await localSupabase.from('para_athletes').update(payload).eq('id', athlete.id).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error(`No se encontró el atleta con id ${athlete.id} para actualizar. Verifique permisos o que el registro exista.`);
     return data;
   } else {
     // Usar Supabase Auth para ocultar y encriptar la contraseña usando el correo real
     const authEmail = athlete.correo.trim();
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const { data: authData, error: authError } = await localSupabase.auth.signUp({
       email: authEmail,
       password: athlete.password,
     });
@@ -79,14 +84,17 @@ export async function saveAthlete(athlete) {
       payload.id = authData.user.id;
     }
 
-    const { data, error } = await supabase.from('para_athletes').insert([payload]).select().single();
+    const { data, error } = await localSupabase.from('para_athletes').insert([payload]).select().single();
     if (error) throw error;
     return data;
   }
 }
 
 export async function deleteAthlete(id) {
-  const { error } = await supabase.from('para_athletes').delete().eq('id', id);
+  const localSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+  const { error } = await localSupabase.from('para_athletes').delete().eq('id', id);
   if (error) throw error;
 }
 
@@ -403,6 +411,28 @@ export async function guardarLogro(nuevoLogro) {
 
 export async function eliminarLogro(logroId) {
   const { error } = await supabase.from('para_logros').delete().eq('id', logroId);
-  if (error) throw error;
+  if (error) {
+    return { error: "Error al eliminar logro: " + error.message };
+  }
   return true;
+}
+
+export async function actualizarLogro(logroId, datosLogro) {
+  const payload = {
+    campeonato: datosLogro.campeonato,
+    logro: datosLogro.logro,
+    ano: datosLogro.ano
+  };
+
+  const { data, error } = await supabase
+    .from('para_logros')
+    .update(payload)
+    .eq('id', logroId)
+    .select()
+    .single();
+
+  if (error) {
+    return { error: "Error al actualizar logro: " + error.message };
+  }
+  return data;
 }

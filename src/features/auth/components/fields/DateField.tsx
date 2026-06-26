@@ -82,7 +82,7 @@ function DateField({
           )}
         </Button>
         {open && (
-          <div className="absolute top-full left-0 z-50 mt-1 rounded-lg border bg-popover p-0 shadow-md">
+          <div className="absolute top-full left-0 z-[99999] mt-1 rounded-lg border bg-popover p-0 shadow-md">
             <Calendar
               mode="single"
               selected={selectedDate}

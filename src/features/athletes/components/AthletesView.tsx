@@ -1,12 +1,21 @@
-import React from "react";
-import { useAthletes } from "../hooks/useAthletes";
+import React, { useState, useEffect } from "react";
+import { useAthletes, useDeleteAthlete } from "../hooks/useAthletes";
 import { useAthletesFilters } from "../hooks/useAthletesFilters";
 import { AthleteCard } from "./AthleteCard";
 import { AthletesFilters } from "./AthletesFilters";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { Card } from "../../../components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { QueryProvider } from "../../../components/providers/QueryProvider";
+import { useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
+
+interface Session {
+  id: string;
+  nombre: string;
+  rol: "atleta" | "profesor" | "admin";
+}
 
 function AthletesGridSkeleton() {
   return (
@@ -47,6 +56,40 @@ function AthletesEmptyState() {
 
 const AthletesGridInner: React.FC = () => {
   const { data: athletes, isLoading, isError, error } = useAthletes();
+  const deleteAthleteMutation = useDeleteAthlete();
+  const queryClient = useQueryClient();
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("sesion_usuario");
+      if (raw) setSession(JSON.parse(raw));
+    } catch (e) {
+      console.error("Error reading session:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    (window as any).refreshAthletesData = () => {
+      queryClient.invalidateQueries({ queryKey: ["athletes"] });
+    };
+    return () => {
+      delete (window as any).refreshAthletesData;
+    };
+  }, [queryClient]);
+
+  const canEdit = session?.rol === "admin" || session?.rol === "profesor";
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este atleta?")) return;
+    try {
+      await deleteAthleteMutation.mutateAsync(id);
+    } catch (err) {
+      console.error(err);
+      alert("Error al eliminar atleta.");
+    }
+  };
+
   const {
     filters,
     updateFilter,
@@ -82,18 +125,34 @@ const AthletesGridInner: React.FC = () => {
       />
 
       <section>
-        <div className="mb-6 flex items-end justify-between border-b border-slate-100 pb-2">
-          <h2 className="text-xl font-black text-slate-900">
-            Nuestros Atletas
-          </h2>
-          <Badge
-            variant="secondary"
-            className="rounded-full text-xs font-bold tracking-widest text-muted-foreground uppercase"
-          >
-            {isLoading
-              ? "Cargando..."
-              : `Mostrando ${filteredAthletes.length} atletas`}
-          </Badge>
+        <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4 flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-black text-slate-900">
+              Nuestros Atletas
+            </h2>
+            <Badge
+              variant="secondary"
+              className="rounded-full text-xs font-bold tracking-widest text-muted-foreground uppercase"
+            >
+              {isLoading
+                ? "Cargando..."
+                : `Mostrando ${filteredAthletes.length} atletas`}
+            </Badge>
+          </div>
+
+          {canEdit && (
+            <Button
+              onClick={() => {
+                if ((window as any).openAthleteModal) {
+                  (window as any).openAthleteModal();
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold gap-2 rounded-xl transition-all shadow-md hover:shadow-lg"
+            >
+              <Plus size={16} />
+              Registrar Nuevo Atleta
+            </Button>
+          )}
         </div>
 
         {isLoading ? (
@@ -111,6 +170,13 @@ const AthletesGridInner: React.FC = () => {
                 key={athlete.id}
                 athlete={athlete}
                 onClick={() => (window.location.href = `/atleta/${athlete.id}`)}
+                canEdit={canEdit}
+                onEdit={() => {
+                  if ((window as any).openAthleteModal) {
+                    (window as any).openAthleteModal(athlete);
+                  }
+                }}
+                onDelete={() => handleDelete(athlete.id)}
               />
             ))}
           </div>

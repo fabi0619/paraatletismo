@@ -205,6 +205,7 @@ export const AthleteForm: React.FC<AthleteFormProps> = ({
     setGeneralError(null);
     try {
       const payload = { ...data };
+      if (isEditing && initialData?.id) payload.id = initialData.id;
       if (isEditing && !payload.password) delete payload.password;
       const saved = await saveAthlete(payload);
       if (onSuccess) onSuccess({ ...saved, ...data });
