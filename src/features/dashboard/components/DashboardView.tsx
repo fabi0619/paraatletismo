@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { athletesService, type Athlete } from "../../athletes/api/athletesService";
+import { athletesService, type Athlete, type Championship } from "../../athletes/api/athletesService";
 import { championshipsService } from "../../championships/api/championshipsService";
 import { professorsService } from "../../professors/api/professorsService";
 import { QueryProvider } from "@/components/providers/QueryProvider";
@@ -110,16 +110,16 @@ function QuickLink({
 }) {
   return (
     <a href={href} className="group block no-underline">
-      <Card className="h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--primary-red)]/30">
+      <Card className="h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-(--primary-red)/30">
         <CardContent className="flex items-start gap-3 p-5">
           <span
-            className="material-icons-round mt-0.5 transition-colors group-hover:text-[var(--primary-red)]"
+            className="material-icons-round mt-0.5 transition-colors group-hover:text-(--primary-red)"
             style={{ fontSize: "22px", color: "var(--text-muted)" }}
           >
             {icon}
           </span>
           <div>
-            <p className="text-sm font-bold text-slate-900 group-hover:text-[var(--primary-red)]">
+            <p className="text-sm font-bold text-slate-900 group-hover:text-(--primary-red)">
               {title}
             </p>
             <p className="mt-0.5 text-xs text-slate-500">{description}</p>
@@ -170,8 +170,8 @@ const DashboardInner: React.FC = () => {
     let golds = 0;
     const champSet = new Set<string>();
 
-    athletes.forEach((a) => {
-      a.campeonatos?.forEach((c) => {
+    athletes.forEach((a: Athlete) => {
+      a.campeonatos?.forEach((c: Championship) => {
         champSet.add(c.campeonato);
         const pos = String(c.posicion).trim();
         if (["1", "Oro"].includes(pos)) { medals++; golds++; }
@@ -279,7 +279,7 @@ const DashboardInner: React.FC = () => {
             </a>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {athletes.slice(0, 4).map((athlete) => (
+            {athletes.slice(0, 4).map((athlete: Athlete) => (
               <a
                 key={athlete.id}
                 href={`/atleta/${athlete.id}`}
@@ -301,7 +301,7 @@ const DashboardInner: React.FC = () => {
                       </div>
                     )}
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-slate-900 group-hover:text-[var(--primary-red)]">
+                      <p className="truncate text-sm font-bold text-slate-900 group-hover:text-(--primary-red)">
                         {athlete.nombre}
                       </p>
                       <p className="truncate text-xs text-slate-500">
