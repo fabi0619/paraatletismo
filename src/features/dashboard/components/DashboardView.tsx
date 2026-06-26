@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { athletesService, type Athlete } from "../../athletes/api/athletesService";
+import { championshipsService } from "../../championships/api/championshipsService";
+import { professorsService } from "../../professors/api/professorsService";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import {
   Card,
@@ -142,9 +144,21 @@ const DashboardInner: React.FC = () => {
     setSession(s);
   }, []);
 
-  const { data: athletes, isLoading } = useQuery<Athlete[], Error>({
+  const { data: athletes, isLoading: athletesLoading } = useQuery<Athlete[], Error>({
     queryKey: ["athletes"],
     queryFn: athletesService.getAthletes,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: championships, isLoading: championshipsLoading } = useQuery({
+    queryKey: ["championships"],
+    queryFn: championshipsService.getChampionships,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: professors, isLoading: professorsLoading } = useQuery({
+    queryKey: ["professors"],
+    queryFn: professorsService.getProfessors,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -208,8 +222,9 @@ const DashboardInner: React.FC = () => {
           Estadísticas Generales
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard icon="groups" label="Atletas Registrados" value={stats.total} isLoading={isLoading} />
-          <StatCard icon="stadium" label="Campeonatos" value={stats.championships} isLoading={isLoading} />
+          <StatCard icon="groups" label="Atletas Registrados" value={athletes?.length ?? 0} isLoading={athletesLoading} />
+          <StatCard icon="sports" label="Entrenadores" value={professors?.length ?? 0} isLoading={professorsLoading} />
+          <StatCard icon="stadium" label="Campeonatos" value={championships?.length ?? 0} isLoading={championshipsLoading} />
         </div>
       </section>
 
