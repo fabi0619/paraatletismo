@@ -64,10 +64,10 @@ function StatCard({
   isLoading?: boolean;
 }) {
   return (
-    <Card>
+    <Card className="bg-white/60 backdrop-blur-md border-white/60 shadow-lg">
       <CardContent className="flex items-center gap-4 p-5">
         <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-inner border border-white/80"
           style={{
             background: "linear-gradient(135deg, var(--primary-red-light) 0%, hsl(0,68%,92%) 100%)",
           }}
@@ -82,7 +82,7 @@ function StatCard({
         <div>
           <p className="text-2xl font-black text-slate-900 tabular-nums">
             {isLoading ? (
-              <span className="inline-block h-7 w-10 animate-pulse rounded bg-slate-200" />
+              <span className="inline-block h-7 w-10 animate-pulse rounded bg-slate-200/60" />
             ) : (
               value
             )}
@@ -110,16 +110,18 @@ function QuickLink({
 }) {
   return (
     <a href={href} className="group block no-underline">
-      <Card className="h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-(--primary-red)/30">
+      <Card className="h-full transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:border-red-500/30 bg-white/60 backdrop-blur-md border-white/60 shadow-md">
         <CardContent className="flex items-start gap-3 p-5">
-          <span
-            className="material-icons-round mt-0.5 transition-colors group-hover:text-(--primary-red)"
-            style={{ fontSize: "22px", color: "var(--text-muted)" }}
-          >
-            {icon}
-          </span>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/80 shadow-sm border border-white group-hover:bg-red-50 transition-colors">
+            <span
+              className="material-icons-round mt-0.5 transition-colors group-hover:text-red-600"
+              style={{ fontSize: "22px", color: "var(--text-muted)" }}
+            >
+              {icon}
+            </span>
+          </div>
           <div>
-            <p className="text-sm font-bold text-slate-900 group-hover:text-(--primary-red)">
+            <p className="text-sm font-bold text-slate-900 group-hover:text-red-600 transition-colors">
               {title}
             </p>
             <p className="mt-0.5 text-xs text-slate-500">{description}</p>
@@ -251,7 +253,7 @@ const DashboardInner: React.FC = () => {
               icon="person_add"
               title="Registrar Atleta"
               description="Agrega un nuevo atleta a la plataforma"
-              href="/registro"
+              href="/registro/atleta"
             />
           )}
           {(session.rol === "profesor" || session.rol === "admin") && (

@@ -1,0 +1,1 @@
+import{c}from"./createLucideIcon.D8CfA5kh.js";const e=[["path",{d:"M5 12h14",key:"1ays0h"}],["path",{d:"M12 5v14",key:"s699le"}]],n=c("plus",e);const o=[["circle",{cx:"12",cy:"8",r:"5",key:"1hypcn"}],["path",{d:"M20 21a8 8 0 0 0-16 0",key:"rfgkzh"}]],r=c("user-round",o);export{n as P,r as U};

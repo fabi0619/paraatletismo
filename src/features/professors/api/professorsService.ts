@@ -65,18 +65,18 @@ export const professorsService = {
   },
 
   getProfessorAchievements: async (profesorId: string): Promise<any[]> => {
-    return obtenerLogros(profesorId);
+    return (obtenerLogros as any)(profesorId);
   },
 
   updateAchievement: async (logroId: string, payload: any): Promise<any> => {
     const res = await actualizarLogro(logroId, payload);
-    if (res?.error) throw new Error(res.error);
+    if (res && typeof res === 'object' && 'error' in res) throw new Error(res.error as string);
     return res;
   },
 
   deleteAchievement: async (logroId: string): Promise<boolean> => {
     const res = await eliminarLogro(logroId);
-    if (res?.error) throw new Error(res.error);
+    if (typeof res !== 'boolean' && res && 'error' in res) throw new Error(res.error as string);
     return true;
   },
 

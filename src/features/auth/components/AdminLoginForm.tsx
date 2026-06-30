@@ -48,11 +48,11 @@ export const AdminLoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-md mx-auto">
-      <Card className="border-slate-800 shadow-2xl relative overflow-hidden bg-slate-900 text-slate-100">
+    <div className="relative flex min-h-screen w-full items-center justify-center">
+      <Card className="border-white/20 shadow-2xl relative overflow-hidden bg-slate-900/80 backdrop-blur-xl text-slate-100 w-full max-w-md mx-4 p-4 md:p-6 rounded-3xl">
         {/* Decorative Glow */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-red-600/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-900/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-red-900/20 rounded-full blur-3xl pointer-events-none" />
 
         <CardHeader className="text-center relative z-10">
           <div className="flex justify-center mb-2">

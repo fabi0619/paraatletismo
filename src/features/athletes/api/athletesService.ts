@@ -27,16 +27,38 @@ export interface Championship {
 export interface Athlete {
   id: string;
   nombre: string;
+  tipoDocumento: string;
   cedula: string;
   fechaNacimiento: string;
   genero: string;
+  grupoSanguineo: string;
+  paisNacimiento: string;
+  departamentoNacimiento: string;
+  municipioNacimiento: string;
+  grupoEtnico: string;
+  nivelEducativo: string;
+  eps: string;
+  altura: string;
+  peso: string;
   telefono: string;
+  telefonoFijo?: string;
   correo: string;
+  paisResidencia: string;
+  departamentoResidencia: string;
+  municipioResidencia: string;
+  barrio: string;
+  direccion: string;
+  estrato: string;
   discapacidad: string;
+  usaSillaRuedas: string;
+  usaSillaAtletica: string;
   tipoClase: string;
   claseDeportiva: string;
   club: string;
+  fechaAfiliacion: string;
+  liga: string;
   foto?: string;
+  certificadoAfiliacion?: string;
   documentos: Document[];
   campeonatos: Championship[];
 }
@@ -85,11 +107,7 @@ export const athletesService = {
   getAthletes: async (): Promise<Athlete[]> => {
     const { data: athletes, error } = await supabase
       .from('para_athletes')
-      .select(`
-        id, nombre, cedula, fecha_nacimiento, genero, telefono, correo, 
-        discapacidad, tipo_clase, clase_deportiva, foto, club,
-        documentos:para_documentos(*)
-      `);
+      .select(`*`);
 
     if (error) {
       console.error('Error fetching athletes with relations:', error);
@@ -108,16 +126,38 @@ export const athletesService = {
     return (athletes || []).map((a: any) => ({
       id: a.id,
       nombre: a.nombre,
+      tipoDocumento: a.tipo_documento,
       cedula: a.cedula,
       fechaNacimiento: a.fecha_nacimiento,
       genero: a.genero,
+      grupoSanguineo: a.grupo_sanguineo,
+      paisNacimiento: a.pais_nacimiento,
+      departamentoNacimiento: a.departamento_nacimiento,
+      municipioNacimiento: a.municipio_nacimiento,
+      grupoEtnico: a.grupo_etnico,
+      nivelEducativo: a.nivel_educativo,
+      eps: a.eps,
+      altura: a.altura,
+      peso: a.peso,
       telefono: a.telefono,
+      telefonoFijo: a.telefono_fijo,
       correo: a.correo,
+      paisResidencia: a.pais_residencia,
+      departamentoResidencia: a.departamento_residencia,
+      municipioResidencia: a.municipio_residencia,
+      barrio: a.barrio,
+      direccion: a.direccion,
+      estrato: a.estrato,
       discapacidad: a.discapacidad,
+      usaSillaRuedas: a.usa_silla_ruedas,
+      usaSillaAtletica: a.usa_silla_atletica,
       tipoClase: a.tipo_clase,
       claseDeportiva: a.clase_deportiva,
       club: a.club,
+      fechaAfiliacion: a.fecha_afiliacion,
+      liga: a.liga,
       foto: a.foto,
+      certificadoAfiliacion: a.certificado_afiliacion_url,
       documentos: a.documentos || [],
       campeonatos: (logrosByAthlete[a.id] || []).map(parseLogroToChampionship).sort((x, y) => new Date(y.fecha).getTime() - new Date(x.fecha).getTime())
     }));
@@ -126,11 +166,7 @@ export const athletesService = {
   getAthleteById: async (id: string): Promise<Athlete | null> => {
     const { data: a, error } = await supabase
       .from('para_athletes')
-      .select(`
-        id, nombre, cedula, fecha_nacimiento, genero, telefono, correo, 
-        discapacidad, tipo_clase, clase_deportiva, foto, club,
-        documentos:para_documentos(*)
-      `)
+      .select(`*`)
       .eq('id', id)
       .maybeSingle();
 
@@ -147,16 +183,38 @@ export const athletesService = {
     return {
       id: a.id,
       nombre: a.nombre,
+      tipoDocumento: a.tipo_documento,
       cedula: a.cedula,
       fechaNacimiento: a.fecha_nacimiento,
       genero: a.genero,
+      grupoSanguineo: a.grupo_sanguineo,
+      paisNacimiento: a.pais_nacimiento,
+      departamentoNacimiento: a.departamento_nacimiento,
+      municipioNacimiento: a.municipio_nacimiento,
+      grupoEtnico: a.grupo_etnico,
+      nivelEducativo: a.nivel_educativo,
+      eps: a.eps,
+      altura: a.altura,
+      peso: a.peso,
       telefono: a.telefono,
+      telefonoFijo: a.telefono_fijo,
       correo: a.correo,
+      paisResidencia: a.pais_residencia,
+      departamentoResidencia: a.departamento_residencia,
+      municipioResidencia: a.municipio_residencia,
+      barrio: a.barrio,
+      direccion: a.direccion,
+      estrato: a.estrato,
       discapacidad: a.discapacidad,
+      usaSillaRuedas: a.usa_silla_ruedas,
+      usaSillaAtletica: a.usa_silla_atletica,
       tipoClase: a.tipo_clase,
       claseDeportiva: a.clase_deportiva,
       club: a.club,
+      fechaAfiliacion: a.fecha_afiliacion,
+      liga: a.liga,
       foto: a.foto,
+      certificadoAfiliacion: a.certificado_afiliacion_url,
       documentos: a.documentos || [],
       campeonatos: campeonatos
     };

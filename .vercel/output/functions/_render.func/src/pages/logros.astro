@@ -1,0 +1,13 @@
+---
+/**
+ * /logros — Página pública de Logros de Entrenadores
+ * ─────────────────────────────────────────────────────────
+ * Muestra el historial de logros obtenidos por entrenadores con atletas del Valle.
+ */
+import MainLayout from "../layouts/MainLayout.astro";
+import { LogrosView } from "../features/professors/components/LogrosView";
+---
+
+<MainLayout title="Logros de Entrenadores - Valle Paraatletismo">
+  <LogrosView client:load />
+</MainLayout>

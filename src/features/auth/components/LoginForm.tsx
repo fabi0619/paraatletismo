@@ -16,6 +16,7 @@ export const LoginForm: React.FC = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -46,22 +47,7 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden">
-      {/* ── Animated background blobs ───────────────── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% -10%, hsla(0,68%,50%,0.18) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full opacity-10 blur-3xl"
-        style={{ background: "hsl(0,68%,50%)" }}
-      />
-
+    <div className="relative flex min-h-screen w-full items-center justify-center">
       {/* ── Card ───────────────────────────────────── */}
       <div
         className="relative z-10 w-full max-w-md rounded-2xl border border-white/60 bg-white/90 p-8 shadow-2xl backdrop-blur-xl"
@@ -201,11 +187,10 @@ export const LoginForm: React.FC = () => {
                 )}
               </Button>
 
-              {/* Register link */}
               <p className="text-center text-sm text-slate-500">
                 ¿No tienes cuenta?{" "}
                 <a
-                  href="/registro"
+                  href={`/registro/${watch("rol") === "profesor" ? "entrenador" : "atleta"}`}
                   className="font-semibold underline-offset-4 hover:underline"
                   style={{ color: "hsl(0,68%,50%)" }}
                 >

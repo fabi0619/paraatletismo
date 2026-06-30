@@ -7,7 +7,7 @@ import { QueryProvider } from "../../../components/providers/QueryProvider";
 import { SearchInput } from "../../../components/search-input";
 import { GraduationCap, Mail, IdCard, CalendarDays } from "lucide-react";
 
-function ProfessorsGridSkeleton() {
+export function ProfessorsGridSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {[...Array(6)].map((_, i) => (
@@ -41,8 +41,8 @@ function ProfessorsEmptyState() {
   );
 }
 
-const ProfesoresInner: React.FC = () => {
-  const { data: professors, isLoading, isError, error } = useProfessors();
+const ProfesoresInner: React.FC<{ initialData?: any }> = ({ initialData }) => {
+  const { data: professors, isLoading, isError, error } = useProfessors(initialData);
   const [search, setSearch] = useState("");
 
   const filteredProfessors = useMemo(() => {
@@ -146,10 +146,10 @@ const ProfesoresInner: React.FC = () => {
   );
 };
 
-export const ProfesoresView: React.FC = () => {
+export const ProfesoresView: React.FC<{ initialData?: any }> = ({ initialData }) => {
   return (
     <QueryProvider>
-      <ProfesoresInner />
+      <ProfesoresInner initialData={initialData} />
     </QueryProvider>
   );
 };

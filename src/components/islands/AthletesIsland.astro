@@ -1,0 +1,15 @@
+---
+import { AthletesView } from '../../features/athletes/components/AthletesView';
+import { athletesService } from '../../features/athletes/api/athletesService';
+
+// Fetch initial data from the database during SSR
+let initialData = null;
+try {
+  initialData = await athletesService.getAthletes();
+} catch (e) {
+  console.error("Error fetching athletes in Server Island:", e);
+}
+---
+
+{/* Render the React component with initial data, client:load to hydrate interactivity */}
+<AthletesView client:load initialData={initialData} />
