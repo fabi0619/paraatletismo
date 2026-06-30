@@ -49,15 +49,17 @@ import { CoachModal } from "../features/auth/components/CoachModal";
       rel="stylesheet"
     />
   </head>
-  <body class="min-h-screen relative">
-    <!-- Fondo decorativo -->
-    <div class="bg-glow"></div>
+  <body class="min-h-screen relative overflow-x-hidden bg-slate-50">
+    <!-- Animated background blobs -->
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 z-0" style="background: radial-gradient(ellipse 80% 60% at 50% -10%, hsla(0,75%,45%,0.25) 0%, transparent 70%);"></div>
+    <div aria-hidden="true" class="pointer-events-none fixed bottom-0 right-0 h-[30rem] w-[30rem] rounded-full opacity-20 blur-3xl" style="background: hsl(0,75%,45%);"></div>
+    <div aria-hidden="true" class="pointer-events-none fixed top-1/2 left-0 h-96 w-96 -translate-y-1/2 -translate-x-1/2 rounded-full opacity-[0.15] blur-3xl" style="background: hsl(348,100%,40%);"></div>
 
     <!-- Header React con sesión + estadísticas -->
     <Header client:load />
 
     <!-- Contenido de la página -->
-    <main class:list={["app-content", className]}>
+    <main class:list={["relative z-10 w-full max-w-7xl mx-auto rounded-3xl border border-white/40 bg-white/30 p-4 sm:p-6 md:p-10 shadow-xl backdrop-blur-2xl my-8", className]}>
       <slot />
     </main>
 

@@ -21,7 +21,7 @@ interface Session {
   rol: "atleta" | "profesor" | "admin";
 }
 
-const ProfileSkeleton: React.FC = () => (
+export const ProfileSkeleton: React.FC = () => (
   <div className="min-h-screen bg-slate-50 px-4 py-6 md:px-8">
     <div className="mx-auto max-w-6xl space-y-6">
       <Skeleton className="h-14 w-full rounded-2xl" />
@@ -47,8 +47,8 @@ const ProfileSkeleton: React.FC = () => (
   </div>
 );
 
-const ProfessorProfileInner: React.FC<{ id: string }> = ({ id }) => {
-  const { data: professor, isLoading, isError, error } = useProfessor(id);
+const ProfessorProfileInner: React.FC<{ id: string; initialData?: any }> = ({ id, initialData }) => {
+  const { data: professor, isLoading, isError, error } = useProfessor(id, initialData);
   const { data: achievements, isLoading: achievementsLoading } = useProfessorAchievements(id);
   const { data: championships } = useChampionships();
   const { data: athletes } = useAthletes();
@@ -236,32 +236,40 @@ const ProfessorProfileInner: React.FC<{ id: string }> = ({ id }) => {
     <div className="min-h-screen bg-slate-50 px-4 py-6 md:px-8">
       <div className="mx-auto max-w-6xl space-y-6">
         {/* Header Bar */}
-        <Card className="border-none bg-slate-900 text-white">
-          <CardContent className="flex items-center justify-between p-4 flex-wrap gap-4">
+        <Card className="border-white/60 shadow-xl rounded-3xl bg-white/60 backdrop-blur-xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-transparent pointer-events-none"></div>
+          <CardContent className="flex items-center justify-between p-4 px-6 relative z-10 flex-wrap gap-4">
             <button
               onClick={() => (window.location.href = "/profesores")}
-              className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-white/20"
+              className="flex items-center gap-2 rounded-full bg-white/80 px-5 py-2 text-sm font-black text-slate-800 transition-all hover:-translate-x-1 hover:shadow-md hover:bg-white border border-white shadow-sm"
             >
-              <span className="material-icons-round text-sm">arrow_back</span>
+              <span className="material-icons-round text-red-600 text-[18px]">arrow_back</span>
               Ver Entrenadores
             </button>
-            {isSelf && (
-              <button
-                onClick={handleEditClick}
-                className="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-red-700 shadow-md"
-              >
-                <span className="material-icons-round text-sm">edit</span>
-                Editar Perfil
-              </button>
-            )}
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-2 text-slate-700 bg-white/50 px-4 py-1.5 rounded-full border border-white/60 shadow-sm">
+                <span className="material-icons-round text-red-600 text-lg">admin_panel_settings</span>
+                <span className="text-xs font-black tracking-widest uppercase">Perfil de Entrenador</span>
+              </div>
+              {isSelf && (
+                <button
+                  onClick={handleEditClick}
+                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-red-500 to-red-600 px-5 py-2 text-sm font-black text-white transition-all hover:shadow-lg hover:scale-105 border border-red-400 shadow-sm"
+                >
+                  <span className="material-icons-round text-[18px]">edit</span>
+                  Editar Perfil
+                </button>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {/* Left Panel: Photo & Identity */}
-          <Card className="md:col-span-1 h-fit">
-            <CardContent className="flex flex-col items-center p-6 text-center">
-              <div className="mb-4 h-40 w-40 overflow-hidden rounded-full border-4 border-white shadow-xl bg-slate-100">
+          <Card className="md:col-span-1 h-fit overflow-hidden border-white/50 shadow-xl rounded-3xl bg-white/50 backdrop-blur-xl relative">
+            <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-red-600/20 to-transparent pointer-events-none"></div>
+            <CardContent className="flex flex-col items-center p-8 text-center relative z-10">
+              <div className="mb-5 h-44 w-44 overflow-hidden rounded-full border-4 border-white shadow-2xl relative bg-slate-100">
                 {professor.foto ? (
                   <img
                     src={professor.foto}
@@ -276,40 +284,45 @@ const ProfessorProfileInner: React.FC<{ id: string }> = ({ id }) => {
                   </div>
                 )}
               </div>
-              <h2 className="text-2xl leading-tight font-black text-black">
+              <h2 className="text-3xl leading-tight font-black text-slate-900 drop-shadow-sm">
                 {professor.nombre.split(" ")[0]}
               </h2>
-              <p className="text-lg font-bold text-red-600">
+              <p className="text-xl font-black text-red-600 tracking-tight drop-shadow-sm">
                 {professor.nombre.split(" ").slice(1).join(" ")}
               </p>
-              <p className="mt-1 text-sm font-bold text-muted-foreground uppercase tracking-wider">
-                {professor.especialidad || "Entrenador Valle"}
-              </p>
+              <div className="mt-4 px-4 py-1.5 bg-white/80 rounded-full border border-white shadow-sm flex items-center gap-1.5">
+                <span className="material-icons-round text-[16px] text-slate-400">shield</span>
+                <p className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                  {professor.especialidad || "Entrenador Valle"}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
           {/* Right Panel: Info & Achievements */}
           <div className="space-y-6 md:col-span-2">
             {/* Detailed Info Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
-                  <span className="material-icons-round text-red-600">assignment_ind</span>
+            <Card className="overflow-hidden border-white/60 shadow-xl rounded-3xl bg-white/60 backdrop-blur-xl relative">
+              <CardHeader className="pb-4 border-b border-white/40 bg-white/30">
+                <CardTitle className="flex items-center gap-2 text-slate-800 font-black">
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                    <span className="material-icons-round text-red-600 text-lg">assignment_ind</span>
+                  </div>
                   Información Personal y Profesional
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {infoItems.map((item) => (
                     <div
                       key={item.label}
-                      className="flex items-center justify-between border-b border-slate-100 pb-3"
+                      className="flex flex-col gap-1.5 border-b border-white/40 pb-3"
                     >
-                      <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase flex items-center gap-1.5">
+                      <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase flex items-center gap-1.5">
                         {item.icon}
                         {item.label}
                       </span>
-                      <span className="text-right text-sm font-bold text-slate-850 truncate max-w-[200px]" title={item.value}>
+                      <span className="font-bold text-slate-800 text-[15px] truncate" title={item.value}>
                         {item.value || "N/A"}
                       </span>
                     </div>
@@ -319,53 +332,58 @@ const ProfessorProfileInner: React.FC<{ id: string }> = ({ id }) => {
             </Card>
 
             {/* Achievements timeline */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
-                  <Award className="text-red-600" />
+            <Card className="overflow-hidden border-white/60 shadow-xl rounded-3xl bg-white/60 backdrop-blur-xl relative">
+              <CardHeader className="pb-4 border-b border-white/40 bg-white/30">
+                <CardTitle className="flex items-center gap-2 text-slate-800 font-black">
+                  <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <Award size={18} className="text-yellow-600" />
+                  </div>
                   Logros Deportivos Registrados
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 {achievementsLoading ? (
                   <div className="space-y-3">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full rounded-2xl" />
+                    <Skeleton className="h-10 w-full rounded-2xl" />
                   </div>
                 ) : achievements && achievements.length > 0 ? (
                   <div className="space-y-4">
                     {achievements.map((ach) => (
                       <div
                         key={ach.id}
-                        className="rounded-xl border border-slate-150 bg-white p-4 shadow-sm hover:border-red-200 transition-colors flex items-start justify-between gap-4"
+                        className="rounded-2xl border border-white/60 bg-white/50 p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:bg-white/70 relative overflow-hidden group flex items-start justify-between gap-4"
                       >
-                        <div className="space-y-1">
+                        <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="space-y-2 relative z-10">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-black text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded">
+                            <span className="text-xs font-black text-red-700 bg-red-100/80 border border-red-200/50 px-3 py-1 rounded-full shadow-sm">
                               {ach.ano}
                             </span>
-                            <span className="text-sm font-bold text-slate-950">
-                              Atleta: {ach.atletaNombre}
+                            <span className="text-sm font-black text-slate-800">
+                              Atleta: <span className="text-red-600">{ach.atletaNombre}</span>
                             </span>
                           </div>
-                          <p className="text-xs font-bold text-slate-500">
+                          <p className="text-xs font-black tracking-wide text-slate-500 uppercase">
                             Evento: <span className="text-slate-700">{ach.campeonato}</span>
                           </p>
-                          <p className="text-xs text-slate-600 italic mt-1 font-medium">
+                          <p className="text-sm text-slate-700 font-medium italic mt-1 pl-3 border-l-2 border-red-300">
                             "{ach.logro}"
                           </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <span className="material-icons-round text-red-500 shrink-0 select-none">
-                            emoji_events
-                          </span>
+                        <div className="flex flex-col items-center gap-2 relative z-10">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 flex items-center justify-center shadow-md text-white">
+                            <span className="material-icons-round shrink-0 select-none drop-shadow-sm">
+                              emoji_events
+                            </span>
+                          </div>
                           {isSelf && (
                             <button
                               onClick={() => handleEditAchievement(ach)}
-                              className="rounded-full bg-slate-100 p-1.5 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors"
+                              className="rounded-full bg-white/80 p-2 text-slate-500 hover:bg-red-50 hover:text-red-600 border border-white shadow-sm transition-all hover:scale-110 mt-1"
                               title="Editar logro"
                             >
-                              <span className="material-icons-round text-sm">edit</span>
+                              <span className="material-icons-round text-[16px]">edit</span>
                             </button>
                           )}
                         </div>
@@ -373,11 +391,13 @@ const ProfessorProfileInner: React.FC<{ id: string }> = ({ id }) => {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 p-12 text-center">
-                    <span className="material-icons-round mb-2 text-4xl text-slate-350">
-                      emoji_events
-                    </span>
-                    <p className="text-sm font-bold text-muted-foreground">
+                  <div className="flex flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 p-12 text-center shadow-inner">
+                    <div className="w-16 h-16 rounded-full bg-slate-200/50 flex items-center justify-center mb-3">
+                      <span className="material-icons-round text-3xl text-slate-400">
+                        emoji_events
+                      </span>
+                    </div>
+                    <p className="text-sm font-black text-slate-500">
                       Sin logros registrados por este entrenador
                     </p>
                   </div>
@@ -628,10 +648,10 @@ const ProfessorProfileInner: React.FC<{ id: string }> = ({ id }) => {
   );
 };
 
-export const ProfessorProfile: React.FC<{ id: string }> = ({ id }) => {
+export const ProfessorProfile: React.FC<{ id: string; initialData?: any }> = ({ id, initialData }) => {
   return (
     <QueryProvider>
-      <ProfessorProfileInner id={id} />
+      <ProfessorProfileInner id={id} initialData={initialData} />
     </QueryProvider>
   );
 };

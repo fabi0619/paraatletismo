@@ -53,20 +53,13 @@ function PersonalDataStep({
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Controller
-          name="fechaNacimiento"
-          control={control}
-          render={({ field }) => (
-            <DateField
-              id="fechaNacimiento"
-              label="Fecha de Nacimiento"
-              required
-              value={field.value}
-              onChange={field.onChange}
-              disabled={isLoading}
-              error={errors.fechaNacimiento?.message as string}
-            />
-          )}
+        <DateField
+          id="fechaNacimiento"
+          label="Fecha de Nacimiento"
+          required
+          disabled={isLoading}
+          error={errors.fechaNacimiento?.message as string}
+          {...reg("fechaNacimiento")}
         />
         <Controller
           name="genero"

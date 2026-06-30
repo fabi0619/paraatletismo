@@ -1,0 +1,21 @@
+---
+import { AthleteProfile } from '../../features/athletes/components/AthleteProfile';
+import { athletesService } from '../../features/athletes/api/athletesService';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+
+// Fetch initial data from the database during SSR
+let initialData = null;
+try {
+  initialData = await athletesService.getAthleteById(id);
+} catch (e) {
+  console.error("Error fetching athlete in Server Island:", e);
+}
+---
+
+{/* Render the React component with initial data, client:load to hydrate interactivity */}
+<AthleteProfile client:load id={id} initialData={initialData} />

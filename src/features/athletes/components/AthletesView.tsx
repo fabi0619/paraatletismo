@@ -17,7 +17,7 @@ interface Session {
   rol: "atleta" | "profesor" | "admin";
 }
 
-function AthletesGridSkeleton() {
+export function AthletesGridSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {[...Array(8)].map((_, i) => (
@@ -54,8 +54,8 @@ function AthletesEmptyState() {
   );
 }
 
-const AthletesGridInner: React.FC = () => {
-  const { data: athletes, isLoading, isError, error } = useAthletes();
+const AthletesGridInner: React.FC<{ initialData?: any }> = ({ initialData }) => {
+  const { data: athletes, isLoading, isError, error } = useAthletes(initialData);
   const deleteAthleteMutation = useDeleteAthlete();
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
@@ -188,10 +188,10 @@ const AthletesGridInner: React.FC = () => {
   );
 };
 
-export const AthletesView: React.FC = () => {
+export const AthletesView: React.FC<{ initialData?: any }> = ({ initialData }) => {
   return (
     <QueryProvider>
-      <AthletesGridInner />
+      <AthletesGridInner initialData={initialData} />
     </QueryProvider>
   );
 };

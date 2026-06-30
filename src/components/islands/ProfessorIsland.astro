@@ -1,0 +1,21 @@
+---
+import { ProfessorProfile } from '../../features/professors/components/ProfessorProfile';
+import { professorsService } from '../../features/professors/api/professorsService';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+
+// Fetch initial data from the database during SSR
+let initialData = null;
+try {
+  initialData = await professorsService.getProfessorById(id);
+} catch (e) {
+  console.error("Error fetching professor in Server Island:", e);
+}
+---
+
+{/* Render the React component with initial data, client:load to hydrate interactivity */}
+<ProfessorProfile client:load id={id} initialData={initialData} />

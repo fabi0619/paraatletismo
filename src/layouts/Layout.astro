@@ -30,7 +30,14 @@ import "../styles/global.css";
 			rel="stylesheet"
 		/>
 	</head>
-	<body class="min-h-screen relative">
-		<slot />
+	<body class="min-h-screen relative overflow-x-hidden bg-slate-50">
+		<!-- Animated background blobs -->
+		<div aria-hidden="true" class="pointer-events-none fixed inset-0 z-0" style="background: radial-gradient(ellipse 80% 60% at 50% -10%, hsla(0,75%,45%,0.25) 0%, transparent 70%);"></div>
+		<div aria-hidden="true" class="pointer-events-none fixed bottom-0 right-0 h-[30rem] w-[30rem] rounded-full opacity-20 blur-3xl" style="background: hsl(0,75%,45%);"></div>
+		<div aria-hidden="true" class="pointer-events-none fixed top-1/2 left-0 h-96 w-96 -translate-y-1/2 -translate-x-1/2 rounded-full opacity-[0.15] blur-3xl" style="background: hsl(348,100%,40%);"></div>
+
+		<div class="relative z-10 flex min-h-screen flex-col">
+			<slot />
+		</div>
 	</body>
 </html>

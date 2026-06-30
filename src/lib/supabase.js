@@ -326,13 +326,46 @@ export async function registrarProfesor(nuevoProfesor) {
   const payload = {
     id: authData.user.id,
     nombre: nuevoProfesor.nombre,
-    especialidad: nuevoProfesor.especialidad,
-    correo: nuevoProfesor.correo,
     cedula: nuevoProfesor.cedula,
     fecha_nacimiento: nuevoProfesor.fechaNacimiento,
     genero: nuevoProfesor.genero,
     telefono: nuevoProfesor.telefono,
-    foto: nuevoProfesor.foto
+    correo: nuevoProfesor.correo,
+    especialidad: nuevoProfesor.especialidad,
+    foto: nuevoProfesor.foto,
+    // Nuevos campos
+    tipo_documento: nuevoProfesor.tipoDocumento,
+    grupo_sanguineo: nuevoProfesor.grupoSanguineo,
+    pais_nacimiento: nuevoProfesor.paisNacimiento,
+    departamento_nacimiento: nuevoProfesor.departamentoNacimiento,
+    municipio_nacimiento: nuevoProfesor.municipioNacimiento,
+    grupo_etnico: nuevoProfesor.grupoEtnico,
+    nivel_educativo: nuevoProfesor.nivelEducativo,
+    eps: nuevoProfesor.eps,
+    altura: nuevoProfesor.altura,
+    peso: nuevoProfesor.peso,
+    pais_residencia: nuevoProfesor.paisResidencia,
+    departamento_residencia: nuevoProfesor.departamentoResidencia,
+    municipio_residencia: nuevoProfesor.municipioResidencia,
+    barrio: nuevoProfesor.barrio,
+    direccion: nuevoProfesor.direccion,
+    estrato: nuevoProfesor.estrato,
+    telefono_fijo: nuevoProfesor.telefonoFijo,
+    discapacidad: nuevoProfesor.discapacidad,
+    usa_silla_ruedas: nuevoProfesor.usaSillaRuedas,
+    usa_silla_atletica: nuevoProfesor.usaSillaAtletica,
+    club: nuevoProfesor.club,
+    fecha_afiliacion: nuevoProfesor.fechaAfiliacion,
+    liga: nuevoProfesor.liga,
+    clase_deportiva: nuevoProfesor.claseDeportiva,
+    tipo_clase: nuevoProfesor.tipoClase,
+    modalidad: nuevoProfesor.modalidad,
+    pruebas_pista: nuevoProfesor.pruebasPista,
+    pruebas_campo: nuevoProfesor.pruebasCampo,
+    talla_tenis_presentacion: nuevoProfesor.tallaTenisPresentacion,
+    talla_chaqueta: nuevoProfesor.tallaChaqueta,
+    talla_pantalon: nuevoProfesor.tallaPantalon,
+    talla_camibuso: nuevoProfesor.tallaCamibuso,
   };
 
   const { data, error } = await supabase.from('para_profesores').insert([payload]).select().single();
@@ -353,7 +386,40 @@ export async function saveProfessor(professor) {
     telefono: professor.telefono,
     correo: professor.correo,
     especialidad: professor.especialidad,
-    foto: professor.foto
+    foto: professor.foto,
+    tipo_documento: professor.tipoDocumento,
+    grupo_sanguineo: professor.grupoSanguineo,
+    pais_nacimiento: professor.paisNacimiento,
+    departamento_nacimiento: professor.departamentoNacimiento,
+    municipio_nacimiento: professor.municipioNacimiento,
+    grupo_etnico: professor.grupoEtnico,
+    nivel_educativo: professor.nivelEducativo,
+    eps: professor.eps,
+    altura: professor.altura,
+    peso: professor.peso,
+    pais_residencia: professor.paisResidencia,
+    departamento_residencia: professor.departamentoResidencia,
+    municipio_residencia: professor.municipioResidencia,
+    barrio: professor.barrio,
+    direccion: professor.direccion,
+    estrato: professor.estrato,
+    telefono_fijo: professor.telefonoFijo,
+    discapacidad: professor.discapacidad,
+    usa_silla_ruedas: professor.usaSillaRuedas,
+    usa_silla_atletica: professor.usaSillaAtletica,
+    club: professor.club,
+    fecha_afiliacion: professor.fechaAfiliacion,
+    liga: professor.liga,
+    clase_deportiva: professor.claseDeportiva,
+    tipo_clase: professor.tipoClase,
+    modalidad: professor.modalidad,
+    pruebas_pista: professor.pruebasPista,
+    pruebas_campo: professor.pruebasCampo,
+    talla_tenis_presentacion: professor.tallaTenisPresentacion,
+    talla_chaqueta: professor.tallaChaqueta,
+    talla_pantalon: professor.tallaPantalon,
+    talla_pantaloneta: professor.tallaPantaloneta,
+    talla_camibuso: professor.tallaCamibuso,
   };
 
   if (isUpdate) {
@@ -362,7 +428,11 @@ export async function saveProfessor(professor) {
     if (!data) throw new Error(`No se encontró el profesor con id ${professor.id} para actualizar.`);
     return data;
   } else {
-    return registrarProfesor(professor);
+    const result = await registrarProfesor(professor);
+    if (result && typeof result === 'object' && 'error' in result) {
+      throw new Error(result.error);
+    }
+    return result;
   }
 }
 

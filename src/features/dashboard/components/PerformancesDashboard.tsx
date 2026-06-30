@@ -132,79 +132,94 @@ export const PerformancesDashboard: React.FC<PerformancesDashboardProps> = ({ at
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       {/* Columna Izquierda: Logros Destacados */}
       <div className="lg:col-span-1">
-        <Card className="h-full overflow-hidden border-none shadow-md rounded-xl bg-white flex flex-col">
-          <div className="bg-slate-900 px-5 py-4 text-white">
-            <h3 className="font-bold text-lg">Logros Destacados</h3>
+        <Card className="h-full overflow-hidden border-white/60 shadow-xl rounded-3xl bg-white/60 backdrop-blur-xl flex flex-col relative">
+          {/* Subtle glowing blob for premium feel */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none"></div>
+          
+          <div className="px-6 py-5 border-b border-white/40 flex items-center justify-between">
+            <h3 className="font-black text-slate-800 text-lg flex items-center gap-2">
+              <span className="material-icons-round text-yellow-500">emoji_events</span>
+              Logros
+            </h3>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-white/50 px-2 py-1 rounded-full">
+              Destacados
+            </span>
           </div>
-          <CardContent className="p-6 flex-1 flex flex-col">
+          
+          <CardContent className="p-6 flex-1 flex flex-col relative z-10">
             {/* Medallas */}
-            <div className="flex justify-between mb-8">
-              <div className="flex flex-col items-center gap-1">
-                <Medal className="fill-yellow-400 text-yellow-500" size={36} strokeWidth={1.5} />
-                <span className="font-black text-xl text-slate-800">{gold}</span>
+            <div className="flex justify-between mb-8 gap-2">
+              <div className="flex flex-col items-center gap-1.5 flex-1 bg-white/50 rounded-2xl py-3 shadow-sm border border-white/40 transition-transform hover:-translate-y-1">
+                <Medal className="fill-yellow-400 text-yellow-600" size={28} strokeWidth={1.5} />
+                <span className="font-black text-xl text-slate-800 leading-none">{gold}</span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <Medal className="fill-slate-300 text-slate-400" size={36} strokeWidth={1.5} />
-                <span className="font-black text-xl text-slate-800">{silver}</span>
+              <div className="flex flex-col items-center gap-1.5 flex-1 bg-white/50 rounded-2xl py-3 shadow-sm border border-white/40 transition-transform hover:-translate-y-1">
+                <Medal className="fill-slate-300 text-slate-500" size={28} strokeWidth={1.5} />
+                <span className="font-black text-xl text-slate-800 leading-none">{silver}</span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <Medal className="fill-orange-400 text-orange-500" size={36} strokeWidth={1.5} />
-                <span className="font-black text-xl text-slate-800">{bronze}</span>
+              <div className="flex flex-col items-center gap-1.5 flex-1 bg-white/50 rounded-2xl py-3 shadow-sm border border-white/40 transition-transform hover:-translate-y-1">
+                <Medal className="fill-orange-400 text-orange-600" size={28} strokeWidth={1.5} />
+                <span className="font-black text-xl text-slate-800 leading-none">{bronze}</span>
               </div>
             </div>
             
             {/* Detalles de la Medalla */}
-            <div className="space-y-4">
+            <div className="space-y-5 bg-white/40 p-5 rounded-2xl border border-white/60 shadow-inner flex-1">
               {highlightedChamp ? (
                 <>
-                  <h4 className="text-yellow-600 font-medium text-lg uppercase tracking-wide">
+                  <div className="inline-block bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
                     {getMedalLabel(highlightedChamp.posicion)}
-                  </h4>
+                  </div>
                   
-                  <div className="space-y-0.5">
-                    <p className="font-black text-2xl text-slate-900 leading-none">
+                  <div className="space-y-1">
+                    <p className="font-black text-2xl text-slate-900 leading-tight">
                       {highlightedChamp.prueba}
                     </p>
-                    <p className="font-black text-2xl text-slate-900 leading-none">
+                    <p className="font-black text-3xl text-red-600 leading-none tracking-tight">
                       {highlightedChamp.marca}
                     </p>
                   </div>
                   
-                  <div className="text-sm font-medium text-slate-500 pt-2">
-                    {highlightedChamp.campeonato}
-                  </div>
-                  
-                  <div className="text-red-600 font-black text-4xl tracking-tighter italic">
-                    VALLE
-                  </div>
-                  
-                  <div className="space-y-0.5">
-                    <p className="font-bold text-slate-900 text-sm">Liga Vallecaucana</p>
-                    <p className="font-bold text-slate-900 text-sm">Paraatletismo</p>
-                    <p className="text-sm font-medium text-slate-500 pt-1">
+                  <div className="w-8 h-1 bg-slate-200 rounded-full"></div>
+
+                  <div>
+                    <p className="text-sm font-semibold text-slate-600 leading-snug">
+                      {highlightedChamp.campeonato}
+                    </p>
+                    <p className="text-xs font-medium text-slate-400 mt-1 flex items-center gap-1">
+                      <span className="material-icons-round text-[14px]">event</span>
                       {highlightedChamp.fecha}
                     </p>
                   </div>
+                  
+                  <div className="pt-2">
+                    <div className="text-transparent bg-clip-text bg-gradient-to-br from-slate-800 to-slate-500 font-black text-3xl tracking-tighter italic leading-none">
+                      VALLE
+                    </div>
+                  </div>
                 </>
               ) : (
-                <div className="flex h-32 flex-col items-center justify-center text-center text-slate-400">
-                  <span className="material-icons-round text-3xl mb-2">emoji_events</span>
-                  <p className="text-sm font-medium">Aún no hay medallas registradas</p>
+                <div className="flex h-full flex-col items-center justify-center text-center text-slate-400">
+                  <div className="w-16 h-16 bg-white/60 rounded-full flex items-center justify-center mb-3 shadow-sm">
+                    <span className="material-icons-round text-3xl text-slate-300">emoji_events</span>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-500">Aún no hay medallas</p>
+                  <p className="text-xs mt-1">Registra logros para verlos aquí</p>
                 </div>
               )}
             </div>
             
             {/* Navegación lateral */}
             {bestChamps.length > 1 && (
-              <div className="flex justify-between items-center mt-auto pt-8 text-slate-400">
-                <button onClick={handlePrevMedal} className="hover:text-slate-600 transition-colors">
-                  <span className="material-icons-round text-3xl">chevron_left</span>
+              <div className="flex justify-between items-center mt-6 px-2">
+                <button onClick={handlePrevMedal} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/60 hover:bg-white text-slate-600 shadow-sm border border-white/50 transition-all hover:scale-105 active:scale-95">
+                  <span className="material-icons-round text-xl">chevron_left</span>
                 </button>
-                <span className="text-xs font-bold text-slate-300">
+                <span className="text-xs font-bold text-slate-400 tracking-widest">
                   {currentMedalIndex + 1} / {bestChamps.length}
                 </span>
-                <button onClick={handleNextMedal} className="hover:text-slate-600 transition-colors">
-                  <span className="material-icons-round text-3xl">chevron_right</span>
+                <button onClick={handleNextMedal} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/60 hover:bg-white text-slate-600 shadow-sm border border-white/50 transition-all hover:scale-105 active:scale-95">
+                  <span className="material-icons-round text-xl">chevron_right</span>
                 </button>
               </div>
             )}
@@ -214,54 +229,76 @@ export const PerformancesDashboard: React.FC<PerformancesDashboardProps> = ({ at
 
       {/* Columna Derecha: Performances Dashboard */}
       <div className="lg:col-span-3">
-        <Card className="h-full overflow-hidden border-none shadow-md rounded-xl bg-white flex flex-col">
-          <div className="bg-red-600 px-5 py-4 text-white">
-            <h3 className="font-bold text-lg">Performances Dashboard</h3>
-          </div>
-          <CardContent className="p-6 flex-1 flex flex-col">
-            {/* Cabecera de controles */}
-            <div className="flex flex-wrap items-center gap-3 mb-8">
+        <Card className="h-full overflow-hidden border-white/60 shadow-xl rounded-3xl bg-white/60 backdrop-blur-xl flex flex-col relative">
+          {/* Subtle glowing blob for premium feel */}
+          <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
-              
-              <div className="ml-auto flex flex-wrap gap-3">
-
-                <Select value={selectedPrueba} onValueChange={setSelectedPrueba}>
-                  <SelectTrigger className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-md px-4 shadow-none border-none h-10 w-auto min-w-[120px] focus:ring-0 focus:ring-offset-0">
-                    <SelectValue placeholder="Seleccionar prueba" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">TODAS LAS PRUEBAS</SelectItem>
-                    {pruebas.map((p) => (
-                      <SelectItem key={String(p)} value={String(p)} className="font-medium uppercase">
-                        {String(p)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          <div className="px-6 py-5 border-b border-white/40 flex flex-wrap items-center justify-between gap-4">
+            <h3 className="font-black text-slate-800 text-lg flex items-center gap-2">
+              <span className="material-icons-round text-red-600">trending_up</span>
+              Performances
+            </h3>
             
+            <div className="ml-auto">
+              <Select value={selectedPrueba} onValueChange={setSelectedPrueba}>
+                <SelectTrigger className="bg-white/80 hover:bg-white text-slate-800 font-bold rounded-xl px-4 shadow-sm border border-white/60 h-10 w-auto min-w-[180px] focus:ring-2 focus:ring-red-500/20 transition-all">
+                  <SelectValue placeholder="Seleccionar prueba" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-white/60 shadow-xl backdrop-blur-xl bg-white/90">
+                  <SelectItem value="all" className="font-black text-red-600">TODAS LAS PRUEBAS</SelectItem>
+                  {pruebas.map((p) => (
+                    <SelectItem key={String(p)} value={String(p)} className="font-medium uppercase">
+                      {String(p)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <CardContent className="p-6 flex-1 flex flex-col relative z-10">
             {/* Gráfico de Líneas */}
-            <div className="w-full overflow-x-auto flex-1 flex items-center justify-center">
+            <div className="w-full overflow-x-auto flex-1 flex items-center justify-center bg-white/30 rounded-2xl border border-white/40 p-4 shadow-inner">
               <svg 
                 viewBox={`0 0 ${width} ${height}`} 
                 className="w-full h-auto min-w-[550px] select-none" 
                 style={{ maxHeight: "400px" }}
               >
+                <defs>
+                  <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--primary-red, #dc2626)" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="var(--primary-red, #dc2626)" stopOpacity="0" />
+                  </linearGradient>
+                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+
                 {/* Eje Y - Etiquetas */}
                 {Array.from({ length: 7 }).map((_, i) => {
                   const val = minPb + (i * (maxPb - minPb) / 6);
                   return (
-                    <text 
-                      key={val} 
-                      x={padding.left - 12} 
-                      y={getY(val)} 
-                      textAnchor="end" 
-                      alignmentBaseline="middle" 
-                      className="text-xs fill-slate-500 font-bold"
-                    >
-                      {val.toFixed(2)}
-                    </text>
+                    <g key={val}>
+                      <line 
+                        x1={padding.left} 
+                        y1={getY(val)} 
+                        x2={width - padding.right} 
+                        y2={getY(val)} 
+                        stroke="#e2e8f0" 
+                        strokeWidth="1"
+                        strokeDasharray="4,4"
+                      />
+                      <text 
+                        x={padding.left - 12} 
+                        y={getY(val)} 
+                        textAnchor="end" 
+                        alignmentBaseline="middle" 
+                        className="text-xs fill-slate-400 font-bold"
+                      >
+                        {val.toFixed(2)}
+                      </text>
+                    </g>
                   );
                 })}
 
@@ -271,9 +308,9 @@ export const PerformancesDashboard: React.FC<PerformancesDashboardProps> = ({ at
                   y={height / 2} 
                   transform={`rotate(-90, 12, ${height / 2})`} 
                   textAnchor="middle" 
-                  className="text-xs fill-slate-500 font-bold tracking-wider"
+                  className="text-xs fill-slate-400 font-bold tracking-widest uppercase"
                 >
-                  Time
+                  Marca
                 </text>
 
                 {/* Líneas de Cuadrícula Verticales y Etiquetas Eje X */}
@@ -282,21 +319,11 @@ export const PerformancesDashboard: React.FC<PerformancesDashboardProps> = ({ at
                   const x = getX(year);
                   return (
                     <g key={year}>
-                      {/* Línea vertical */}
-                      <line 
-                        x1={x} 
-                        y1={padding.top} 
-                        x2={x} 
-                        y2={height - padding.bottom} 
-                        stroke="#cbd5e1" 
-                        strokeWidth="1.5"
-                      />
-                      {/* Etiqueta del año */}
                       <text 
                         x={x} 
                         y={height - padding.bottom + 20} 
                         textAnchor="middle" 
-                        className="text-xs fill-slate-500 font-bold"
+                        className="text-xs fill-slate-500 font-black"
                       >
                         {year}
                       </text>
@@ -310,54 +337,69 @@ export const PerformancesDashboard: React.FC<PerformancesDashboardProps> = ({ at
                   y1={height - padding.bottom} 
                   x2={width - padding.right + 20} 
                   y2={height - padding.bottom} 
-                  stroke="#94a3b8" 
+                  stroke="#cbd5e1" 
                   strokeWidth="2"
+                  strokeLinecap="round"
                 />
+
+                {/* Fill Gradient */}
+                {chartData.length > 0 && (
+                  <polygon 
+                    points={`${points} ${getX(chartData[chartData.length-1].year)},${height - padding.bottom} ${getX(chartData[0].year)},${height - padding.bottom}`}
+                    fill="url(#chart-gradient)"
+                  />
+                )}
 
                 {/* Ruta de la línea de Performance */}
                 <polyline 
                   points={points} 
                   fill="none" 
                   stroke="var(--primary-red, #dc2626)" 
-                  strokeWidth="2.5" 
+                  strokeWidth="3" 
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  filter="url(#glow)"
                 />
 
                 {/* Puntos de datos */}
                 {chartData.map((d, i) => (
-                  <circle 
-                    key={i} 
-                    cx={getX(d.year)} 
-                    cy={getY(d.pb)} 
-                    r="4.5" 
-                    fill="white" 
-                    stroke="var(--primary-red, #dc2626)" 
-                    strokeWidth="2.5" 
-                    className="cursor-pointer transition-all duration-200 hover:r-[6]"
-                    onMouseEnter={(e) => {
-                      if (!d.prueba) return;
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      setTooltip({
-                        top: rect.top - 8,
-                        left: rect.left + rect.width / 2,
-                        prueba: d.prueba,
-                        marca: d.marca,
-                        year: d.year
-                      });
-                    }}
-                    onMouseLeave={() => setTooltip(null)}
-                  />
+                  <g key={i}>
+                    <circle 
+                      cx={getX(d.year)} 
+                      cy={getY(d.pb)} 
+                      r="6" 
+                      fill="white" 
+                      stroke="var(--primary-red, #dc2626)" 
+                      strokeWidth="2.5" 
+                      className="cursor-pointer transition-all duration-300 hover:r-[8]"
+                      onMouseEnter={(e) => {
+                        if (!d.prueba) return;
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setTooltip({
+                          top: rect.top - 8,
+                          left: rect.left + rect.width / 2,
+                          prueba: d.prueba,
+                          marca: d.marca,
+                          year: d.year
+                        });
+                      }}
+                      onMouseLeave={() => setTooltip(null)}
+                    />
+                  </g>
                 ))}
               </svg>
             </div>
             
             {/* Paginación Inferior (PB by Year) */}
-            <div className="flex justify-center items-center gap-12 mt-4 text-slate-400">
-              <button className="hover:text-slate-600 transition-colors">
-                <span className="material-icons-round text-2xl">arrow_back_ios_new</span>
+            <div className="flex justify-center items-center gap-12 mt-6">
+              <button className="w-8 h-8 flex items-center justify-center rounded-full bg-white/60 hover:bg-white text-slate-600 shadow-sm border border-white/50 transition-all hover:scale-105 active:scale-95">
+                <span className="material-icons-round text-xl">chevron_left</span>
               </button>
-              <span className="text-sm font-bold text-slate-500 tracking-wide">PB by Year</span>
-              <button className="hover:text-slate-600 transition-colors">
-                <span className="material-icons-round text-2xl">arrow_forward_ios</span>
+              <span className="text-xs font-black text-slate-500 tracking-widest uppercase bg-white/50 px-3 py-1 rounded-full shadow-sm border border-white/30">
+                Personal Bests
+              </span>
+              <button className="w-8 h-8 flex items-center justify-center rounded-full bg-white/60 hover:bg-white text-slate-600 shadow-sm border border-white/50 transition-all hover:scale-105 active:scale-95">
+                <span className="material-icons-round text-xl">chevron_right</span>
               </button>
             </div>
           </CardContent>

@@ -1,0 +1,12 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { AdminLoginForm } from "../../features/auth/components/AdminLoginForm";
+import "../../styles/styles.css";
+---
+
+<Layout title="Acceso de Administrador - Valle Paraatletismo">
+  <div class="bg-glow"></div>
+  <div class="min-h-screen flex items-center justify-center p-4 relative z-10">
+    <AdminLoginForm client:load />
+  </div>
+</Layout>

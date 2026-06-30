@@ -1,0 +1,15 @@
+---
+import { ProfesoresView } from '../../features/professors/components/ProfesoresView';
+import { professorsService } from '../../features/professors/api/professorsService';
+
+// Fetch initial data from the database during SSR
+let initialData = null;
+try {
+  initialData = await professorsService.getProfessors();
+} catch (e) {
+  console.error("Error fetching professors in Server Island:", e);
+}
+---
+
+{/* Render the React component with initial data, client:load to hydrate interactivity */}
+<ProfesoresView client:load initialData={initialData} />

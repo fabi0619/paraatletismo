@@ -5,16 +5,13 @@ import { AthletesView } from "../features/athletes/components/AthletesView";
 import { Header } from "./layout/Header";
 ---
 
-<!-- Elemento decorativo de fondo -->
-<div class="bg-glow"></div>
-
 <!-- Pantalla de Login antigua eliminada (migrada a /login) -->
 
 <!-- Encabezado React (sesión + estadísticas en tiempo real) -->
 <Header client:load />
 
 <!-- Diseño del Contenido Principal -->
-<main class="app-content">
+<main class="relative z-10 w-full max-w-7xl mx-auto rounded-3xl border border-white/40 bg-white/30 p-4 sm:p-6 md:p-10 shadow-xl backdrop-blur-2xl my-8 flex-1">
 
   <!-- VISTA PRINCIPAL DE ATLETAS (React + Tanstack Query) -->
   <div id="contenedor-vista-atletas">

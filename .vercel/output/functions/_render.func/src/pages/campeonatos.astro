@@ -1,0 +1,13 @@
+---
+/**
+ * /campeonatos — Página pública de Campeonatos
+ * ─────────────────────────────────────────────────────────
+ * Muestra el historial deportivo y marcas de campeonatos.
+ */
+import MainLayout from "../layouts/MainLayout.astro";
+import { CampeonatosView } from "../features/championships/components/CampeonatosView";
+---
+
+<MainLayout title="Campeonatos - Valle Paraatletismo">
+  <CampeonatosView client:load />
+</MainLayout>
